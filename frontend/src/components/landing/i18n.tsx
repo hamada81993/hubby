@@ -396,8 +396,9 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   // Resolve the initial locale on the client (?lang= overrides storage).
   useEffect(() => {
     const url = new URLSearchParams(window.location.search).get('lang');
-    const saved = window.localStorage.getItem('locale');
-    const initial: Locale = url === 'ar' || saved === 'ar' ? 'ar' : 'en';
+    let saved: string | null = null;
+    try { saved = window.localStorage.getItem('locale'); } catch { /* Storage may be disabled. */ }
+    const initial: Locale = url === 'ar' || url === 'en' ? url : saved === 'ar' ? 'ar' : 'en';
     setLocaleState(initial);
   }, []);
 
