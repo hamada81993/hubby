@@ -13,15 +13,17 @@ import {
   X,
   LogOut,
   Settings,
-  ChevronDown
+  ChevronDown,
+  Menu
 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/i18n';
+import GlobalSearch from '@/components/operations/GlobalSearch';
 
-export default function Topbar() {
+export default function Topbar({ onOpenMenu }: { onOpenMenu?: () => void }) {
   const router = useRouter();
   const { t, locale, setLocale } = useI18n();
   const { user, organizations, activeOrgId, setActiveOrgId, logout } = useAuthStore();
@@ -87,24 +89,18 @@ export default function Topbar() {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20">
-      <div className="flex items-center gap-4">
-        <div className="relative group">
-          <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-          <input
-            type="text"
-            placeholder={t('topbar.search')}
-            className="bg-background/50 border border-border rounded-full ps-10 pe-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 w-64 transition-all"
-          />
-        </div>
+    <header className="min-h-16 border-b border-border bg-card/50 backdrop-blur-md px-3 md:px-6 py-2 flex flex-wrap gap-2 items-center justify-between sticky top-0 z-20">
+      <div className="flex items-center gap-2">
+        <button className="md:hidden p-2" aria-label={locale === 'ar' ? 'فتح القائمة' : 'Open navigation'} onClick={onOpenMenu}><Menu size={20} /></button>
+        <GlobalSearch />
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1 sm:gap-3 max-w-full">
         {organizations.length > 0 && (
           <select 
             value={activeOrgId || ''} 
             onChange={(e) => setActiveOrgId(Number(e.target.value))}
-            className="bg-background border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer hover:border-primary/50 transition-all"
+            className="max-w-28 sm:max-w-48 bg-background border border-border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer hover:border-primary/50 transition-all"
           >
             {organizations.map(org => (
               <option key={org.id} value={org.id}>{org.name}</option>

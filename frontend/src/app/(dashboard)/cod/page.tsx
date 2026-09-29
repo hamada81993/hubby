@@ -9,6 +9,7 @@ import { Money } from '@/components/ui/Money';
 import api from '@/lib/api';
 import { useToast } from '@/components/ui/Toast';
 import { useT } from '@/i18n';
+import CodStatements from '@/components/operations/CodStatements';
 
 type Summary = {
   currency: string;
@@ -71,6 +72,7 @@ export default function CodPage() {
 
   return (
     <div className="space-y-6">
+      <CodStatements />
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-3"><Banknote className="text-primary" />{t('cod.title')}</h1>
         <p className="text-muted-foreground text-sm">{t('cod.subtitle')}</p>

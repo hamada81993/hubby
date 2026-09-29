@@ -2,10 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Models\Store;
+use App\Models\PlatformProduct;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\PlatformProduct;
+use App\Models\Store;
 use App\Models\SyncLog;
 use App\Services\Integrations\IntegrationFactory;
 use Illuminate\Bus\Queueable;
@@ -24,7 +24,7 @@ class SyncProductsJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(Store $store = null)
+    public function __construct(?Store $store = null, public ?int $syncLogId = null)
     {
         $this->store = $store;
     }
@@ -34,49 +34,44 @@ class SyncProductsJob implements ShouldQueue
      */
     public function handle(): void
     {
-        if (!$this->store) {
-            Store::all()->each(fn($store) => self::dispatch($store));
+        if (! $this->store) {
+            Store::all()->each(fn ($store) => self::dispatch($store));
+
             return;
         }
-        $log = SyncLog::create([
+        $log = $this->syncLogId ? SyncLog::findOrFail($this->syncLogId) : SyncLog::create([
             'store_id' => $this->store->id,
             'type' => 'products',
             'status' => 'in_progress',
         ]);
+        $log->update(['status' => 'in_progress']);
 
         try {
+            $this->store->refresh();
+            $canUpdateStock = $this->store->is_master || ! Store::where('organization_id', $this->store->organization_id)->where('is_master', true)->exists();
             $service = $this->getService();
             $products = $service->fetchProducts($this->store);
 
             foreach ($products as $productData) {
                 $mappedData = $this->mapProductData($productData);
-                
-                $product = Product::updateOrCreate(
-                    [
-                        'organization_id' => $this->store->organization_id,
-                        'sku' => $mappedData['sku'],
-                    ],
-                    [
-                        'name' => $mappedData['name'],
-                        'description' => $mappedData['description'],
-                        'price' => $mappedData['price'],
-                        'stock' => $mappedData['stock'],
-                        'image_url' => $mappedData['image_url'],
-                    ]
-                );
+
+                $product = Product::firstOrNew(['organization_id' => $this->store->organization_id, 'sku' => $mappedData['sku']]);
+                $product->fill([
+                    'name' => $mappedData['name'], 'description' => $mappedData['description'],
+                    'price' => $mappedData['price'], 'image_url' => $mappedData['image_url'],
+                ]);
+                if (! $product->exists || $canUpdateStock) {
+                    $product->stock = $mappedData['stock'];
+                }
+                $product->save();
 
                 foreach ($mappedData['variants'] as $variantData) {
-                    $variant = ProductVariant::updateOrCreate(
-                        [
-                            'product_id' => $product->id,
-                            'sku' => $variantData['sku'],
-                        ],
-                        [
-                            'name' => $variantData['name'],
-                            'price' => $variantData['price'],
-                            'stock' => $variantData['stock'],
-                        ]
-                    );
+                    $variant = ProductVariant::firstOrNew(['product_id' => $product->id, 'sku' => $variantData['sku']]);
+                    $variant->fill(['price' => $variantData['price']]);
+                    if (! $variant->exists || $canUpdateStock) {
+                        $variant->stock = $variantData['stock'];
+                    }
+                    $variant->save();
 
                     PlatformProduct::updateOrCreate(
                         [
@@ -93,7 +88,7 @@ class SyncProductsJob implements ShouldQueue
             $log->update(['status' => 'success']);
             $this->store->update(['status' => 'connected', 'last_synced_at' => now()]);
         } catch (\Exception $e) {
-            Log::error("SyncProductsJob failed for store {$this->store->id}: " . $e->getMessage());
+            Log::error("SyncProductsJob failed for store {$this->store->id}: ".$e->getMessage());
             $log->update(['status' => 'failed', 'message' => $e->getMessage()]);
             $this->store->update(['status' => 'error']);
         }
@@ -108,17 +103,18 @@ class SyncProductsJob implements ShouldQueue
     {
         if ($this->store->platform === 'shopify') {
             $mainVariant = $data['variants'][0] ?? null;
+
             return [
                 'name' => $data['title'],
-                'sku' => $mainVariant['sku'] ?? 'SHP-' . $data['id'],
+                'sku' => $mainVariant['sku'] ?? 'SHP-'.$data['id'],
                 'description' => $data['body_html'],
                 'price' => $mainVariant['price'] ?? 0,
                 'stock' => array_sum(array_column($data['variants'], 'inventory_quantity')),
                 'image_url' => $data['image']['src'] ?? null,
-                'variants' => array_map(fn($v) => [
+                'variants' => array_map(fn ($v) => [
                     'external_id' => (string) $v['id'],
                     'name' => $v['title'],
-                    'sku' => $v['sku'] ?? 'SHP-VAR-' . $v['id'],
+                    'sku' => $v['sku'] ?? 'SHP-VAR-'.$v['id'],
                     'price' => $v['price'],
                     'stock' => $v['inventory_quantity'] ?? 0,
                 ], $data['variants']),
@@ -128,15 +124,15 @@ class SyncProductsJob implements ShouldQueue
         if ($this->store->platform === 'salla') {
             return [
                 'name' => $data['name'],
-                'sku' => $data['sku'] ?? 'SAL-' . $data['id'],
+                'sku' => $data['sku'] ?? 'SAL-'.$data['id'],
                 'description' => $data['description'],
                 'price' => $data['price']['amount'] ?? 0,
                 'stock' => $data['quantity'] ?? 0,
                 'image_url' => $data['main_image'] ?? null,
-                'variants' => array_map(fn($v) => [
+                'variants' => array_map(fn ($v) => [
                     'external_id' => (string) $v['id'],
                     'name' => $v['name'],
-                    'sku' => $v['sku'] ?? 'SAL-VAR-' . $v['id'],
+                    'sku' => $v['sku'] ?? 'SAL-VAR-'.$v['id'],
                     'price' => $v['price']['amount'] ?? 0,
                     'stock' => $v['quantity'] ?? 0,
                 ], $data['skus'] ?? []), // Salla calls variants 'skus'
@@ -146,15 +142,15 @@ class SyncProductsJob implements ShouldQueue
         if ($this->store->platform === 'trendyol') {
             return [
                 'name' => $data['title'] ?? $data['productName'] ?? '',
-                'sku' => $data['stockCode'] ?? $data['barcode'] ?? 'TRD-' . ($data['id'] ?? ''),
+                'sku' => $data['stockCode'] ?? $data['barcode'] ?? 'TRD-'.($data['id'] ?? ''),
                 'description' => $data['description'] ?? null,
                 'price' => $data['salePrice'] ?? $data['listPrice'] ?? $data['price'] ?? 0,
                 'stock' => $data['quantity'] ?? $data['stock'] ?? 0,
                 'image_url' => $data['images'][0]['url'] ?? $data['imageUrl'] ?? null,
-                'variants' => array_map(fn($v) => [
+                'variants' => array_map(fn ($v) => [
                     'external_id' => (string) ($v['id'] ?? $v['barcode'] ?? ''),
                     'name' => $v['name'] ?? $v['attributeValue'] ?? '',
-                    'sku' => $v['stockCode'] ?? $v['barcode'] ?? 'TRD-VAR-' . ($v['id'] ?? ''),
+                    'sku' => $v['stockCode'] ?? $v['barcode'] ?? 'TRD-VAR-'.($v['id'] ?? ''),
                     'price' => $v['salePrice'] ?? $v['price'] ?? 0,
                     'stock' => $v['quantity'] ?? 0,
                 ], $data['variants'] ?? []),

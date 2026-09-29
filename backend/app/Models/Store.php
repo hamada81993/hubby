@@ -19,12 +19,14 @@ class Store extends Model
         'last_synced_at',
         'default_ship_from_address_id',
         'shipping_settings',
+        'safety_stock',
     ];
 
     protected $casts = [
         'is_master' => 'boolean',
         'last_synced_at' => 'datetime',
         'shipping_settings' => 'array',
+        'safety_stock' => 'integer',
     ];
 
     public function organization(): BelongsTo

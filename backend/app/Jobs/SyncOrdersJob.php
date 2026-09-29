@@ -2,16 +2,19 @@
 
 namespace App\Jobs;
 
-use App\Models\Store;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Store;
 use App\Models\SyncLog;
 use App\Services\Integrations\IntegrationFactory;
+use App\Services\Shipping\AddressExtractor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class SyncOrdersJob implements ShouldQueue
@@ -32,7 +35,7 @@ class SyncOrdersJob implements ShouldQueue
      * With no store the job fans out to one instance per store (the scheduler
      * path). With a store and no external id it syncs that store's orders.
      */
-    public function __construct(?Store $store = null, ?string $externalId = null)
+    public function __construct(?Store $store = null, ?string $externalId = null, public ?int $syncLogId = null)
     {
         $this->store = $store;
         $this->externalId = $externalId;
@@ -43,15 +46,17 @@ class SyncOrdersJob implements ShouldQueue
      */
     public function handle(): void
     {
-        if (!$this->store) {
-            Store::all()->each(fn($store) => self::dispatch($store));
+        if (! $this->store) {
+            Store::all()->each(fn ($store) => self::dispatch($store));
+
             return;
         }
-        $log = SyncLog::create([
+        $log = $this->syncLogId ? SyncLog::findOrFail($this->syncLogId) : SyncLog::create([
             'store_id' => $this->store->id,
             'type' => 'orders',
             'status' => 'in_progress',
         ]);
+        $log->update(['status' => 'in_progress']);
 
         try {
             $service = $this->getService();
@@ -111,7 +116,7 @@ class SyncOrdersJob implements ShouldQueue
                 // Capture the ship-to address (normalized + city-canonicalized) so shipping has a
                 // carrier-ready destination. Best-effort — a platform with no address just skips.
                 try {
-                    app(\App\Services\Shipping\AddressExtractor::class)
+                    app(AddressExtractor::class)
                         ->forOrder($order->load('store'), $this->store->platform, $orderData);
                 } catch (\Throwable $e) {
                     Log::warning("Address capture failed for order {$order->id}: ".$e->getMessage());
@@ -148,20 +153,20 @@ class SyncOrdersJob implements ShouldQueue
                 return;
             }
 
-            \App\Models\Notification::create([
+            Notification::create([
                 'organization_id' => $this->store->organization_id,
                 'title' => 'Sync Complete',
                 'message' => "Successfully synced orders for {$this->store->name} ({$this->store->platform}).",
                 'type' => 'success',
             ]);
         } catch (\Exception $e) {
-            Log::error("SyncOrdersJob failed for store {$this->store->id}: " . $e->getMessage());
+            Log::error("SyncOrdersJob failed for store {$this->store->id}: ".$e->getMessage());
             $log->update(['status' => 'failed', 'message' => $e->getMessage()]);
 
-            \App\Models\Notification::create([
+            Notification::create([
                 'organization_id' => $this->store->organization_id,
                 'title' => 'Sync Failed',
-                'message' => "Failed to sync orders for {$this->store->name}: " . $e->getMessage(),
+                'message' => "Failed to sync orders for {$this->store->name}: ".$e->getMessage(),
                 'type' => 'error',
             ]);
         }
@@ -176,7 +181,7 @@ class SyncOrdersJob implements ShouldQueue
      * Normalise a platform-supplied order date to a Carbon instance, or null if it is
      * missing/unparseable — the caller stores null and analytics falls back to created_at.
      */
-    protected function parseDate($value): ?\Illuminate\Support\Carbon
+    protected function parseDate($value): ?Carbon
     {
         if (blank($value)) {
             return null;
@@ -184,7 +189,7 @@ class SyncOrdersJob implements ShouldQueue
 
         try {
             // Carbon::parse handles ISO strings and DateTimeInterface (e.g. the Trendyol Carbon) alike.
-            return \Illuminate\Support\Carbon::parse($value);
+            return Carbon::parse($value);
         } catch (\Throwable) {
             return null;
         }
@@ -217,10 +222,10 @@ class SyncOrdersJob implements ShouldQueue
                 'status' => $data['financial_status'],
                 'total' => $data['total_price'],
                 'currency' => $data['currency'],
-                'customer_name' => ($data['customer']['first_name'] ?? '') . ' ' . ($data['customer']['last_name'] ?? ''),
+                'customer_name' => ($data['customer']['first_name'] ?? '').' '.($data['customer']['last_name'] ?? ''),
                 'customer_email' => $data['customer']['email'] ?? null,
                 'placed_at' => $data['created_at'] ?? $data['processed_at'] ?? null,
-                'items' => array_map(fn($item) => [
+                'items' => array_map(fn ($item) => [
                     'external_id' => (string) $item['id'],
                     'name' => $item['title'],
                     'sku' => $item['sku'],
@@ -236,10 +241,10 @@ class SyncOrdersJob implements ShouldQueue
                 'status' => $data['status']['name'] ?? 'pending',
                 'total' => $data['amounts']['total']['amount'] ?? 0,
                 'currency' => $data['amounts']['total']['currency'] ?? 'SAR',
-                'customer_name' => ($data['customer']['first_name'] ?? '') . ' ' . ($data['customer']['last_name'] ?? ''),
+                'customer_name' => ($data['customer']['first_name'] ?? '').' '.($data['customer']['last_name'] ?? ''),
                 'customer_email' => $data['customer']['email'] ?? null,
                 'placed_at' => $data['date']['date'] ?? $data['created_at'] ?? null,
-                'items' => array_map(fn($item) => [
+                'items' => array_map(fn ($item) => [
                     'external_id' => (string) $item['id'],
                     'name' => $item['name'],
                     'sku' => $item['sku'],
@@ -255,13 +260,13 @@ class SyncOrdersJob implements ShouldQueue
                 'status' => strtolower($data['status'] ?? $data['shipmentPackageStatus'] ?? 'pending'),
                 'total' => $data['totalPrice'] ?? $data['grossAmount'] ?? 0,
                 'currency' => $data['currencyCode'] ?? 'TRY',
-                'customer_name' => trim(($data['customerFirstName'] ?? '') . ' ' . ($data['customerLastName'] ?? '')),
+                'customer_name' => trim(($data['customerFirstName'] ?? '').' '.($data['customerLastName'] ?? '')),
                 'customer_email' => $data['customerEmail'] ?? null,
                 // Trendyol sends orderDate as epoch milliseconds.
                 'placed_at' => isset($data['orderDate'])
-                    ? \Illuminate\Support\Carbon::createFromTimestampMs((int) $data['orderDate'])
+                    ? Carbon::createFromTimestampMs((int) $data['orderDate'])
                     : null,
-                'items' => array_map(fn($item) => [
+                'items' => array_map(fn ($item) => [
                     'external_id' => (string) ($item['id'] ?? $item['lineItemId'] ?? ''),
                     'name' => $item['productName'] ?? $item['name'] ?? '',
                     'sku' => $item['sku'] ?? $item['merchantSku'] ?? $item['barcode'] ?? null,

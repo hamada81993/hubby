@@ -23,6 +23,8 @@ import { useStores } from '@/components/providers/StoresProvider';
 import { useToast } from '@/components/ui/Toast';
 import ConnectPrompt from '@/components/ui/ConnectPrompt';
 import { useT } from '@/i18n';
+import { useAuthStore } from '@/store/auth';
+import OrderWorkspaceTools from '@/components/operations/OrderWorkspaceTools';
 
 const statusColors: Record<string, string> = {
   paid: 'bg-secondary/10 text-secondary',
@@ -47,6 +49,9 @@ export default function OrdersPage() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
+  const org = useAuthStore(s => s.activeOrgId);
+  const [selected, setSelected] = useState<number[]>([]);
+  useEffect(() => { setSelected([]); setOrders([]); }, [org, search, platform, status, page]);
 
   // Close menu on click outside
   useEffect(() => {
@@ -55,7 +60,7 @@ export default function OrdersPage() {
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (signal?: AbortSignal) => {
     setIsLoading(true);
     try {
       const params: any = { page, per_page: 15 };
@@ -63,7 +68,8 @@ export default function OrdersPage() {
       if (platform !== 'All') params.platform = platform.toLowerCase();
       if (status !== 'All') params.status = status.toLowerCase();
       
-      const response = await api.get('/orders', { params });
+      const response = await api.get('/orders', { params, signal });
+      if (signal?.aborted || useAuthStore.getState().activeOrgId !== org) return;
       setOrders(response.data.data);
       setMeta(response.data);
     } catch (err) {
@@ -74,11 +80,12 @@ export default function OrdersPage() {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(() => {
-      fetchOrders();
+      fetchOrders(controller.signal);
     }, 500);
-    return () => clearTimeout(timer);
-  }, [search, platform, status, page]);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [search, platform, status, page, org]);
 
   const handleExport = async () => {
     try {
@@ -106,6 +113,7 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-6">
+      <OrderWorkspaceTools filters={{search, platform, status}} apply={f => {setSearch(f.search);setPlatform(f.platform);setStatus(f.status);setPage(1);}} selected={selected} clear={() => setSelected([])} />
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">{t('orders.title')}</h1>
@@ -191,6 +199,7 @@ export default function OrdersPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
+                  <th className="px-3"><input type="checkbox" aria-label="Select current page" checked={orders.length > 0 && selected.length === orders.length} onChange={e => setSelected(e.target.checked ? orders.map(o => o.id) : [])}/></th>
                   <th className="px-6 py-4">{t('orders.columns.orderId')}</th>
                   <th className="px-6 py-4">{t('orders.columns.customer')}</th>
                   <th className="px-6 py-4">{t('orders.columns.platform')}</th>
@@ -211,6 +220,7 @@ export default function OrdersPage() {
                       onClick={() => router.push(`/orders/${order.id}`)}
                       className="hover:bg-accent/30 transition-all cursor-pointer group"
                     >
+                      <td className="px-3" onClick={e => e.stopPropagation()}><input type="checkbox" aria-label={`Select order ${order.external_id}`} checked={selected.includes(order.id)} onChange={e => setSelected(e.target.checked ? [...selected, order.id] : selected.filter(id => id !== order.id))}/></td>
                       <td className="px-6 py-4 font-mono text-sm text-primary font-bold"
                       onClick={() => router.push(`/orders/${order.id}`)}>#{order.external_id.slice(-6).toUpperCase()}</td>
                       <td className="px-6 py-4">

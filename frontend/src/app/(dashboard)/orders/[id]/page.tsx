@@ -26,6 +26,7 @@ import { PlatformLogo } from '@/components/ui/PlatformLogo';
 import { OrderProfitCard } from '@/components/orders/OrderProfitCard';
 import { CreateReturnModal } from '@/components/returns/CreateReturnModal';
 import { useT } from '@/i18n';
+import CustomerPortalLink from '@/components/operations/CustomerPortalLink';
 
 const statusConfig: Record<string, any> = {
   paid: { color: 'text-secondary bg-secondary/10', icon: CheckCircle2, label: 'Paid' },
@@ -116,6 +117,7 @@ export default function OrderDetailsPage() {
 
   return (
     <div className="space-y-6 pb-20 print:pb-0">
+      <CustomerPortalLink orderId={order.id} />
       <div className="flex items-center justify-between print:hidden">
         <div className="flex items-center gap-4">
           <button 

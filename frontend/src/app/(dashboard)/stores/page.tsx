@@ -18,6 +18,7 @@ import { PlatformLogo } from '@/components/ui/PlatformLogo';
 import ConnectStoreModal from '@/components/stores/ConnectStoreModal';
 import { useStores } from '@/components/providers/StoresProvider';
 import { useT } from '@/i18n';
+import ChannelBuffers from '@/components/operations/ChannelBuffers';
 
 /** Visual treatment for each real store status the backend reports. Labels are
  *  looked up at render time via `t('stores.status.<status>')`. */
@@ -109,6 +110,7 @@ export default function StoresPage() {
 
   return (
     <div className="space-y-8">
+      <ChannelBuffers />
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">{t('stores.title')}</h1>

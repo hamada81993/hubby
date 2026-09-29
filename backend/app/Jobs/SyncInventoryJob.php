@@ -2,12 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Models\Store;
-use App\Models\ProductVariant;
 use App\Models\InventoryLog;
+use App\Models\ProductVariant;
+use App\Models\Store;
 use App\Models\SyncLog;
-use App\Services\Integrations\ShopifyService;
-use App\Services\Integrations\SallaService;
+use App\Services\Integrations\IntegrationFactory;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -38,14 +37,20 @@ class SyncInventoryJob implements ShouldQueue
      */
     public function handle(): void
     {
-        if (!$this->store) {
-            Store::all()->each(fn($store) => self::dispatch($store));
+        if (! $this->store) {
+            Store::where('is_master', true)->each(fn ($store) => self::dispatch($store));
+
+            return;
+        }
+        // Re-read authority at execution time: a queued former master cannot overwrite stock.
+        $this->store->refresh();
+        if (! $this->store->is_master) {
             return;
         }
         // This job usually runs via webhook or frequently via cron for the master store.
-        // If it's the master store, we sync its stock to our central DB, 
+        // If it's the master store, we sync its stock to our central DB,
         // and then PushInventoryJob will push to other stores.
-        
+
         $log = SyncLog::create([
             'store_id' => $this->store->id,
             'type' => 'inventory',
@@ -57,14 +62,15 @@ class SyncInventoryJob implements ShouldQueue
             $inventory = $service->fetchInventory($this->store);
 
             foreach ($inventory as $item) {
-                $variant = ProductVariant::where('sku', $item['sku'])->first();
+                $variant = ProductVariant::where('organization_id', $this->store->organization_id)
+                    ->where('sku', $item['sku'])->first();
                 if ($variant) {
                     $oldStock = $variant->stock;
                     $newStock = $item['quantity'];
-                    
+
                     if ($oldStock != $newStock) {
                         $variant->update(['stock' => $newStock]);
-                        
+
                         InventoryLog::create([
                             'product_variant_id' => $variant->id,
                             'change' => $newStock - $oldStock,
@@ -82,17 +88,13 @@ class SyncInventoryJob implements ShouldQueue
 
             $log->update(['status' => 'success']);
         } catch (\Exception $e) {
-            Log::error("SyncInventoryJob failed for store {$this->store->id}: " . $e->getMessage());
+            Log::error("SyncInventoryJob failed for store {$this->store->id}: ".$e->getMessage());
             $log->update(['status' => 'failed', 'message' => $e->getMessage()]);
         }
     }
 
     protected function getService()
     {
-        return match ($this->store->platform) {
-            'shopify' => new ShopifyService(),
-            'salla' => new SallaService(),
-            default => throw new \Exception("Platform not supported"),
-        };
+        return IntegrationFactory::make($this->store->platform);
     }
 }

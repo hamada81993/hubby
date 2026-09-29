@@ -11,16 +11,21 @@ import { useI18n } from '@/i18n';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { dir } = useI18n();
 
   return (
     <div dir={dir} className="theme-light min-h-screen bg-background text-foreground flex">
-      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <div className="hidden md:flex shrink-0"><Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} /></div>
+      {mobileMenuOpen && <div className="fixed inset-0 z-50 md:hidden">
+        <button className="absolute inset-0 bg-black/40" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} />
+        <div className="relative h-full w-64 overflow-y-auto" onClick={e => { if ((e.target as HTMLElement).closest('a')) setMobileMenuOpen(false); }}><Sidebar isOpen setIsOpen={() => setMobileMenuOpen(false)} /></div>
+      </div>}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <Topbar />
+        <Topbar onOpenMenu={() => setMobileMenuOpen(true)} />
 
-        <main className="p-6 flex-1 overflow-y-auto">
+        <main className="p-3 sm:p-6 flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto space-y-6">
             <ConnectBanner />
             {children}
