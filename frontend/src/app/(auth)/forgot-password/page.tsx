@@ -6,7 +6,7 @@ import { ArrowRight, ArrowLeft, MailCheck } from 'lucide-react';
 import api from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import AuthShell from '@/components/auth/AuthShell';
+import AuthShell from '@/components/auth/LegacyAuthShell';
 import { I18nProvider, useI18n } from '@/components/landing/i18n';
 
 const inputClass =
