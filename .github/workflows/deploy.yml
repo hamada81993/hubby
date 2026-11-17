@@ -1,16 +1,17 @@
 name: CI/CD
 
 # Pull requests → run checks only.
-# Push to main → run checks, then deploy to the server over SSH.
+# Push to main or test → run checks, then deploy that branch to the server over SSH.
 on:
   push:
-    branches: [main]
+    branches: [main, test]
   pull_request:
-    branches: [main]
+    branches: [main, test]
 
 # Never let two deploys run at once; cancel an in-progress run if a newer push lands.
 concurrency:
-  group: cicd-${{ github.ref }}
+  # One group for both branches: they deploy to the same server, so never run two deploys at once.
+  group: ${{ github.event_name == 'push' && 'cicd-deploy' || format('cicd-{0}', github.ref) }}
   cancel-in-progress: true
 
 jobs:
@@ -84,8 +85,8 @@ jobs:
     name: Deploy to server
     needs: [frontend, backend]
     runs-on: ubuntu-latest
-    # Only deploy real pushes to main — never on pull requests.
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Only deploy real pushes to main or test — never on pull requests.
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test') && github.event_name == 'push'
     steps:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
@@ -104,4 +105,8 @@ jobs:
             git config --global --add safe.directory "$(pwd)" || true
             # Prove this is the repo that actually serves the site before building.
             echo "▶ Remote: $(git remote get-url origin 2>/dev/null || echo 'NOT A GIT REPO')"
-            bash ./deploy.sh
+            # Check out the pushed branch first so its own deploy.sh is the one that runs.
+            BRANCH="${{ github.ref_name }}"
+            git fetch origin "$BRANCH"
+            git reset --hard "origin/$BRANCH"
+            DEPLOY_BRANCH="$BRANCH" bash ./deploy.sh
