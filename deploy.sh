@@ -26,7 +26,10 @@ if ! grep -q '^APP_KEY=base64:' .env; then
   exit 1
 fi
 
-# --- Sync to the latest origin/main (force, so a stuck/detached/diverged repo
+# Branch to deploy: main by default; GitHub Actions passes DEPLOY_BRANCH=test for the test branch.
+DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
+
+# --- Sync to the latest origin/$DEPLOY_BRANCH (force, so a stuck/detached/diverged repo
 # can never silently rebuild stale code). .env and other ignored files are left
 # untouched. Fails LOUDLY instead of ever building stale code silently. ---------
 echo "📂 Deploy directory: $(pwd)"
@@ -36,14 +39,14 @@ if [ ! -d .git ]; then
   echo "   GitHub Actions deploys into. Fix DEPLOY_PATH (or re-clone here)."
   exit 1
 fi
-echo "📥 Syncing to origin/main..."
+echo "📥 Syncing to origin/$DEPLOY_BRANCH..."
 echo "   remote: $(git remote get-url origin)"
-git fetch origin main
-git reset --hard origin/main
+git fetch origin "$DEPLOY_BRANCH"
+git reset --hard "origin/$DEPLOY_BRANCH"
 HEAD_SHA="$(git rev-parse HEAD)"
-ORIGIN_SHA="$(git rev-parse origin/main)"
+ORIGIN_SHA="$(git rev-parse "origin/$DEPLOY_BRANCH")"
 if [ "$HEAD_SHA" != "$ORIGIN_SHA" ]; then
-  echo "❌ After reset, HEAD ($HEAD_SHA) != origin/main ($ORIGIN_SHA). Aborting."
+  echo "❌ After reset, HEAD ($HEAD_SHA) != origin/$DEPLOY_BRANCH ($ORIGIN_SHA). Aborting."
   exit 1
 fi
 echo "   now at: $(git rev-parse --short HEAD) $(git log -1 --pretty=%s)"
