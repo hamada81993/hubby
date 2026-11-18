@@ -18,8 +18,12 @@ class PlatformLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final meta = platformFor(platformId);
     if (kPlatformLogoIds.contains(meta.id)) {
-      return ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: size, maxWidth: size * 3),
+      // Brand logos are drawn for a light ground, so they sit on a white chip
+      // in both themes.
+      return Container(
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
+        constraints: BoxConstraints(maxHeight: size + 4, maxWidth: size * 3 + 4),
         child: SvgPicture.asset(
           'assets/platforms/${meta.id}.svg',
           height: size,
