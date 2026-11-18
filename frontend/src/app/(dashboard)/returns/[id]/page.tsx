@@ -111,9 +111,9 @@ export default function ReturnDetailPage() {
 
       {rma.refund && rma.can_push_refund && (
         <div className={cn('rounded-lg border px-4 py-3 text-sm flex items-center gap-2',
-          rma.refund.status === 'succeeded' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-            : rma.refund.status === 'failed' ? 'border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400'
-            : 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-500')}>
+          rma.refund.status === 'succeeded' ? 'border-positive/30 bg-positive/15 text-positive'
+            : rma.refund.status === 'failed' ? 'border-negative/30 bg-negative/15 text-negative'
+            : 'border-caution/30 bg-caution/15 text-caution')}>
           <Banknote size={16} className="shrink-0" />
           {rma.refund.status === 'succeeded'
             ? t('returns.refundPushed', { platform: platformLabel(rma.platform) }) + (rma.refund.external_id ? ` · #${rma.refund.external_id}` : '')

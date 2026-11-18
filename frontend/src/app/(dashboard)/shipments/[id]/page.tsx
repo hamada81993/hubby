@@ -181,7 +181,7 @@ export default function ShipmentDetailPage() {
         <Card className="p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-bold text-sm">{t('shipping.ratesTitle')}</h3>
-            {ratesErr && <span className="text-xs text-amber-600">{t('shipping.ratesError')}</span>}
+            {ratesErr && <span className="text-xs text-caution">{t('shipping.ratesError')}</span>}
           </div>
           {rates.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t('shipping.noRates')}</p>
@@ -194,7 +194,7 @@ export default function ShipmentDetailPage() {
                     <span className="font-medium capitalize">{r.carrier_code}</span>
                     <span className="text-xs text-muted-foreground">{r.service_name}</span>
                     {r.rank === 1 && <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-action text-action-foreground">{t('shipping.recommended')}</span>}
-                    {r.is_estimate && <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-500">{t('shipping.estimate')}</span>}
+                    {r.is_estimate && <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-caution/15 text-caution">{t('shipping.estimate')}</span>}
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="font-bold tabular-nums"><Money amount={r.total_amount} currency={r.currency} /></span>

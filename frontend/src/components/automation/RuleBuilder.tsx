@@ -350,7 +350,7 @@ function ActionRow({
           className="flex-1 min-w-[110px] h-9 rounded-lg border border-border bg-background px-2 text-sm"
         />
       ))}
-      {def?.deferred && <span className="text-[10px] text-orange-500">{t('automation.builder.deferredNote')}</span>}
+      {def?.deferred && <span className="text-[10px] text-caution">{t('automation.builder.deferredNote')}</span>}
       <button onClick={onRemove} className="text-muted-foreground hover:text-destructive ms-auto"><Trash2 size={15} /></button>
     </div>
   );

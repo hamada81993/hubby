@@ -32,7 +32,7 @@ const outcomeColor: Record<string, string> = {
   simulated: 'text-primary bg-primary/10',
   deduped: 'text-muted-foreground bg-accent',
   skipped: 'text-muted-foreground bg-accent',
-  partial: 'text-orange-600 bg-orange-100',
+  partial: 'text-caution bg-caution/15',
   failed: 'text-destructive bg-destructive/10',
 };
 

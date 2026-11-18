@@ -23,6 +23,8 @@ export const orders = {
       delivered: 'Delivered',
       cancelled: 'Cancelled',
       authorized: 'Authorized',
+      completed: 'Completed',
+      refunded: 'Refunded',
     },
     columns: {
       orderId: 'Order ID',
@@ -137,6 +139,8 @@ export const orders = {
       delivered: 'تم التسليم',
       cancelled: 'ملغى',
       authorized: 'مُصرّح به',
+      completed: 'مكتمل',
+      refunded: 'مُسترد',
     },
     columns: {
       orderId: 'رقم الطلب',

@@ -28,7 +28,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar onOpenMenu={() => setMobileMenuOpen(true)} />
 
-        <main className="p-3 sm:p-6 flex-1 overflow-y-auto">
+        <main className="p-3 sm:p-6 lg:px-8 flex-1">
           <div className="max-w-7xl mx-auto space-y-6">
             <ConnectBanner />
             {children}

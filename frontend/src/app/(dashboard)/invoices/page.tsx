@@ -13,10 +13,10 @@ import { useT } from '@/i18n';
 const FILTERS = ['', 'draft', 'issued', 'void'];
 
 const statusColor = (s: string) =>
-  s === 'issued' || s === 'cleared' || s === 'reported' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-    : s === 'draft' ? 'bg-slate-500/10 text-slate-600 dark:text-slate-400'
-    : s === 'void' || s === 'rejected' || s === 'failed' ? 'bg-red-500/10 text-red-600 dark:text-red-400'
-    : 'bg-amber-500/10 text-amber-600 dark:text-amber-500';
+  s === 'issued' || s === 'cleared' || s === 'reported' ? 'bg-positive/15 text-positive'
+    : s === 'draft' ? 'bg-slate-500/10 text-slate-600'
+    : s === 'void' || s === 'rejected' || s === 'failed' ? 'bg-negative/15 text-negative'
+    : 'bg-caution/15 text-caution';
 
 export default function InvoicesPage() {
   const t = useT();

@@ -172,7 +172,7 @@ export default function ManifestsPage() {
               <div className="flex items-center gap-3">
                 <span className="text-[10px] font-bold uppercase">{p.status}</span>
                 {p.status !== 'cancelled' && (
-                  <button onClick={() => cancelPickup(p.id)} className="text-muted-foreground hover:text-red-600"><X size={14} /></button>
+                  <button onClick={() => cancelPickup(p.id)} className="text-muted-foreground hover:text-negative"><X size={14} /></button>
                 )}
               </div>
             </div>

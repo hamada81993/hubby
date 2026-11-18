@@ -332,7 +332,7 @@ export default function ProfitPage() {
                             {row.is_estimated && (
                               <span
                                 title={t('profit.bySku.estimatedHint')}
-                                className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-orange-100 text-orange-700"
+                                className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-caution/15 text-caution"
                               >
                                 {t('profit.bySku.estimated')}
                               </span>
@@ -490,7 +490,7 @@ function CoverageBanner({
         complete ? 'border-l-secondary' : 'border-l-orange-400',
       )}
     >
-      <div className={cn('mt-0.5 shrink-0', complete ? 'text-secondary' : 'text-orange-500')}>
+      <div className={cn('mt-0.5 shrink-0', complete ? 'text-secondary' : 'text-caution')}>
         {complete ? <ShieldCheck size={20} /> : <AlertTriangle size={20} />}
       </div>
       <div className="flex-1 space-y-1.5">

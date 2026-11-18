@@ -277,7 +277,7 @@ export default function ProductsPage() {
                     <ImageIcon size={48} className="text-muted-foreground/20" />
                   )}
                   {product.stock === 0 && (
-                    <div className="absolute top-3 left-4 bg-destructive text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider shadow-lg">
+                    <div className="absolute top-3 start-11 bg-destructive text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
                       {t('products.list.outOfStock')}
                     </div>
                   )}

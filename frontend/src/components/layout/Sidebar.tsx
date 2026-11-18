@@ -22,45 +22,73 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Building2
+  Building2,
+  ListChecks,
+  ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/ui/Logo';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
-const menuItems = [
-  { icon: LayoutDashboard, key: 'dashboard', href: '/dashboard' },
-  { icon: ShoppingBag, key: 'orders', href: '/orders' },
-  { icon: Undo2, key: 'returns', href: '/returns' },
-  { icon: Truck, key: 'shipping', href: '/shipments' },
-  { icon: Banknote, key: 'cod', href: '/cod' },
-  { icon: FileText, key: 'invoices', href: '/invoices' },
-  { icon: Users, key: 'customers', href: '/customers' },
-  { icon: Package, key: 'products', href: '/products' },
-  { icon: Package, key: 'listingQuality', href: '/listing-quality' },
-  { icon: Database, key: 'inventory', href: '/inventory' },
-  { icon: Building2, key: 'warehouse', href: '/warehouse' },
-  { icon: ShoppingBag, key: 'purchasing', href: '/purchasing' },
-  { icon: StoreIcon, key: 'stores', href: '/stores' },
-  { icon: BarChart3, key: 'analytics', href: '/analytics' },
-  { icon: Coins, key: 'profit', href: '/profit' },
-  { icon: Workflow, key: 'automation', href: '/automation' },
-  { icon: CreditCard, key: 'billing', href: '/billing' },
-  { icon: Settings, key: 'settings', href: '/settings' },
+type NavItem = { icon: typeof LayoutDashboard; key: string; href: string };
+// Grouped so eighteen destinations read as four short lists.
+const menuGroups: { en: string; ar: string; items: NavItem[] }[] = [
+  {
+    en: 'Operate',
+    ar: 'التشغيل',
+    items: [
+      { icon: LayoutDashboard, key: 'dashboard', href: '/dashboard' },
+      { icon: ShoppingBag, key: 'orders', href: '/orders' },
+      { icon: Truck, key: 'shipping', href: '/shipments' },
+      { icon: Undo2, key: 'returns', href: '/returns' },
+      { icon: Users, key: 'customers', href: '/customers' },
+    ],
+  },
+  {
+    en: 'Catalogue',
+    ar: 'الكتالوج',
+    items: [
+      { icon: Package, key: 'products', href: '/products' },
+      { icon: ListChecks, key: 'listingQuality', href: '/listing-quality' },
+      { icon: Database, key: 'inventory', href: '/inventory' },
+      { icon: Building2, key: 'warehouse', href: '/warehouse' },
+      { icon: ClipboardList, key: 'purchasing', href: '/purchasing' },
+    ],
+  },
+  {
+    en: 'Money',
+    ar: 'المالية',
+    items: [
+      { icon: Coins, key: 'profit', href: '/profit' },
+      { icon: BarChart3, key: 'analytics', href: '/analytics' },
+      { icon: Banknote, key: 'cod', href: '/cod' },
+      { icon: FileText, key: 'invoices', href: '/invoices' },
+    ],
+  },
+  {
+    en: 'Set up',
+    ar: 'الإعداد',
+    items: [
+      { icon: StoreIcon, key: 'stores', href: '/stores' },
+      { icon: Workflow, key: 'automation', href: '/automation' },
+      { icon: CreditCard, key: 'billing', href: '/billing' },
+      { icon: Settings, key: 'settings', href: '/settings' },
+    ],
+  },
 ];
 
 export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolean) => void }) {
   const pathname = usePathname();
-  const { t, dir } = useI18n();
+  const { t, dir, locale } = useI18n();
   const { theme } = useTheme();
   const { organizations, activeOrgId, setActiveOrgId } = useAuthStore();
   const activeOrg = organizations.find(o => o.id === activeOrgId);
 
   return (
     <aside className={cn(
-      "bg-card border-r border-border transition-all duration-300 flex flex-col glass",
-      isOpen ? "w-64" : "w-20"
+      "sticky top-0 h-screen bg-background border-e border-border transition-all duration-300 flex flex-col",
+      isOpen ? "w-[232px]" : "w-[72px]"
     )}>
       <div className="p-4 flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -90,22 +118,35 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean; setIsO
         )}
       </div>
 
-      <nav className="flex-1 px-4 space-y-2 mt-4">
-        {menuItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center p-3 rounded-xl transition-all hover:bg-accent group",
-              pathname.startsWith(item.href) ? "bg-accent text-foreground font-semibold" : "text-muted-foreground"
+      <nav className="flex-1 overflow-y-auto custom-scrollbar px-3.5 pb-4">
+        {menuGroups.map((group) => (
+          <div key={group.en} className="mt-4 first:mt-1">
+            {isOpen && (
+              <p className="mb-1 px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground/70">
+                {locale === 'ar' ? group.ar : group.en}
+              </p>
             )}
-          >
-            <item.icon size={22} className={cn(
-              "min-w-[22px]",
-              pathname.startsWith(item.href) ? "text-primary" : "group-hover:text-primary"
-            )} />
-            {isOpen && <span className="ms-4 font-medium">{t('nav.' + item.key)}</span>}
-          </Link>
+            <div className="space-y-1">
+              {group.items.map((item) => {
+                const active = pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    title={isOpen ? undefined : t('nav.' + item.key)}
+                    aria-current={active ? 'page' : undefined}
+                    className={cn(
+                      "group flex h-10 items-center gap-2.5 rounded-xl px-3 text-[15px] transition-colors hover:bg-accent",
+                      active ? "bg-accent font-bold text-foreground" : "font-medium text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <item.icon size={20} strokeWidth={1.75} className={cn("shrink-0", active && "text-primary")} />
+                    {isOpen && <span className="truncate">{t('nav.' + item.key)}</span>}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         ))}
       </nav>
     </aside>

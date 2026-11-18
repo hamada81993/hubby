@@ -93,7 +93,7 @@ export default function Topbar({ onOpenMenu }: { onOpenMenu?: () => void }) {
   };
 
   return (
-    <header className="min-h-16 border-b border-border bg-card/50 backdrop-blur-md px-3 md:px-6 py-2 flex flex-wrap gap-2 items-center justify-between sticky top-0 z-20">
+    <header className="min-h-16 border-b border-border bg-background/80 backdrop-blur-md px-3 md:px-6 py-2 flex flex-wrap gap-2 items-center justify-between sticky top-0 z-20">
       <div className="flex items-center gap-2">
         <button className="md:hidden p-2" aria-label={locale === 'ar' ? 'فتح القائمة' : 'Open navigation'} onClick={onOpenMenu}><Menu size={20} /></button>
         <GlobalSearch />

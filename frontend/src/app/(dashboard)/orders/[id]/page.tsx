@@ -31,8 +31,8 @@ import CustomerPortalLink from '@/components/operations/CustomerPortalLink';
 const statusConfig: Record<string, any> = {
   paid: { color: 'text-secondary bg-secondary/10', icon: CheckCircle2, label: 'Paid' },
   processing: { color: 'text-primary bg-primary/10', icon: Clock, label: 'Processing' },
-  shipped: { color: 'text-blue-500 bg-blue-500/10', icon: Truck, label: 'Shipped' },
-  delivered: { color: 'text-green-600 bg-green-600/10', icon: CheckCircle2, label: 'Delivered' },
+  shipped: { color: 'text-notice bg-notice/15', icon: Truck, label: 'Shipped' },
+  delivered: { color: 'text-positive bg-positive/15', icon: CheckCircle2, label: 'Delivered' },
   pending: { color: 'text-warning bg-warning/10', icon: Clock, label: 'Pending' },
   cancelled: { color: 'text-destructive bg-destructive/10', icon: AlertCircle, label: 'Cancelled' },
 };

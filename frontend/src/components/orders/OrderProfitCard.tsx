@@ -73,7 +73,7 @@ export function OrderProfitCard({ orderId }: { orderId: string | number }) {
       <Coins size={18} className="text-primary" />
       <h3 className="font-bold text-sm">{t('orders.profit.title')}</h3>
       {data?.order.is_estimated && (
-        <span className="ms-auto px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-orange-100 text-orange-700">
+        <span className="ms-auto px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-caution/15 text-caution">
           {t('orders.profit.estimated')}
         </span>
       )}
@@ -145,7 +145,7 @@ export function OrderProfitCard({ orderId }: { orderId: string | number }) {
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{line.sku ?? '—'}</span>
                       {line.is_estimated && (
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-orange-100 text-orange-700">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-caution/15 text-caution">
                           {t('orders.profit.lineEstimated')}
                         </span>
                       )}

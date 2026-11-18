@@ -12,10 +12,10 @@ import { useToast } from '@/components/ui/Toast';
 import { useT } from '@/i18n';
 
 const statusColor = (s: string) =>
-  s === 'issued' || s === 'cleared' || s === 'reported' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-    : s === 'draft' ? 'bg-slate-500/10 text-slate-600 dark:text-slate-400'
-    : s === 'void' || s === 'rejected' || s === 'failed' ? 'bg-red-500/10 text-red-600 dark:text-red-400'
-    : 'bg-amber-500/10 text-amber-600 dark:text-amber-500';
+  s === 'issued' || s === 'cleared' || s === 'reported' ? 'bg-positive/15 text-positive'
+    : s === 'draft' ? 'bg-slate-500/10 text-slate-600'
+    : s === 'void' || s === 'rejected' || s === 'failed' ? 'bg-negative/15 text-negative'
+    : 'bg-caution/15 text-caution';
 
 export default function InvoiceDetailPage() {
   const t = useT();
@@ -111,10 +111,10 @@ export default function InvoiceDetailPage() {
 
       {/* Honest about fiscal status — never imply ZATCA clearance we haven't done. */}
       {!inv.is_fiscal && (
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-start gap-3">
-          <ShieldAlert size={18} className="text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
+        <div className="rounded-lg border border-caution/30 bg-caution/15 px-4 py-3 flex items-start gap-3">
+          <ShieldAlert size={18} className="text-caution shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-amber-700 dark:text-amber-500">{t('invoices.nonFiscalTitle')}</p>
+            <p className="font-medium text-caution">{t('invoices.nonFiscalTitle')}</p>
             <p className="text-muted-foreground text-xs mt-0.5">{t('invoices.nonFiscalBody')}</p>
           </div>
         </div>

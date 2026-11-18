@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
       value: (summary?.active_products ?? 0).toLocaleString(),
       trend: null,
       icon: Package,
-      color: 'text-orange-500',
+      color: 'text-caution',
     },
   ];
 

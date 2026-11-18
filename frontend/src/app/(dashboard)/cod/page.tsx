@@ -63,11 +63,11 @@ export default function CodPage() {
   };
 
   const tiles = summary ? [
-    { key: 'inTransit', value: summary.in_transit, hint: 'inTransitHint', tone: 'text-blue-600 dark:text-blue-400' },
-    { key: 'awaitingRemittance', value: summary.awaiting_remittance, hint: 'awaitingHint', tone: 'text-amber-600 dark:text-amber-500' },
-    { key: 'overdue', value: summary.overdue, hint: 'overdueHint', tone: 'text-red-600 dark:text-red-400' },
-    { key: 'remitted30d', value: summary.remitted_30d, hint: 'remittedHint', tone: 'text-emerald-600 dark:text-emerald-400' },
-    { key: 'rtoAmount', value: summary.rto_amount, hint: 'rtoHint', tone: 'text-red-600 dark:text-red-400' },
+    { key: 'inTransit', value: summary.in_transit, hint: 'inTransitHint', tone: 'text-notice' },
+    { key: 'awaitingRemittance', value: summary.awaiting_remittance, hint: 'awaitingHint', tone: 'text-caution' },
+    { key: 'overdue', value: summary.overdue, hint: 'overdueHint', tone: 'text-negative' },
+    { key: 'remitted30d', value: summary.remitted_30d, hint: 'remittedHint', tone: 'text-positive' },
+    { key: 'rtoAmount', value: summary.rto_amount, hint: 'rtoHint', tone: 'text-negative' },
   ] : [];
 
   return (
@@ -140,7 +140,7 @@ export default function CodPage() {
                     <td className="px-5 py-3">
                       <span className="text-[10px] font-bold uppercase">{t(`cod.statuses.${r.status}`)}</span>
                       {r.is_overdue && (
-                        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-red-600">
+                        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-negative">
                           <AlertTriangle size={11} /> {t('cod.overdueBadge')}
                         </span>
                       )}

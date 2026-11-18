@@ -81,6 +81,7 @@
   --positive: #5FE39A;
   --caution: #F9C566;
   --negative: #FF8A8A;
+  --notice: #7FE3F5;
 
   /* ---- The hub (dashboard hero) ---- */
   --hub-pulse: #C7FF46;
@@ -107,6 +108,7 @@
   --positive: #0F7A40;
   --caution: #8A5A00;
   --negative: #B42323;
+  --notice: #0E6F80;
   --hub-pulse: #0B5A5C;
   --hub-stage: radial-gradient(circle at 50% 50%, #DDF5DB 0%, #F4FAF8 52%, #FFFFFF 100%);
   --glass-bg: rgba(255, 255, 255, 0.92);
@@ -141,10 +143,22 @@
   --color-positive: var(--positive);
   --color-caution: var(--caution);
   --color-negative: var(--negative);
+  --color-notice: var(--notice);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 }
+
+/* `dark:` follows the dashboard theme, not the operating system. */
+@custom-variant dark (&:where(:not(.theme-light, .theme-light *)));
+
+/* Status colours as text: the brand fills are too light to read on a light
+   surface and too heavy on a dark one, so text always takes the readable pair. */
+.text-secondary,
+.text-success { color: var(--positive); }
+.text-warning { color: var(--caution); }
+.text-destructive { color: var(--negative); }
+.text-info { color: var(--notice); }
 
 * {
   border-color: var(--border);

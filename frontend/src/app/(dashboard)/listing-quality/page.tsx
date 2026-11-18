@@ -95,13 +95,13 @@ export default function ListingQualityPage() {
             {p.issues.map((issue) => (
               <span
                 key={issue}
-                className="text-xs rounded-full px-3 py-1 bg-amber-500/10 text-amber-600"
+                className="text-xs rounded-full px-3 py-1 bg-caution/15 text-caution"
               >
                 {labels[issue]?.[ar ? 1 : 0] || issue}
               </span>
             ))}
             {!p.issues.length && (
-              <span className="text-xs text-emerald-600">
+              <span className="text-xs text-positive">
                 {ar ? "المحتوى الأساسي مكتمل" : "Core content complete"}
               </span>
             )}

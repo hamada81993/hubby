@@ -203,7 +203,7 @@ export default function ProductDetailsPage() {
                         </p>
                         <span className={cn(
                           "text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase",
-                          pp.sync_enabled ? "bg-green-500/10 text-green-500" : "bg-muted text-muted-foreground"
+                          pp.sync_enabled ? "bg-positive/15 text-positive" : "bg-muted text-muted-foreground"
                         )}>
                           {pp.sync_enabled ? t('products.detail.syncOn') : t('products.detail.syncOff')}
                         </span>

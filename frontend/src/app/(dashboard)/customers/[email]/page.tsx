@@ -27,7 +27,7 @@ import { useT } from '@/i18n';
 const statusColors: Record<string, string> = {
   paid: 'text-secondary bg-secondary/10',
   processing: 'text-primary bg-primary/10',
-  shipped: 'text-blue-500 bg-blue-500/10',
+  shipped: 'text-notice bg-notice/15',
   pending: 'text-warning bg-warning/10',
   cancelled: 'text-destructive bg-destructive/10',
 };

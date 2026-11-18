@@ -95,7 +95,7 @@ export default function CarrierAccountsPage() {
         <p className="text-muted-foreground text-sm">{t('shipping.accountsHint')}</p>
       </div>
 
-      <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-500">
+      <div className="rounded-lg border border-caution/30 bg-caution/15 px-4 py-3 text-sm text-caution">
         {t('shipping.manualOnlyHint')}
       </div>
 
@@ -151,12 +151,12 @@ export default function CarrierAccountsPage() {
               <div>
                 <p className="font-medium">{a.label} <span className="text-xs text-muted-foreground capitalize">· {a.carrier_code}</span></p>
                 {a.last_validated_at && (
-                  <p className="text-[11px] text-emerald-600 flex items-center gap-1"><CheckCircle2 size={12} /> {new Date(a.last_validated_at).toLocaleDateString()}</p>
+                  <p className="text-[11px] text-positive flex items-center gap-1"><CheckCircle2 size={12} /> {new Date(a.last_validated_at).toLocaleDateString()}</p>
                 )}
               </div>
               <div className="flex items-center gap-2">
                 <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold uppercase',
-                  a.is_active ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400' : 'bg-muted text-muted-foreground')}>
+                  a.is_active ? 'bg-positive/15 text-positive' : 'bg-muted text-muted-foreground')}>
                   {a.is_active ? 'active' : 'inactive'}
                 </span>
                 <Button variant="outline" onClick={() => validate(a.id)}>{t('shipping.validate')}</Button>

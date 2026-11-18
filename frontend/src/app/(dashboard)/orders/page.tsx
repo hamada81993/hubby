@@ -7,7 +7,6 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import {
   Search,
-  Filter,
   Download,
   ExternalLink,
   MoreHorizontal,
@@ -29,10 +28,10 @@ import OrderWorkspaceTools from '@/components/operations/OrderWorkspaceTools';
 const statusColors: Record<string, string> = {
   paid: 'bg-secondary/10 text-secondary',
   processing: 'bg-primary/10 text-primary',
-  shipped: 'bg-blue-500/10 text-blue-500',
+  shipped: 'bg-notice/15 text-notice',
   pending: 'bg-warning/10 text-warning',
   cancelled: 'bg-destructive/10 text-destructive',
-  authorized: 'bg-blue-500/10 text-blue-500', // Shopify status
+  authorized: 'bg-notice/15 text-notice', // Shopify status
 };
 
 export default function OrdersPage() {
@@ -46,7 +45,6 @@ export default function OrdersPage() {
   const [search, setSearch] = useState('');
   const [platform, setPlatform] = useState('All');
   const [status, setStatus] = useState('All');
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const org = useAuthStore(s => s.activeOrgId);
@@ -128,20 +126,31 @@ export default function OrdersPage() {
             <Download size={16} className="mr-2" />
             {t('orders.exportCsv')}
           </Button>
-          <Button 
-            variant={showAdvanced ? "primary" : "outline"} 
-            size="sm"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-          >
-            <Filter size={16} className="mr-2" />
-            {showAdvanced ? t('orders.hideFilters') : t('orders.advancedFilters')}
-          </Button>
         </div>
       </div>
 
       {!storesLoading && !hasConnectedStore ? (
         <ConnectPrompt description={t('orders.connectDescription')} />
       ) : (
+      <>
+      <div role="tablist" aria-label={t('orders.filters.status')} className="grid grid-cols-3 gap-2 lg:grid-cols-6">
+        {['All', 'Pending', 'Processing', 'Paid', 'Shipped', 'Cancelled'].map((s) => (
+          <button
+            key={s}
+            role="tab"
+            aria-selected={s === status}
+            onClick={() => { setStatus(s); setPage(1); }}
+            className={cn(
+              "rounded-2xl border px-4 py-3 text-start text-sm transition-colors",
+              s === status
+                ? "border-primary bg-accent font-bold text-foreground"
+                : "border-border bg-card font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+            )}
+          >
+            {s === 'All' ? t('orders.filters.all') : t(`orders.status.${s.toLowerCase()}`)}
+          </button>
+        ))}
+      </div>
       <Card className="p-0 overflow-hidden">
         <div className="p-4 border-b border-border space-y-4 bg-card/30">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -162,7 +171,7 @@ export default function OrdersPage() {
                   onClick={() => { setPlatform(p); setPage(1); }}
                   className={cn(
                     "px-3 py-1.5 text-xs rounded-lg border border-border hover:bg-accent transition-all",
-                    p === platform ? "bg-action text-action-foreground border-action" : "bg-background"
+                    p === platform ? "border-primary bg-accent font-bold text-foreground" : "bg-background"
                   )}
                 >
                   {p === 'All' ? t('orders.filters.all') : p}
@@ -171,25 +180,6 @@ export default function OrdersPage() {
             </div>
           </div>
 
-          {showAdvanced && (
-            <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground mr-2">{t('orders.filters.status')}</span>
-                {['All', 'Pending', 'Processing', 'Paid', 'Shipped', 'Cancelled'].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => { setStatus(s); setPage(1); }}
-                    className={cn(
-                      "px-3 py-1.5 text-xs rounded-lg border border-border hover:bg-accent transition-all",
-                      s === status ? "bg-secondary text-secondary-foreground border-secondary" : "bg-background"
-                    )}
-                  >
-                    {s === 'All' ? t('orders.filters.all') : t(`orders.status.${s.toLowerCase()}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="overflow-x-auto min-h-[400px]">
@@ -356,6 +346,7 @@ export default function OrdersPage() {
           </div>
         )}
       </Card>
+      </>
       )}
     </div>
   );
