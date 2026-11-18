@@ -139,7 +139,7 @@ function Page() {
                   <div key={id} className={styles.row}>
                     <span className={styles.mark}><img src={`/platforms/${file}.svg`} alt="" /></span>
                     <b>{id}</b><span className={styles.grow}>{name}</span>
-                    <span className={styles.pill} data-tone={tone}>{['Ready to pack', 'Late to ship', 'Shipped'][tone]}</span>
+                    <span className={styles.pill} data-tone={tone}>{(ar ? ['جاهز للتجهيز', 'تأخر عن الشحن', 'تم الشحن'] : ['Ready to pack', 'Late to ship', 'Shipped'])[tone]}</span>
                     <strong>{total}</strong>
                   </div>
                 ))}

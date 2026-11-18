@@ -1088,6 +1088,9 @@
   .ghost {
     display: none;
   }
+  .navActions {
+    margin-inline-start: auto;
+  }
   .bento,
   .aiGrid,
   .pocket {
