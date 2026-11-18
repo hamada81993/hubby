@@ -258,10 +258,10 @@ class _ProfitPageState extends State<ProfitPage> {
                 LineChartBarData(
                   spots: revenue,
                   isCurved: true,
-                  color: AppPalette.primary,
+                  color: AppPalette.chartAlt,
                   barWidth: 2.5,
                   dotData: const FlDotData(show: false),
-                  belowBarData: BarAreaData(show: true, color: AppPalette.primary.withValues(alpha: 0.08)),
+                  belowBarData: BarAreaData(show: true, color: AppPalette.chartAlt.withValues(alpha: 0.08)),
                 ),
                 LineChartBarData(
                   spots: profit,
@@ -276,7 +276,7 @@ class _ProfitPageState extends State<ProfitPage> {
           ),
           const SizedBox(height: 10),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _legendDot(AppPalette.primary, context.t('profit.netRevenue')),
+            _legendDot(AppPalette.chartAlt, context.t('profit.netRevenue')),
             const SizedBox(width: 16),
             _legendDot(AppPalette.secondary, context.t('profit.netProfit')),
           ]),

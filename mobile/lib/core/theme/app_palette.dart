@@ -33,6 +33,9 @@ class AppPalette {
   static Color get success => isDark ? const Color(0xFF5FE39A) : const Color(0xFF0F7A40);
   static const info = Color(0xFF22D3EE); // AI cyan
 
+  /// The second series in a chart, beside the brand green.
+  static Color get chartAlt => isDark ? const Color(0xFF2FA3A0) : teal;
+
   // ── Surfaces ───────────────────────────────────────────────────────────
   static Color get background => isDark ? const Color(0xFF041817) : const Color(0xFFF3F7F6);
   static Color get card => isDark ? const Color(0xFF0A2625) : const Color(0xFFFFFFFF);

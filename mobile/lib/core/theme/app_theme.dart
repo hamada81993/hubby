@@ -117,6 +117,7 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppPalette.card,
         selectedColor: AppPalette.primary,
+        checkmarkColor: AppPalette.onPrimary,
         side: BorderSide(color: AppPalette.borderStrong),
         labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppPalette.foreground),
         secondaryLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppPalette.onPrimary),

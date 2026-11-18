@@ -31,11 +31,11 @@
 .formCard .submit:hover { background:#62de5d; }
 .formCard .submit svg { color:var(--ink); }
 .helper { text-align:end; margin-top:10px; font-size:13px; }
-.helper a,.switch a { color:var(--green); font-weight:700; }
+.shell .helper a,.shell .switch a { color:var(--green); font-weight:700; }
 .helper a:hover,.switch a:hover,.terms a:hover { text-decoration:underline; }
 .switch { text-align:center; margin-top:24px; font-size:14px; color:var(--muted); }
 .terms { margin-top:22px; text-align:center; font-size:12px; color:var(--muted); line-height:1.8; }
-.terms a { color:var(--dim); text-decoration:underline; text-underline-offset:3px; }
+.shell .terms a { color:var(--dim); text-decoration:underline; text-underline-offset:3px; }
 .error { background:#ff8a8a1f; border:1px solid #ff8a8a55; padding:12px 15px; border-radius:14px; color:#ff8a8a; font-size:14px; }
 .footer { text-align:center; color:var(--muted); font-size:12px; margin:28px 0 0; }
 .shell a { color:inherit; text-decoration:none; }

@@ -238,7 +238,13 @@ class _OrdersPageState extends State<OrdersPage> {
         selected: active,
         onSelected: (_) => onTap(),
         selectedColor: color,
-        labelStyle: TextStyle(color: active ? AppPalette.onPrimary : AppPalette.foreground, fontSize: 12),
+        // Text on the selected chip follows the fill: dark ink on a light fill, white on a dark one.
+        labelStyle: TextStyle(
+            color: !active
+                ? AppPalette.foreground
+                : (color.computeLuminance() > 0.4 ? AppPalette.ink : Colors.white),
+            fontSize: 12),
+        checkmarkColor: color.computeLuminance() > 0.4 ? AppPalette.ink : Colors.white,
         backgroundColor: AppPalette.card,
         side: BorderSide(color: AppPalette.border),
       ),
