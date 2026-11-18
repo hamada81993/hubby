@@ -75,19 +75,19 @@ function ResetInner() {
       </div>
 
       {done ? (
-        <div className="flex items-start gap-3 rounded-xl border border-[#0F7A40]/30 bg-[#0F7A40]/10 p-4 text-sm text-[#0F7A40]">
+        <div className="flex items-start gap-3 rounded-xl border border-[#5FE39A]/30 bg-[#5FE39A]/10 p-4 text-sm text-[#5FE39A]">
           <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
           <span>{c.success}</span>
         </div>
       ) : tokenMissing ? (
         <div className="space-y-6">
-          <div className="rounded-xl border border-[#8A5A00]/30 bg-[#8A5A00]/10 p-4 text-sm text-[#8A5A00]">
+          <div className="rounded-xl border border-[#F9C566]/30 bg-[#F9C566]/10 p-4 text-sm text-[#F9C566]">
             {c.missingToken}
           </div>
           <Link
             href="/forgot-password"
             data-cursor
-            className="flex items-center justify-center gap-2 text-sm font-bold text-[#0B5A5C] hover:underline"
+            className="flex items-center justify-center gap-2 text-sm font-bold text-[#4FD34A] hover:underline"
           >
             <ArrowLeft size={16} className="rtl:-scale-x-100" />
             {c.backToLogin}

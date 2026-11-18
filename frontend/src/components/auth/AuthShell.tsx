@@ -2,18 +2,32 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Check, Package, Store, Sparkles } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import LiveHub from '@/components/operations/LiveHub';
 import { useI18n } from '../landing/i18n';
 import { Logo } from '../ui/Logo';
 import styles from './auth.module.css';
 
+// Illustrative stores for the hub beside the form; the real hub reads the merchant's own.
+const sampleStores = [
+  { id: 1, name: 'Salla', platform: 'salla', state: 'healthy', revenue: 16940 },
+  { id: 2, name: 'Shopify', platform: 'shopify', state: 'healthy', revenue: 11280 },
+  { id: 3, name: 'Noon', platform: 'noon', state: 'healthy', revenue: 7420 },
+  { id: 4, name: 'Amazon.sa', platform: 'amazon', state: 'healthy', revenue: 4870 },
+  { id: 5, name: 'Zid', platform: 'zid', state: 'healthy', revenue: 1350 },
+];
+
+/**
+ * The sign-in and sign-up layout: the form on one side, and on the other the
+ * thing the visitor is signing in to, the live hub, already moving.
+ */
 export default function AuthShell({ screen, children }: { accent?: 'primary' | 'secondary'; screen: 'login' | 'register'; children: ReactNode }) {
   const { locale, dir, toggle, t } = useI18n();
   const ar = locale === 'ar';
   const register = screen === 'register';
   return <div className={styles.shell} dir={dir} lang={locale}>
     <header className={styles.header}>
-      <Link href="/" aria-label="Hubby"><Logo className={styles.logo} /></Link>
+      <Link href="/" aria-label="Hubby"><Logo variant="dark" className={styles.logo} /></Link>
       <div className={styles.headerLinks}>
         <Link href="/" className={styles.back}>{ar ? 'العودة إلى هَبّي' : 'Back to Hubby'}<ArrowUpRight size={15} /></Link>
         <button type="button" onClick={toggle} aria-label={ar ? 'Switch to English' : 'Switch to Arabic'}>{ar ? 'English' : 'العربية'}</button>
@@ -23,26 +37,23 @@ export default function AuthShell({ screen, children }: { accent?: 'primary' | '
       <aside className={styles.brand}>
         <div className={styles.brandIntro}>
           <p className={styles.kicker}><span />{ar ? 'متاجر كثيرة. هَبّي واحد.' : 'MANY STORES. ONE HUBBY.'}</p>
-          <h2>{ar ? (register ? 'مساحة لطموحك.' : 'كل شيء في مكانه.') : (register ? 'Big ideas.' : 'Your world.')}<br /><em>{ar ? (register ? 'وبداية جديدة.' : 'أهلًا بعودتك.') : (register ? 'A place to grow.' : 'All together.')}</em></h2>
-          <p className={styles.description}>{ar ? 'متاجرك وطلباتك وخطوتك القادمة — كلها متصلة في مساحة واحدة.' : 'Your stores, your orders, your next big move. All connected in one place.'}</p>
+          <h2>{ar ? (register ? 'أحضر متاجرك.' : 'أهلاً بعودتك.') : (register ? 'Bring your stores.' : 'Welcome back.')}<br /><em>{ar ? (register ? 'ونحن نحفظ الإيقاع.' : 'متاجرك في انتظارك.') : (register ? 'We will keep the beat.' : 'Your stores are waiting.')}</em></h2>
         </div>
-        <div className={styles.art} aria-hidden="true">
-          <div className={styles.orbit} />
-          <div className={styles.platform} />
-          <div className={styles.bag}>
-            <div className={styles.handle} />
-            <div className={styles.storefront}><div className={styles.awning} /><Store strokeWidth={1.1} /><div className={styles.shelves}><i /><i /><i /></div></div>
-            <span className={styles.bagLabel}>h.</span>
-          </div>
-          <div className={styles.parcel}><Package size={40} strokeWidth={1} /><span /></div>
-          <div className={styles.statusCard}><span><Check size={15} /></span><div>{ar ? 'كل شيء متصل' : 'Everything connected'}<small>{ar ? 'جاهز لخطوتك القادمة' : 'Ready for your next move'}</small></div><ArrowUpRight size={18} /></div>
-          <div className={styles.spark}><Sparkles size={27} strokeWidth={1.2} /></div>
+        <div className={styles.hub} aria-hidden="true">
+          <LiveHub
+            stores={sampleStores}
+            centreValue="128"
+            centreLabel={ar ? 'طلب اليوم' : 'orders today'}
+            ariaLabel=""
+            shareLabel={pct => `${pct}%`}
+            moreLabel={n => `+${n}`}
+            stateLabel={() => ({ text: ar ? 'مباشر' : 'Live', ok: true })}
+          />
         </div>
-        <div className={styles.brandFoot}><span>H / {ar ? 'مساحتك للنمو' : 'YOUR SPACE TO GROW'}</span><span>01 — ∞</span></div>
+        <p className={styles.brandFoot}>{ar ? 'الأرقام هنا بيانات تجريبية.' : 'Figures here are sample data.'}</p>
       </aside>
       <main className={styles.main}>
         <div className={styles.formCard}>
-          <p className={styles.formEyebrow}>{ar ? (register ? 'فصلك القادم يبدأ هنا' : 'أهلًا بك في مساحتك') : (register ? 'YOUR NEXT CHAPTER STARTS HERE' : 'MAKE YOURSELF AT HOME')}</p>
           {children}
         </div>
         <p className={styles.footer}>{t.footer.copyright}</p>
