@@ -85,7 +85,7 @@ export default function NewRulePage() {
           {/* Start from scratch */}
           <button
             onClick={() => setInitial(EMPTY_RULE)}
-            className="w-full text-left"
+            className="w-full text-start"
           >
             <Card className="p-5 flex items-center gap-4 hover:border-primary/40 transition-colors">
               <div className="h-11 w-11 rounded-xl bg-accent flex items-center justify-center text-muted-foreground">
@@ -112,7 +112,7 @@ export default function NewRulePage() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {items.map((tpl) => (
-                    <button key={tpl.id} onClick={() => pick(tpl)} className="text-left">
+                    <button key={tpl.id} onClick={() => pick(tpl)} className="text-start">
                       <Card className="p-4 h-full flex flex-col gap-2 hover:border-primary/40 hover:shadow-md transition-all">
                         <p className="font-bold text-sm">{tName(tpl)}</p>
                         <p className="text-xs text-muted-foreground flex-1">{tDesc(tpl)}</p>

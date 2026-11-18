@@ -161,7 +161,7 @@ export default function CarrierAccountsPage() {
                 </span>
                 <Button variant="outline" onClick={() => validate(a.id)}>{t('shipping.validate')}</Button>
                 {a.is_active && (
-                  <Button variant="outline" onClick={() => deactivate(a.id)}><Power size={14} className="mr-1" />{t('shipping.deactivate')}</Button>
+                  <Button variant="outline" onClick={() => deactivate(a.id)}><Power size={14} className="me-1" />{t('shipping.deactivate')}</Button>
                 )}
               </div>
             </div>

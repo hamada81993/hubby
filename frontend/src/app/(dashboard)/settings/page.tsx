@@ -199,7 +199,7 @@ export default function SettingsPage() {
 
                 <div className="flex justify-end">
                   <Button type="submit" isLoading={savingProfile}>
-                    <Save size={16} className="mr-2" />
+                    <Save size={16} className="me-2" />
                     {t('settings.profile.save')}
                   </Button>
                 </div>
@@ -270,7 +270,7 @@ export default function SettingsPage() {
 
                 <div className="flex justify-end">
                   <Button type="submit" isLoading={savingPw}>
-                    <ShieldCheck size={16} className="mr-2" />
+                    <ShieldCheck size={16} className="me-2" />
                     {t('settings.security.update')}
                   </Button>
                 </div>
@@ -346,7 +346,7 @@ function NotificationToggle({
         <div
           className={cn(
             'absolute top-1 w-4 h-4 bg-white rounded-full transition-all',
-            on ? 'right-1' : 'left-1'
+            on ? 'end-1' : 'start-1'
           )}
         />
       </button>

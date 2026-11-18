@@ -114,7 +114,7 @@ export default function AutomationPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                   <thead>
                     <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                       <th className="px-5 py-3">{t('automation.colName')}</th>
@@ -132,7 +132,7 @@ export default function AutomationPage() {
                         <td className="px-5 py-3">
                           <button
                             onClick={() => router.push(`/automation/${rule.id}`)}
-                            className="font-medium text-left hover:text-primary transition-colors"
+                            className="font-medium text-start hover:text-primary transition-colors"
                           >
                             {rule.name}
                           </button>
@@ -159,7 +159,7 @@ export default function AutomationPage() {
                             {rule.enabled ? t('automation.enabled') : t('automation.disabled')}
                           </button>
                         </td>
-                        <td className="px-5 py-3 text-right">
+                        <td className="px-5 py-3 text-end">
                           <button
                             onClick={() => remove(rule)}
                             className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"

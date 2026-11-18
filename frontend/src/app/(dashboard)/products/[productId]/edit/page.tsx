@@ -235,11 +235,11 @@ export default function EditProductPage() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('products.form.globalPrice')}</label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                    <DollarSign className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                     <Input
                       type="number"
                       step="0.01"
-                      className="pl-10"
+                      className="ps-10"
                       placeholder={t('products.form.pricePlaceholder')}
                       value={formData.price}
                       onChange={(e) => setFormData({...formData, price: e.target.value})}
@@ -316,7 +316,7 @@ export default function EditProductPage() {
             <div className="flex items-center justify-between border-b border-border pb-2">
               <h3 className="font-bold text-sm">{t('products.form.productVariants')}</h3>
               <Button type="button" variant="ghost" size="sm" className="h-8 text-primary" onClick={addVariant}>
-                <Plus size={14} className="mr-1" /> {t('products.form.addVariant')}
+                <Plus size={14} className="me-1" /> {t('products.form.addVariant')}
               </Button>
             </div>
             
@@ -326,12 +326,12 @@ export default function EditProductPage() {
                   <button 
                     type="button"
                     onClick={() => removeVariant(index)}
-                    className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-destructive transition-colors"
+                    className="absolute top-4 end-4 p-2 text-muted-foreground hover:text-destructive transition-colors"
                   >
                     <Trash2 size={16} />
                   </button>
                   
-                  <div className="grid grid-cols-2 gap-4 mr-8">
+                  <div className="grid grid-cols-2 gap-4 me-8">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('products.form.variantName')}</label>
                       <Input
@@ -422,10 +422,10 @@ export default function EditProductPage() {
             <div className="space-y-1.5">
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('products.form.totalStock')}</label>
               <div className="relative">
-                <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                <Package className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 <Input
                   type="number"
-                  className="pl-10"
+                  className="ps-10"
                   placeholder={t('products.form.zeroPlaceholder')}
                   value={formData.stock}
                   onChange={(e) => setFormData({...formData, stock: e.target.value})}
@@ -447,7 +447,7 @@ export default function EditProductPage() {
               className="w-full shadow-lg shadow-primary/20" 
               isLoading={isSaving}
             >
-              <Save size={18} className="mr-2" />
+              <Save size={18} className="me-2" />
               {t('products.form.saveChanges')}
             </Button>
             <Button 

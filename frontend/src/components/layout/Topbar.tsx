@@ -138,7 +138,7 @@ export default function Topbar({ onOpenMenu }: { onOpenMenu?: () => void }) {
           >
             <Bell size={20} className={cn(unreadCount > 0 && "text-primary")} />
             {unreadCount > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-card animate-pulse"></span>
+              <span className="absolute top-2 end-2 w-2 h-2 bg-primary rounded-full border-2 border-card animate-pulse"></span>
             )}
           </button>
 
@@ -193,7 +193,7 @@ export default function Topbar({ onOpenMenu }: { onOpenMenu?: () => void }) {
         <div className="relative" ref={profileRef}>
           <button 
             onClick={() => setShowProfile(!showProfile)}
-            className="flex items-center gap-3 p-1 pr-3 hover:bg-accent rounded-full transition-all group"
+            className="flex items-center gap-3 p-1 pe-3 hover:bg-accent rounded-full transition-all group"
           >
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-primary/30 group-hover:border-primary/50 transition-all">
               <User size={18} />

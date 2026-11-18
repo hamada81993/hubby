@@ -196,7 +196,7 @@ export default function LiveHub({
             >
               <PlatformMark platform={n.store.platform} />
               <span className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate font-bold">{n.store.name}</span>
+                <span dir="auto" className="truncate text-start font-bold">{n.store.name}</span>
                 <span className="flex items-baseline justify-between gap-2 text-[13px]">
                   <span className="truncate text-muted-foreground">{caption(n.store)}</span>
                   <span className={cn("shrink-0 text-xs font-bold", state.ok ? "text-positive" : "text-negative")}>

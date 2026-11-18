@@ -122,7 +122,7 @@ export default function ManifestsPage() {
           <Button onClick={createManifest} disabled={busy || !mAccount}>{t('shipping.newManifest')}</Button>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-start text-sm">
             <thead><tr className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
               <th className="py-2">{t('shipping.colRef')}</th><th>{t('shipping.colCarrier')}</th>
               <th className="text-center">{t('shipping.colCount')}</th><th>{t('shipping.colDate')}</th><th>{t('shipping.colStatus')}</th><th />
@@ -137,7 +137,7 @@ export default function ManifestsPage() {
                   <td className="text-center tabular-nums">{m.shipment_count}</td>
                   <td className="text-xs text-muted-foreground">{m.manifest_date}</td>
                   <td><span className="text-[10px] font-bold uppercase">{m.status}</span></td>
-                  <td className="text-right">
+                  <td className="text-end">
                     <div className="inline-flex items-center gap-3">
                       <button onClick={() => printSlips(m.id)} className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
                         <Printer size={14} /> {t('shipping.printSlips')}

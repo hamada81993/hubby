@@ -125,7 +125,7 @@ export default function NewCategoryPage() {
           <div className="pt-4 border-t border-border flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => router.back()}>{t('categories.cancel')}</Button>
             <Button type="submit" isLoading={isSaving} className="shadow-lg shadow-primary/20">
-              <Save size={16} className="mr-2" />
+              <Save size={16} className="me-2" />
               {t('categories.saveCategory')}
             </Button>
           </div>

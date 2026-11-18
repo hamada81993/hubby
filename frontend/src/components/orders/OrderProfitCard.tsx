@@ -124,7 +124,7 @@ export function OrderProfitCard({ orderId }: { orderId: string | number }) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-start text-sm">
           <thead>
             <tr className="bg-accent/40 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
               <th className="px-4 py-2">{t('orders.profit.colSku')}</th>
@@ -132,7 +132,7 @@ export function OrderProfitCard({ orderId }: { orderId: string | number }) {
               <th className="px-4 py-2">{t('orders.profit.colRevenue')}</th>
               <th className="px-4 py-2">{t('orders.profit.colCogs')}</th>
               <th className="px-4 py-2">{t('orders.profit.colFees')}</th>
-              <th className="px-4 py-2 text-right">{t('orders.profit.colProfit')}</th>
+              <th className="px-4 py-2 text-end">{t('orders.profit.colProfit')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -155,7 +155,7 @@ export function OrderProfitCard({ orderId }: { orderId: string | number }) {
                   <td className="px-4 py-2 tabular-nums"><Money amount={line.net_revenue} /></td>
                   <td className="px-4 py-2 tabular-nums text-muted-foreground"><Money amount={line.cogs} /></td>
                   <td className="px-4 py-2 tabular-nums text-muted-foreground"><Money amount={fees} /></td>
-                  <td className={cn('px-4 py-2 text-right font-bold tabular-nums', lineProfit >= 0 ? 'text-secondary' : 'text-destructive')}>
+                  <td className={cn('px-4 py-2 text-end font-bold tabular-nums', lineProfit >= 0 ? 'text-secondary' : 'text-destructive')}>
                     <Money amount={line.net_profit} />
                   </td>
                 </tr>

@@ -167,7 +167,7 @@ export default function ProductsPage() {
             onClick={handleSync}
             isLoading={isSyncing}
           >
-            <RefreshCw size={16} className={cn("mr-2", isSyncing && "animate-spin")} />
+            <RefreshCw size={16} className={cn("me-2", isSyncing && "animate-spin")} />
             {t('products.list.syncProducts')}
           </Button>
           <Button 
@@ -175,7 +175,7 @@ export default function ProductsPage() {
             size="sm"
             onClick={() => router.push('/products/new')}
           >
-            <Plus size={16} className="mr-2" />
+            <Plus size={16} className="me-2" />
             {t('products.list.addGlobalProduct')}
           </Button>
         </div>
@@ -183,41 +183,41 @@ export default function ProductsPage() {
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
           <Input
             placeholder={t('products.list.searchPlaceholder')}
-            className="pl-10"
+            className="ps-10"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" className="text-xs" onClick={() => {router.push('/categories')}}>
-            <Tag size={14} className="mr-2" />
+            <Tag size={14} className="me-2" />
             {t('products.list.categories')} ({categories.length})
           </Button>
           <div className="relative group">
             <Button variant="ghost" size="sm" className={cn("text-xs", selectedIds.length > 0 && "bg-primary/10 text-primary")}>
-              <Layers size={14} className="mr-2" />
+              <Layers size={14} className="me-2" />
               {selectedIds.length > 0 ? `${selectedIds.length} ${t('products.list.selectedSuffix')}` : t('products.list.bulkActions')}
             </Button>
             {selectedIds.length > 0 && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-xl z-20 overflow-hidden">
+              <div className="absolute top-full end-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-xl z-20 overflow-hidden">
                 <button 
                   onClick={handleSync}
-                  className="w-full px-4 py-3 text-xs text-left hover:bg-accent flex items-center gap-2"
+                  className="w-full px-4 py-3 text-xs text-start hover:bg-accent flex items-center gap-2"
                 >
                   <RefreshCw size={12} /> {t('products.list.syncSelected')}
                 </button>
                 <button 
                   onClick={handleBulkDelete}
-                  className="w-full px-4 py-3 text-xs text-left hover:bg-destructive/10 text-destructive flex items-center gap-2"
+                  className="w-full px-4 py-3 text-xs text-start hover:bg-destructive/10 text-destructive flex items-center gap-2"
                 >
                   <Trash2 size={12} /> {t('products.list.deleteSelected')}
                 </button>
                 <button 
                   onClick={() => setSelectedIds([])}
-                  className="w-full px-4 py-3 text-xs text-left border-t border-border hover:bg-accent"
+                  className="w-full px-4 py-3 text-xs text-start border-t border-border hover:bg-accent"
                 >
                   {t('products.list.clearSelection')}
                 </button>
@@ -258,7 +258,7 @@ export default function ProductsPage() {
               >
                 <div className="aspect-square bg-accent/30 flex items-center justify-center relative overflow-hidden">
                   <div 
-                    className="absolute top-3 left-3 z-10"
+                    className="absolute top-3 start-3 z-10"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleSelect(product.id);
@@ -281,7 +281,7 @@ export default function ProductsPage() {
                       {t('products.list.outOfStock')}
                     </div>
                   )}
-                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                  <div className="absolute top-3 end-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                     <button 
                       className="p-2 bg-background rounded-full border border-border hover:bg-action hover:text-action-foreground hover:border-action transition-all shadow-xl"
                       onClick={(e) => {
@@ -314,7 +314,7 @@ export default function ProductsPage() {
                       <span className="text-[10px] text-muted-foreground font-medium uppercase">{t('products.list.price')}</span>
                       <span className="font-bold"><Money amount={product.price} /></span>
                     </div>
-                    <div className="flex flex-col text-right">
+                    <div className="flex flex-col text-end">
                       <span className="text-[10px] text-muted-foreground font-medium uppercase">{t('products.list.stock')}</span>
                       <span className={cn(
                         "font-bold",

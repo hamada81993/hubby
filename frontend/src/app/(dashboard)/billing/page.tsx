@@ -97,7 +97,7 @@ export default function BillingPage() {
           <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center text-primary shrink-0 shadow-inner">
             <Zap size={40} />
           </div>
-          <div className="flex-1 text-center md:text-left">
+          <div className="flex-1 text-center md:text-start">
             <h3 className="text-xl font-bold">
               {t('billing.currentPlan')}: {subscription?.plan?.name || t('billing.trial')}
             </h3>

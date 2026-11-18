@@ -15,7 +15,7 @@ export default function Input({ label, error, className, id, ...props }: InputPr
   return (
     <div className="space-y-1.5 w-full">
       {label && (
-        <label htmlFor={inputId} className="text-xs font-medium text-muted-foreground ml-1">
+        <label htmlFor={inputId} className="text-xs font-medium text-muted-foreground ms-1">
           {label}
         </label>
       )}
@@ -31,7 +31,7 @@ export default function Input({ label, error, className, id, ...props }: InputPr
         {...props}
       />
       {error && (
-        <p id={errorId} className="text-[10px] font-medium text-destructive ml-1">
+        <p id={errorId} className="text-[10px] font-medium text-destructive ms-1">
           {error}
         </p>
       )}

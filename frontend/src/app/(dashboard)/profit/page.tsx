@@ -308,7 +308,7 @@ export default function ProfitPage() {
               <p className="text-xs text-muted-foreground">{t('profit.bySku.subtitle')}</p>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-start">
                 <thead>
                   <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                     <th className="px-5 py-3">{t('profit.bySku.colSku')}</th>
@@ -318,7 +318,7 @@ export default function ProfitPage() {
                     <th className="px-5 py-3">{t('profit.bySku.colFees')}</th>
                     <th className="px-5 py-3">{t('profit.bySku.colProfit')}</th>
                     <th className="px-5 py-3">{t('profit.bySku.colPerUnit')}</th>
-                    <th className="px-5 py-3 text-right">{t('profit.bySku.colMargin')}</th>
+                    <th className="px-5 py-3 text-end">{t('profit.bySku.colMargin')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -349,7 +349,7 @@ export default function ProfitPage() {
                         <td className="px-5 py-3 text-sm tabular-nums">
                           {row.profit_per_unit === null ? '—' : <Money amount={row.profit_per_unit} />}
                         </td>
-                        <td className="px-5 py-3 text-sm text-right tabular-nums">{pct(row.margin_pct)}</td>
+                        <td className="px-5 py-3 text-sm text-end tabular-nums">{pct(row.margin_pct)}</td>
                       </tr>
                     );
                   })}
@@ -371,14 +371,14 @@ export default function ProfitPage() {
                 <h3 className="font-bold text-lg">{t('profit.byChannel.title')}</h3>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-left">
+                <table className="w-full text-start">
                   <thead>
                     <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                       <th className="px-5 py-3">{t('profit.byChannel.colChannel')}</th>
                       <th className="px-5 py-3 text-center">{t('profit.byChannel.colOrders')}</th>
                       <th className="px-5 py-3">{t('profit.byChannel.colRevenue')}</th>
                       <th className="px-5 py-3">{t('profit.byChannel.colProfit')}</th>
-                      <th className="px-5 py-3 text-right">{t('profit.byChannel.colMargin')}</th>
+                      <th className="px-5 py-3 text-end">{t('profit.byChannel.colMargin')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -402,7 +402,7 @@ export default function ProfitPage() {
                           <td className={cn('px-5 py-3 text-sm font-bold tabular-nums', profit >= 0 ? 'text-secondary' : 'text-destructive')}>
                             <Money amount={row.net_profit} />
                           </td>
-                          <td className="px-5 py-3 text-sm text-right tabular-nums">{pct(row.margin_pct)}</td>
+                          <td className="px-5 py-3 text-sm text-end tabular-nums">{pct(row.margin_pct)}</td>
                         </tr>
                       );
                     })}

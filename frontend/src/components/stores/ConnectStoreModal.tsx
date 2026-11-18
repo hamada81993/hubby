@@ -143,7 +143,7 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
             <div className="space-y-3">
               <Button type="button" variant="primary" className="w-full group" isLoading={oauthBusy} onClick={startOAuth}>
                 Continue with {platform.name}
-                <ArrowRight size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
+                <ArrowRight size={16} className="ms-2 transition-transform group-hover:translate-x-1" />
               </Button>
               <div className="flex items-center gap-3 py-1">
                 <span className="h-px flex-1 bg-border" />

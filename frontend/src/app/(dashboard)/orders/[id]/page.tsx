@@ -196,19 +196,19 @@ export default function OrderDetailsPage() {
             <div className="p-4 border-b border-border bg-card/30 flex items-center gap-2">
               <Package size={18} className="text-primary" />
               <h3 className="font-bold text-sm">{t('orders.detail.lineItems')}</h3>
-              <span className="ml-auto text-[10px] font-bold text-muted-foreground uppercase bg-accent px-2 py-0.5 rounded">
+              <span className="ms-auto text-[10px] font-bold text-muted-foreground uppercase bg-accent px-2 py-0.5 rounded">
                 {order.items?.length || 0} {t('orders.detail.products')}
               </span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-start">
                 <thead>
                   <tr className="bg-accent/30 text-muted-foreground text-[10px] uppercase font-bold tracking-wider">
                     <th className="px-6 py-3">{t('orders.items.product')}</th>
                     <th className="px-6 py-3">{t('orders.items.sku')}</th>
                     <th className="px-6 py-3">{t('orders.items.price')}</th>
                     <th className="px-6 py-3 text-center">{t('orders.items.qty')}</th>
-                    <th className="px-6 py-3 text-right">{t('orders.items.total')}</th>
+                    <th className="px-6 py-3 text-end">{t('orders.items.total')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -225,7 +225,7 @@ export default function OrderDetailsPage() {
                       <td className="px-6 py-4 font-mono text-xs text-muted-foreground">{item.sku || 'N/A'}</td>
                       <td className="px-6 py-4"><Money amount={item.price} currency={order.currency} /></td>
                       <td className="px-6 py-4 text-center">{item.quantity}</td>
-                      <td className="px-6 py-4 text-right font-bold"><Money amount={item.price * item.quantity} currency={order.currency} /></td>
+                      <td className="px-6 py-4 text-end font-bold"><Money amount={item.price * item.quantity} currency={order.currency} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -277,7 +277,7 @@ export default function OrderDetailsPage() {
               ];
               const currentIdx = steps.findIndex((s) => s.key === status);
               return (
-                <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-border">
+                <div className="space-y-6 relative before:absolute before:start-[11px] before:top-2 before:bottom-2 before:w-px before:bg-border">
                   {steps.map((s, i) => {
                     const done = currentIdx >= 0 && i < currentIdx;
                     const current = i === currentIdx;
@@ -359,7 +359,7 @@ export default function OrderDetailsPage() {
                 <p className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">{order.store?.platform}</p>
               </div>
               <button 
-                className="ml-auto p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-primary transition-all"
+                className="ms-auto p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-primary transition-all"
                 onClick={() => {
                   // For now, just link to store domain or dashboard
                   const url = order.store?.domain ? `https://${order.store.domain}` : '#';

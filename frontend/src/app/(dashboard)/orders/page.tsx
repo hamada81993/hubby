@@ -123,7 +123,7 @@ export default function OrdersPage() {
             size="sm"
             onClick={handleExport}
           >
-            <Download size={16} className="mr-2" />
+            <Download size={16} className="me-2" />
             {t('orders.exportCsv')}
           </Button>
         </div>
@@ -155,16 +155,16 @@ export default function OrdersPage() {
         <div className="p-4 border-b border-border space-y-4 bg-card/30">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative w-full md:w-96">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <Input
                 placeholder={t('orders.searchPlaceholder')}
-                className="pl-10"
+                className="ps-10"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground mr-2">{t('orders.filters.platform')}</span>
+              <span className="text-xs text-muted-foreground me-2">{t('orders.filters.platform')}</span>
               {['All', ...connectedPlatforms.map((p) => getPlatform(p).name)].map((p) => (
                 <button
                   key={p}
@@ -186,7 +186,7 @@ export default function OrdersPage() {
           {isLoading ? (
             <div className="flex items-center justify-center h-full py-20">{t('orders.loading')}</div>
           ) : (
-            <table className="w-full text-left">
+            <table className="w-full text-start">
               <thead>
                 <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                   <th className="px-3"><input type="checkbox" aria-label="Select current page" checked={orders.length > 0 && selected.length === orders.length} onChange={e => setSelected(e.target.checked ? orders.map(o => o.id) : [])}/></th>
@@ -196,7 +196,7 @@ export default function OrdersPage() {
                   <th className="px-6 py-4">{t('orders.columns.date')}</th>
                   <th className="px-6 py-4">{t('orders.columns.total')}</th>
                   <th className="px-6 py-4">{t('orders.columns.status')}</th>
-                  <th className="px-6 py-4 text-right">{t('orders.columns.actions')}</th>
+                  <th className="px-6 py-4 text-end">{t('orders.columns.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -237,7 +237,7 @@ export default function OrdersPage() {
                           {t(`orders.status.${order.status.toLowerCase()}`)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-end">
                         <div className="flex items-center justify-end gap-2">
                           <button 
                             className="p-2 hover:bg-primary/10 rounded-lg text-primary transition-all opacity-40 group-hover:opacity-100"
@@ -265,12 +265,12 @@ export default function OrdersPage() {
                             </button>
                             {isMenuOpen && (
                               <div 
-                                className="absolute right-0 bottom-full mb-2 w-40 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                                className="absolute end-0 bottom-full mb-2 w-40 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {order.status.toLowerCase() !== 'cancelled' && order.status.toLowerCase() !== 'shipped' && (
                                   <button 
-                                    className="w-full text-left px-4 py-2.5 text-xs hover:bg-destructive/10 text-destructive flex items-center gap-2"
+                                    className="w-full text-start px-4 py-2.5 text-xs hover:bg-destructive/10 text-destructive flex items-center gap-2"
                                     onClick={async (e) => {
                                       e.stopPropagation();
                                       if (confirm(t('orders.confirm.cancelOrder'))) {
@@ -290,7 +290,7 @@ export default function OrdersPage() {
                                   </button>
                                 )}
                                 <button 
-                                  className="w-full text-left px-4 py-2.5 text-xs hover:bg-accent flex items-center gap-2"
+                                  className="w-full text-start px-4 py-2.5 text-xs hover:bg-accent flex items-center gap-2"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     router.push(`/orders/${order.id}`);

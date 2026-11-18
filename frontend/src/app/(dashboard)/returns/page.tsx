@@ -101,8 +101,8 @@ export default function ReturnsPage() {
       <Card className="p-0 overflow-hidden">
         <div className="p-4 border-b border-border space-y-3">
           <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input placeholder={t('returns.searchPlaceholder')} className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+            <Input placeholder={t('returns.searchPlaceholder')} className="ps-10" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           <div className="flex flex-wrap gap-2">
             {FILTERS.map((f) => (
@@ -129,7 +129,7 @@ export default function ReturnsPage() {
               <p className="text-sm text-muted-foreground">{t('returns.emptyHint')}</p>
             </div>
           ) : (
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead>
                 <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                   <th className="px-5 py-3">{t('returns.colRma')}</th>
@@ -154,7 +154,7 @@ export default function ReturnsPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
-                    <td className="px-5 py-3 text-right">
+                    <td className="px-5 py-3 text-end">
                       <ChevronRight size={16} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     </td>
                   </tr>

@@ -66,23 +66,23 @@ export default function ReturnDetailPage() {
   const actions: React.ReactNode[] = [];
   if (status === 'requested') {
     actions.push(
-      <Button key="a" onClick={() => act('approve', {}, 'approved')} disabled={busy}><CheckCircle2 size={16} className="mr-1" />{t('returns.approve')}</Button>,
+      <Button key="a" onClick={() => act('approve', {}, 'approved')} disabled={busy}><CheckCircle2 size={16} className="me-1" />{t('returns.approve')}</Button>,
       <Button key="r" variant="outline" onClick={() => {
         const reason = window.prompt(t('returns.rejectReason'));
         if (reason) void act('reject', { reason }, 'rejected');
-      }} disabled={busy}><XCircle size={16} className="mr-1" />{t('returns.reject')}</Button>,
+      }} disabled={busy}><XCircle size={16} className="me-1" />{t('returns.reject')}</Button>,
     );
   } else if (status === 'approved' || status === 'awaiting_shipment') {
-    actions.push(<Button key="s" onClick={() => act('ship', {}, 'shipped')} disabled={busy}><Truck size={16} className="mr-1" />{t('returns.markShipped')}</Button>);
+    actions.push(<Button key="s" onClick={() => act('ship', {}, 'shipped')} disabled={busy}><Truck size={16} className="me-1" />{t('returns.markShipped')}</Button>);
   } else if (status === 'in_transit') {
-    actions.push(<Button key="rc" onClick={() => act('receive', {}, 'received')} disabled={busy}><PackageCheck size={16} className="mr-1" />{t('returns.receive')}</Button>);
+    actions.push(<Button key="rc" onClick={() => act('receive', {}, 'received')} disabled={busy}><PackageCheck size={16} className="me-1" />{t('returns.receive')}</Button>);
   } else if (status === 'received' || status === 'inspecting') {
-    actions.push(<Button key="i" onClick={() => setInspecting(true)} disabled={busy}><ClipboardCheck size={16} className="mr-1" />{t('returns.inspect')}</Button>);
+    actions.push(<Button key="i" onClick={() => setInspecting(true)} disabled={busy}><ClipboardCheck size={16} className="me-1" />{t('returns.inspect')}</Button>);
   } else if (status === 'inspected' || status === 'refund_pending') {
     const failed = rma.refund?.status === 'failed';
     actions.push(
       <Button key="rf" onClick={() => act('refund', {}, rma.can_push_refund ? 'refundQueued' : 'refunded')} disabled={busy}>
-        <Banknote size={16} className="mr-1" />
+        <Banknote size={16} className="me-1" />
         {rma.can_push_refund
           ? (failed ? t('returns.retryRefund') : t('returns.refundOnPlatform', { platform: platformLabel(rma.platform) }))
           : t('returns.issueRefund')}
@@ -127,7 +127,7 @@ export default function ReturnDetailPage() {
         <Card className="lg:col-span-2 p-0 overflow-hidden">
           <div className="p-4 border-b border-border font-bold text-sm">{t('returns.lines')}</div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead>
                 <tr className="bg-accent/40 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                   <th className="px-4 py-2">SKU</th>
@@ -135,7 +135,7 @@ export default function ReturnDetailPage() {
                   <th className="px-4 py-2 text-center">{t('returns.qtyApproved')}</th>
                   <th className="px-4 py-2 text-center">{t('returns.qtyReceived')}</th>
                   <th className="px-4 py-2">{t('returns.disposition')}</th>
-                  <th className="px-4 py-2 text-right">{t('returns.colRefund')}</th>
+                  <th className="px-4 py-2 text-end">{t('returns.colRefund')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -148,14 +148,14 @@ export default function ReturnDetailPage() {
                     <td className="px-4 py-2">
                       <span className="text-xs">{t(`returns.dispositions.${it.disposition}`)}</span>
                     </td>
-                    <td className="px-4 py-2 text-right tabular-nums"><Money amount={it.refund_amount} currency={rma.currency} /></td>
+                    <td className="px-4 py-2 text-end tabular-nums"><Money amount={it.refund_amount} currency={rma.currency} /></td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr className="border-t border-border font-bold">
                   <td className="px-4 py-2" colSpan={5}>{t('returns.colRefund')}</td>
-                  <td className="px-4 py-2 text-right"><Money amount={rma.total_refund} currency={rma.currency} /></td>
+                  <td className="px-4 py-2 text-end"><Money amount={rma.total_refund} currency={rma.currency} /></td>
                 </tr>
               </tfoot>
             </table>

@@ -123,7 +123,7 @@ export default function InventoryPage() {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" size="sm">
-            <History size={16} className="mr-2" />
+            <History size={16} className="me-2" />
             {t('inventory.stockHistory')}
           </Button>
           <Button
@@ -142,7 +142,7 @@ export default function InventoryPage() {
               }
             }}
           >
-            <RefreshCw size={16} className="mr-2" />
+            <RefreshCw size={16} className="me-2" />
             {t('inventory.pushGlobalSync')}
           </Button>
         </div>
@@ -156,10 +156,10 @@ export default function InventoryPage() {
           <Card className="p-0 overflow-hidden">
             <div className="p-4 border-b border-border bg-card/30 flex items-center justify-between">
               <div className="relative w-full max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <Input
                   placeholder={t('inventory.searchPlaceholder')}
-                  className="pl-10"
+                  className="ps-10"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -187,14 +187,14 @@ export default function InventoryPage() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-start">
                 <thead>
                   <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase font-bold tracking-wider">
                     <th className="px-6 py-4">{t('inventory.colProduct')}</th>
                     <th className="px-6 py-4">{t('inventory.colStock')}</th>
                     <th className="px-6 py-4">{t('inventory.colStores')}</th>
                     <th className="px-6 py-4">{t('inventory.colStatus')}</th>
-                    <th className="px-6 py-4 text-right">{t('inventory.colActions')}</th>
+                    <th className="px-6 py-4 text-end">{t('inventory.colActions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -242,7 +242,7 @@ export default function InventoryPage() {
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-6 py-4 text-end">
                           <Button
                             variant="outline"
                             size="xs"
@@ -338,7 +338,7 @@ export default function InventoryPage() {
 
           {adjustItem?.variants?.length > 0 && (
             <div className="space-y-1.5 w-full">
-              <label className="text-xs font-medium text-muted-foreground ml-1">{t('inventory.variant')}</label>
+              <label className="text-xs font-medium text-muted-foreground ms-1">{t('inventory.variant')}</label>
               <select
                 value={variantId}
                 onChange={(e) => setVariantId(e.target.value)}

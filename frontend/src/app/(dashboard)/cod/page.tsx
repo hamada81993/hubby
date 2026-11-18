@@ -118,13 +118,13 @@ export default function CodPage() {
               <p className="text-sm text-muted-foreground">{t('cod.emptyHint')}</p>
             </div>
           ) : (
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead>
                 <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                   <th className="px-5 py-3">{t('cod.colOrder')}</th>
                   <th className="px-5 py-3">{t('cod.colCarrier')}</th>
                   <th className="px-5 py-3">{t('cod.colAwb')}</th>
-                  <th className="px-5 py-3 text-right">{t('cod.colExpected')}</th>
+                  <th className="px-5 py-3 text-end">{t('cod.colExpected')}</th>
                   <th className="px-5 py-3">{t('cod.colStatus')}</th>
                   <th className="px-5 py-3 text-center">{t('cod.colAge')}</th>
                   <th className="px-5 py-3" />
@@ -136,17 +136,17 @@ export default function CodPage() {
                     <td className="px-5 py-3 font-mono text-xs">{r.order?.external_id || r.order_id}</td>
                     <td className="px-5 py-3 capitalize">{r.carrier_code || '—'}</td>
                     <td className="px-5 py-3 font-mono text-xs">{r.awb_number || '—'}</td>
-                    <td className="px-5 py-3 text-right tabular-nums"><Money amount={r.expected_amount} currency={r.currency} /></td>
+                    <td className="px-5 py-3 text-end tabular-nums"><Money amount={r.expected_amount} currency={r.currency} /></td>
                     <td className="px-5 py-3">
                       <span className="text-[10px] font-bold uppercase">{t(`cod.statuses.${r.status}`)}</span>
                       {r.is_overdue && (
-                        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-negative">
+                        <span className="ms-2 inline-flex items-center gap-1 text-[10px] font-bold text-negative">
                           <AlertTriangle size={11} /> {t('cod.overdueBadge')}
                         </span>
                       )}
                     </td>
                     <td className="px-5 py-3 text-center text-xs text-muted-foreground">{r.aging_bucket || '—'}</td>
-                    <td className="px-5 py-3 text-right">
+                    <td className="px-5 py-3 text-end">
                       {r.status === 'collected' && (
                         <Button variant="outline" onClick={() => markRemitted(r.id)} disabled={busy === r.id}>
                           {t('cod.markRemitted')}

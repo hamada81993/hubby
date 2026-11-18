@@ -126,17 +126,17 @@ export default function ShipmentDetailPage() {
         <div className="flex items-center gap-2">
           {isDraft && (
             <Button variant="outline" onClick={compareRates} disabled={busy}>
-              <Tag size={16} className="mr-1" />{t('shipping.getRates')}
+              <Tag size={16} className="me-1" />{t('shipping.getRates')}
             </Button>
           )}
           {!isDraft && shipment.tracking_number && (
             <Button variant="outline" onClick={downloadLabel}>
-              <Download size={16} className="mr-1" />{t('shipping.downloadLabel')}
+              <Download size={16} className="me-1" />{t('shipping.downloadLabel')}
             </Button>
           )}
           {!isDraft && (
             <Button variant="outline" onClick={openPackingSlip}>
-              <FileText size={16} className="mr-1" />{t('shipping.packingSlip')}
+              <FileText size={16} className="me-1" />{t('shipping.packingSlip')}
             </Button>
           )}
           {isDraft && (
@@ -166,12 +166,12 @@ export default function ShipmentDetailPage() {
           )}
           {!isDraft && !isFinal && (
             <Button variant="outline" onClick={() => setTracking(true)} disabled={busy}>
-              <MapPin size={16} className="mr-1" />{t('shipping.addEvent')}
+              <MapPin size={16} className="me-1" />{t('shipping.addEvent')}
             </Button>
           )}
           {canCancel && (
             <Button variant="outline" onClick={() => act(() => api.post(`/shipments/${id}/cancel`, {}), 'cancelled')} disabled={busy}>
-              <Ban size={16} className="mr-1" />{t('shipping.cancel')}
+              <Ban size={16} className="me-1" />{t('shipping.cancel')}
             </Button>
           )}
         </div>

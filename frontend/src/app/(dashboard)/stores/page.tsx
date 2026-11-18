@@ -117,7 +117,7 @@ export default function StoresPage() {
           <p className="text-muted-foreground text-sm">{t('stores.subtitle')}</p>
         </div>
         <Button variant="primary" size="sm" onClick={() => setConnectPlatform(PLATFORMS[0].id)}>
-          <Plus size={16} className="mr-2" />
+          <Plus size={16} className="me-2" />
           {t('stores.connect')}
         </Button>
       </div>
@@ -143,13 +143,13 @@ export default function StoresPage() {
         <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0 shadow-inner">
           <Crown size={32} />
         </div>
-        <div className="flex-1 text-center md:text-left">
+        <div className="flex-1 text-center md:text-start">
           <h3 className="text-lg font-bold">{t('stores.master.title')}</h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
             {t('stores.master.description')}
           </p>
         </div>
-        <div className="shrink-0 text-center md:text-right">
+        <div className="shrink-0 text-center md:text-end">
           <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">{t('stores.master.lastNetworkSync')}</p>
           <p className="text-sm font-bold flex items-center gap-1.5 mt-1 justify-center md:justify-end">
             <Clock size={14} className="text-primary" />
@@ -196,7 +196,7 @@ export default function StoresPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs p-3 rounded-xl bg-background/50 border border-border/50">
                   <span className="text-muted-foreground">{PlatformInfo.domainLabel}</span>
-                  <span className="font-medium truncate max-w-[60%] text-right">{store.domain || '—'}</span>
+                  <span className="font-medium truncate max-w-[60%] text-end">{store.domain || '—'}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs p-3 rounded-xl bg-background/50 border border-border/50">
                   <span className="text-muted-foreground flex items-center gap-1.5"><Clock size={12} /> {t('stores.card.lastSynced')}</span>

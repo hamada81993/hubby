@@ -87,16 +87,16 @@ export default function CustomersPage() {
         <div className="p-4 border-b border-border bg-card/30 space-y-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative w-full md:w-96">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <Input
                 placeholder={t('customers.searchPlaceholder')}
-                className="pl-10"
+                className="ps-10"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground mr-2">{t('customers.platformLabel')}</span>
+              <span className="text-xs text-muted-foreground me-2">{t('customers.platformLabel')}</span>
               {['All', ...connectedPlatforms.map((p) => getPlatform(p).name)].map((p) => (
                 <button
                   key={p}
@@ -119,7 +119,7 @@ export default function CustomersPage() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <table className="w-full text-left">
+            <table className="w-full text-start">
               <thead>
                 <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                   <th className="px-6 py-4">{t('customers.colCustomer')}</th>
@@ -128,7 +128,7 @@ export default function CustomersPage() {
                   <th className="px-6 py-4 text-center">{t('customers.colTotalOrders')}</th>
                   <th className="px-6 py-4">{t('customers.colTotalSpend')}</th>
                   <th className="px-6 py-4">{t('customers.colLastOrder')}</th>
-                  <th className="px-6 py-4 text-right">{t('customers.colAction')}</th>
+                  <th className="px-6 py-4 text-end">{t('customers.colAction')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -167,7 +167,7 @@ export default function CustomersPage() {
                       <td className="px-6 py-4 text-xs text-muted-foreground">
                         {new Date(customer.last_order_date).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-end">
                         <button className="p-2 hover:bg-primary/10 rounded-lg text-primary opacity-0 group-hover:opacity-100 transition-all">
                           <ChevronRight size={18} />
                         </button>

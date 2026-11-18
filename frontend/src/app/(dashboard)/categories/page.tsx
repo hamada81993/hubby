@@ -90,7 +90,7 @@ const CategoryNode = ({
       </div>
       
       {isExpanded && hasChildren && (
-        <div className="mt-1 relative before:absolute before:left-[35px] before:top-0 before:bottom-0 before:w-px before:bg-border/50">
+        <div className="mt-1 relative before:absolute before:start-[35px] before:top-0 before:bottom-0 before:w-px before:bg-border/50">
           {category.children.map((child: any) => (
             <CategoryNode 
               key={child.id} 
@@ -167,7 +167,7 @@ export default function CategoriesPage() {
           <p className="text-sm text-muted-foreground mt-1">{t('categories.subtitle')}</p>
         </div>
         <Button onClick={() => router.push('/categories/new')} className="shadow-lg shadow-primary/20">
-          <Plus size={18} className="mr-2" />
+          <Plus size={18} className="me-2" />
           {t('categories.addCategory')}
         </Button>
       </div>
@@ -175,10 +175,10 @@ export default function CategoriesPage() {
       <Card className="p-0 overflow-hidden border-border/50">
         <div className="p-4 border-b border-border/50 bg-card/50 flex flex-col md:flex-row gap-4 justify-between items-center">
           <div className="relative w-full max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             <Input
               placeholder={t('categories.searchPlaceholder')}
-              className="pl-9 bg-background/50 border-border/50"
+              className="ps-9 bg-background/50 border-border/50"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

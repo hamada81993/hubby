@@ -125,11 +125,11 @@ export default function ProductDetailsPage() {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" size="sm" onClick={() => router.push(`/products/${productId}/edit`)}>
-            <Edit2 size={16} className="mr-2" />
+            <Edit2 size={16} className="me-2" />
             {t('products.detail.editProduct')}
           </Button>
           <Button variant="destructive" size="sm" onClick={() => setIsDeleting(true)}>
-            <Trash2 size={16} className="mr-2" />
+            <Trash2 size={16} className="me-2" />
             {t('products.detail.delete')}
           </Button>
         </div>
@@ -211,7 +211,7 @@ export default function ProductDetailsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-right">
+                    <div className="text-end">
                       <p className="text-xs font-bold"><Money amount={pp.price || product.price} /></p>
                       <p className="text-[10px] text-muted-foreground">{t('products.detail.platformPrice')}</p>
                     </div>
@@ -226,8 +226,8 @@ export default function ProductDetailsPage() {
                         title={pp.sync_enabled ? t('products.detail.disableSync') : t('products.detail.enableSync')}
                       >
                         <div className={cn(
-                          "absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-all duration-300",
-                          pp.sync_enabled && "left-6",
+                          "absolute top-1 start-1 w-3 h-3 bg-white rounded-full transition-all duration-300",
+                          pp.sync_enabled && "start-6",
                           isSyncingStore === pp.id && "animate-pulse"
                         )} />
                       </button>
@@ -268,7 +268,7 @@ export default function ProductDetailsPage() {
                       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('products.detail.totalStock')}</span>
                       <span className={cn('text-xs font-bold', statusColor)}>{status}</span>
                     </div>
-                    <p className="text-2xl font-bold">{totalStock}<span className="text-xs font-medium text-muted-foreground ml-1">{t('products.detail.units')}</span></p>
+                    <p className="text-2xl font-bold">{totalStock}<span className="text-xs font-medium text-muted-foreground ms-1">{t('products.detail.units')}</span></p>
                   </div>
                   <div className="space-y-3 pt-2">
                     <div className="flex items-center justify-between text-xs">
@@ -298,7 +298,7 @@ export default function ProductDetailsPage() {
                     <p className="text-xs font-bold">{variant.name}</p>
                     <p className="text-[10px] text-muted-foreground font-mono uppercase mt-0.5">{variant.sku}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-xs font-bold"><Money amount={variant.price} /></p>
                     <p className="text-[10px] text-muted-foreground">{variant.stock} {t('products.detail.inStockSuffix')}</p>
                   </div>

@@ -99,7 +99,7 @@ export default function OnboardingPage() {
                 <h2 className="text-2xl font-bold mb-1">Connect {platform?.name}</h2>
                 <p className="text-muted-foreground text-sm">We'll need your permission to manage your orders and products.</p>
               </div>
-              <div className="bg-background border border-border p-4 rounded-xl text-left flex items-start gap-3">
+              <div className="bg-background border border-border p-4 rounded-xl text-start flex items-start gap-3">
                 <Zap size={20} className="text-warning mt-0.5 shrink-0" />
                 <p className="text-xs text-muted-foreground">
                   By clicking connect, you'll be redirected to {platform?.name} to approve Hubby.
@@ -137,7 +137,7 @@ export default function OnboardingPage() {
             </div>
             <Button onClick={() => router.push('/dashboard')} className="w-full group">
               Go to Dashboard
-              <ArrowRight size={18} className="ml-2 transition-transform group-hover:translate-x-1" />
+              <ArrowRight size={18} className="ms-2 transition-transform group-hover:translate-x-1" />
             </Button>
           </Card>
         )}

@@ -163,7 +163,7 @@ export default function CustomerProfilePage() {
               </span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-start">
                 <thead>
                   <tr className="bg-accent/30 text-muted-foreground text-[10px] uppercase font-bold tracking-wider">
                     <th className="px-6 py-3">{t('customers.colOrderId')}</th>
@@ -171,7 +171,7 @@ export default function CustomerProfilePage() {
                     <th className="px-6 py-3">{t('customers.colDate')}</th>
                     <th className="px-6 py-3">{t('customers.colTotal')}</th>
                     <th className="px-6 py-3">{t('customers.colStatus')}</th>
-                    <th className="px-6 py-3 text-right">{t('customers.colAction')}</th>
+                    <th className="px-6 py-3 text-end">{t('customers.colAction')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -196,7 +196,7 @@ export default function CustomerProfilePage() {
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-end">
                         <button 
                           onClick={() => router.push(`/orders/${order.id}`)}
                           className="p-1.5 hover:bg-primary/10 rounded-lg text-primary opacity-0 group-hover:opacity-100 transition-all"

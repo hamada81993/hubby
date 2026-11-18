@@ -53,8 +53,8 @@ export default function InvoicesPage() {
       <Card className="p-0 overflow-hidden">
         <div className="p-4 border-b border-border space-y-3">
           <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input placeholder={t('invoices.searchPlaceholder')} className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+            <Input placeholder={t('invoices.searchPlaceholder')} className="ps-10" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           <div className="flex flex-wrap gap-2">
             {FILTERS.map((f) => (
@@ -79,13 +79,13 @@ export default function InvoicesPage() {
               <p className="text-sm text-muted-foreground">{t('invoices.emptyHint')}</p>
             </div>
           ) : (
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead>
                 <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                   <th className="px-5 py-3">{t('invoices.colNumber')}</th>
                   <th className="px-5 py-3">{t('invoices.colType')}</th>
                   <th className="px-5 py-3">{t('invoices.colBuyer')}</th>
-                  <th className="px-5 py-3 text-right">{t('invoices.colTotal')}</th>
+                  <th className="px-5 py-3 text-end">{t('invoices.colTotal')}</th>
                   <th className="px-5 py-3">{t('invoices.colStatus')}</th>
                   <th className="px-5 py-3">{t('invoices.colDate')}</th>
                   <th className="px-5 py-3" />
@@ -97,14 +97,14 @@ export default function InvoicesPage() {
                     <td className="px-5 py-3 font-mono text-xs">{r.invoice_number}</td>
                     <td className="px-5 py-3 text-xs">{t(`invoices.types.${r.document_type}`)}</td>
                     <td className="px-5 py-3">{r.buyer_name || '—'}</td>
-                    <td className="px-5 py-3 text-right tabular-nums"><Money amount={r.tax_inclusive_amount} currency={r.currency_code} /></td>
+                    <td className="px-5 py-3 text-end tabular-nums"><Money amount={r.tax_inclusive_amount} currency={r.currency_code} /></td>
                     <td className="px-5 py-3">
                       <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold uppercase', statusColor(r.status))}>
                         {t(`invoices.statuses.${r.status}`)}
                       </span>
                     </td>
                     <td className="px-5 py-3 text-xs text-muted-foreground">{r.issue_date?.slice(0, 10)}</td>
-                    <td className="px-5 py-3 text-right">
+                    <td className="px-5 py-3 text-end">
                       <ChevronRight size={16} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     </td>
                   </tr>

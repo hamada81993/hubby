@@ -101,10 +101,10 @@ export default function InvoiceDetailPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {isDraft && <Button onClick={issue} disabled={busy}><FileCheck2 size={16} className="mr-1" />{t('invoices.issue')}</Button>}
-          {isDraft && <Button variant="outline" onClick={discard} disabled={busy}><Trash2 size={16} className="mr-1" />{t('invoices.discard')}</Button>}
+          {isDraft && <Button onClick={issue} disabled={busy}><FileCheck2 size={16} className="me-1" />{t('invoices.issue')}</Button>}
+          {isDraft && <Button variant="outline" onClick={discard} disabled={busy}><Trash2 size={16} className="me-1" />{t('invoices.discard')}</Button>}
           {inv.status === 'issued' && inv.document_type === 'invoice' && (
-            <Button variant="outline" onClick={creditNote} disabled={busy}><Undo2 size={16} className="mr-1" />{t('invoices.creditNote')}</Button>
+            <Button variant="outline" onClick={creditNote} disabled={busy}><Undo2 size={16} className="me-1" />{t('invoices.creditNote')}</Button>
           )}
         </div>
       </div>
@@ -134,15 +134,15 @@ export default function InvoiceDetailPage() {
         <Card className="lg:col-span-2 p-0 overflow-hidden">
           <div className="p-4 border-b border-border font-bold text-sm">{t('invoices.lines')}</div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead>
                 <tr className="bg-accent/40 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
                   <th className="px-4 py-2">{t('invoices.colItem')}</th>
                   <th className="px-4 py-2 text-center">{t('invoices.colQty')}</th>
-                  <th className="px-4 py-2 text-right">{t('invoices.colUnitPrice')}</th>
-                  <th className="px-4 py-2 text-right">{t('invoices.colLineNet')}</th>
-                  <th className="px-4 py-2 text-right">{t('invoices.colLineVat')}</th>
-                  <th className="px-4 py-2 text-right">{t('invoices.colLineTotal')}</th>
+                  <th className="px-4 py-2 text-end">{t('invoices.colUnitPrice')}</th>
+                  <th className="px-4 py-2 text-end">{t('invoices.colLineNet')}</th>
+                  <th className="px-4 py-2 text-end">{t('invoices.colLineVat')}</th>
+                  <th className="px-4 py-2 text-end">{t('invoices.colLineTotal')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -150,10 +150,10 @@ export default function InvoiceDetailPage() {
                   <tr key={l.id}>
                     <td className="px-4 py-2"><div className="font-medium">{l.name}</div><div className="text-[11px] text-muted-foreground">{l.sku}</div></td>
                     <td className="px-4 py-2 text-center tabular-nums">{Number(l.quantity)}</td>
-                    <td className="px-4 py-2 text-right tabular-nums"><Money amount={l.unit_price} currency={inv.currency_code} /></td>
-                    <td className="px-4 py-2 text-right tabular-nums"><Money amount={l.line_extension_amount} currency={inv.currency_code} /></td>
-                    <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">{Number(l.tax_percent)}% · <Money amount={l.tax_amount} currency={inv.currency_code} /></td>
-                    <td className="px-4 py-2 text-right tabular-nums font-medium"><Money amount={l.line_amount_with_tax} currency={inv.currency_code} /></td>
+                    <td className="px-4 py-2 text-end tabular-nums"><Money amount={l.unit_price} currency={inv.currency_code} /></td>
+                    <td className="px-4 py-2 text-end tabular-nums"><Money amount={l.line_extension_amount} currency={inv.currency_code} /></td>
+                    <td className="px-4 py-2 text-end tabular-nums text-muted-foreground">{Number(l.tax_percent)}% · <Money amount={l.tax_amount} currency={inv.currency_code} /></td>
+                    <td className="px-4 py-2 text-end tabular-nums font-medium"><Money amount={l.line_amount_with_tax} currency={inv.currency_code} /></td>
                   </tr>
                 ))}
               </tbody>
