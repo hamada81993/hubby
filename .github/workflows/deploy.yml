@@ -1,7 +1,9 @@
 name: CI/CD
 
 # Pull requests → run checks only.
-# Push to main or test → run checks, then deploy that branch to the server over SSH.
+# Push to test → run checks only here; the test server (test.hubbynetwork.com) pulls
+#   the branch itself (cron, /usr/local/bin/hubby-test-deploy) once these checks pass.
+# Push to main → run checks, then deploy to the LIVE server over SSH.
 on:
   push:
     branches: [main, test]
@@ -10,8 +12,7 @@ on:
 
 # Never let two deploys run at once; cancel an in-progress run if a newer push lands.
 concurrency:
-  # One group for both branches: they deploy to the same server, so never run two deploys at once.
-  group: ${{ github.event_name == 'push' && 'cicd-deploy' || format('cicd-{0}', github.ref) }}
+  group: cicd-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -85,8 +86,8 @@ jobs:
     name: Deploy to server
     needs: [frontend, backend]
     runs-on: ubuntu-latest
-    # Only deploy real pushes to main or test — never on pull requests.
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test') && github.event_name == 'push'
+    # Only real pushes to main go to the LIVE server — never test, never pull requests.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
