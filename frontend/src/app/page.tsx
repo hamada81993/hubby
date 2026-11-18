@@ -1,5 +1,5 @@
-import LandingExperience from '@/components/landing/LandingExperience';
+import HubLanding from '@/components/landing/HubLanding';
 
 export default function LandingPage() {
-  return <LandingExperience />;
+  return <HubLanding />;
 }
