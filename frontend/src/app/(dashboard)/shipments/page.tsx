@@ -86,7 +86,7 @@ export default function ShipmentsPage() {
                 key={f || 'all'}
                 onClick={() => setStatus(f)}
                 className={cn('px-3 py-1.5 text-xs rounded-lg border border-border transition-all',
-                  f === status ? 'bg-action text-action-foreground border-action' : 'bg-background hover:bg-accent')}
+                  f === status ? 'border-primary bg-accent font-bold text-foreground' : 'bg-background hover:bg-accent')}
               >
                 {f === '' ? t('shipping.all') : t(`shipping.statuses.${f}`)}
               </button>

@@ -101,7 +101,7 @@ export default function CodPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={cn('px-3 py-1.5 text-xs rounded-lg border border-border transition-all',
-                  f === filter ? 'bg-action text-action-foreground border-action' : 'bg-background hover:bg-accent')}
+                  f === filter ? 'border-primary bg-accent font-bold text-foreground' : 'bg-background hover:bg-accent')}
               >
                 {t(f === 'all' ? 'cod.filterAll' : 'cod.filterOverdue')}
               </button>

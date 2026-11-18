@@ -7,11 +7,9 @@ import { ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import api from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import AuthShell from '@/components/auth/LegacyAuthShell';
+import AuthShell from '@/components/auth/AuthShell';
+import styles from '@/components/auth/auth.module.css';
 import { I18nProvider, useI18n } from '@/components/landing/i18n';
-
-const inputClass =
-  'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:ring-primary/40';
 
 export default function ResetPasswordPage() {
   return (
@@ -71,25 +69,25 @@ function ResetInner() {
 
   return (
     <AuthShell accent="secondary" screen="login">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">{c.resetTitle}</h1>
-        <p className="mt-2 text-sm text-white/50">{c.resetSubtitle}</p>
+      <div className={styles.formHeader}>
+        <h1>{c.resetTitle}</h1>
+        <p>{c.resetSubtitle}</p>
       </div>
 
       {done ? (
-        <div className="flex items-start gap-3 rounded-xl border border-secondary/30 bg-secondary/10 p-4 text-sm text-secondary">
+        <div className="flex items-start gap-3 rounded-xl border border-[#0F7A40]/30 bg-[#0F7A40]/10 p-4 text-sm text-[#0F7A40]">
           <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
           <span>{c.success}</span>
         </div>
       ) : tokenMissing ? (
         <div className="space-y-6">
-          <div className="rounded-xl border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
+          <div className="rounded-xl border border-[#8A5A00]/30 bg-[#8A5A00]/10 p-4 text-sm text-[#8A5A00]">
             {c.missingToken}
           </div>
           <Link
             href="/forgot-password"
             data-cursor
-            className="flex items-center justify-center gap-2 text-sm text-white/60 transition-colors hover:text-white"
+            className="flex items-center justify-center gap-2 text-sm font-bold text-[#0B5A5C] hover:underline"
           >
             <ArrowLeft size={16} className="rtl:-scale-x-100" />
             {c.backToLogin}
@@ -98,7 +96,7 @@ function ResetInner() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            <div role="alert" className={styles.error}>
               {error}
             </div>
           )}
@@ -108,7 +106,7 @@ function ResetInner() {
             type="email"
             value={email}
             disabled
-            className={`${inputClass} opacity-70`}
+            className="opacity-70"
           />
 
           <Input
@@ -118,7 +116,6 @@ function ResetInner() {
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
             required
           />
 
@@ -129,7 +126,6 @@ function ResetInner() {
             placeholder="••••••••"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className={inputClass}
             required
           />
 
@@ -137,7 +133,7 @@ function ResetInner() {
             type="submit"
             isLoading={isLoading}
             data-cursor
-            className="group h-12 w-full rounded-xl border-0 bg-gradient-to-r from-primary to-secondary text-base font-semibold shadow-lg shadow-primary/20"
+            className={styles.submit}
           >
             {c.resetButton}
             <ArrowRight size={18} className="ms-2 transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />

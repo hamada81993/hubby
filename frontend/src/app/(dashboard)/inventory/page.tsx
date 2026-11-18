@@ -176,7 +176,7 @@ export default function InventoryPage() {
                     className={cn(
                       'px-3 py-1.5 text-xs rounded-lg border font-medium transition-all',
                       stockFilter === f.k
-                        ? 'bg-action text-action-foreground border-action'
+                        ? 'border-primary bg-accent font-bold text-foreground'
                         : 'bg-background border-border hover:bg-accent'
                     )}
                   >

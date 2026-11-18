@@ -82,6 +82,7 @@
   --caution: #F9C566;
   --negative: #FF8A8A;
   --notice: #7FE3F5;
+  --chart-alt: #2FA3A0;          /* second series beside the brand green */
 
   /* ---- The hub (dashboard hero) ---- */
   --hub-pulse: #C7FF46;
@@ -109,6 +110,7 @@
   --caution: #8A5A00;
   --negative: #B42323;
   --notice: #0E6F80;
+  --chart-alt: #0B5A5C;
   --hub-pulse: #0B5A5C;
   --hub-stage: radial-gradient(circle at 50% 50%, #DDF5DB 0%, #F4FAF8 52%, #FFFFFF 100%);
   --glass-bg: rgba(255, 255, 255, 0.92);

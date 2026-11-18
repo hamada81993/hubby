@@ -198,7 +198,7 @@ function GroupEditor({
             <button
               key={m}
               onClick={() => onChange({ ...group, match: m })}
-              className={cn('px-3 py-1 text-[11px] font-bold', group.match === m ? 'bg-action text-action-foreground' : 'bg-background')}
+              className={cn('px-3 py-1 text-[11px] font-bold', group.match === m ? 'bg-accent text-foreground' : 'bg-background text-muted-foreground')}
             >
               {t(`automation.builder.${m}`)}
             </button>

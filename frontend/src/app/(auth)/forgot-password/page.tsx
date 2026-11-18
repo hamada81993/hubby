@@ -6,11 +6,9 @@ import { ArrowRight, ArrowLeft, MailCheck } from 'lucide-react';
 import api from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import AuthShell from '@/components/auth/LegacyAuthShell';
+import AuthShell from '@/components/auth/AuthShell';
+import styles from '@/components/auth/auth.module.css';
 import { I18nProvider, useI18n } from '@/components/landing/i18n';
-
-const inputClass =
-  'bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:ring-primary/40';
 
 export default function ForgotPasswordPage() {
   return (
@@ -46,21 +44,21 @@ function ForgotInner() {
 
   return (
     <AuthShell accent="primary" screen="login">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">{c.forgotTitle}</h1>
-        <p className="mt-2 text-sm text-white/50">{c.forgotSubtitle}</p>
+      <div className={styles.formHeader}>
+        <h1>{c.forgotTitle}</h1>
+        <p>{c.forgotSubtitle}</p>
       </div>
 
       {sent ? (
         <div className="space-y-6">
-          <div className="flex items-start gap-3 rounded-xl border border-secondary/30 bg-secondary/10 p-4 text-sm text-secondary">
+          <div className="flex items-start gap-3 rounded-xl border border-[#0F7A40]/30 bg-[#0F7A40]/10 p-4 text-sm text-[#0F7A40]">
             <MailCheck size={18} className="mt-0.5 shrink-0" />
             <span>{c.sent}</span>
           </div>
           <Link
             href="/login"
             data-cursor
-            className="flex items-center justify-center gap-2 text-sm text-white/60 transition-colors hover:text-white"
+            className="flex items-center justify-center gap-2 text-sm font-bold text-[#0B5A5C] hover:underline"
           >
             <ArrowLeft size={16} className="rtl:-scale-x-100" />
             {c.backToLogin}
@@ -69,7 +67,7 @@ function ForgotInner() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            <div role="alert" className={styles.error}>
               {error}
             </div>
           )}
@@ -81,7 +79,6 @@ function ForgotInner() {
             placeholder="name@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={inputClass}
             required
           />
 
@@ -89,7 +86,7 @@ function ForgotInner() {
             type="submit"
             isLoading={isLoading}
             data-cursor
-            className="group h-12 w-full rounded-xl border-0 bg-gradient-to-r from-primary to-secondary text-base font-semibold shadow-lg shadow-primary/20"
+            className={styles.submit}
           >
             {c.sendButton}
             <ArrowRight size={18} className="ms-2 transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
@@ -98,7 +95,7 @@ function ForgotInner() {
           <Link
             href="/login"
             data-cursor
-            className="flex items-center justify-center gap-2 text-sm text-white/50 transition-colors hover:text-white"
+            className="flex items-center justify-center gap-2 text-sm font-bold text-[#0B5A5C] hover:underline"
           >
             <ArrowLeft size={16} className="rtl:-scale-x-100" />
             {c.backToLogin}

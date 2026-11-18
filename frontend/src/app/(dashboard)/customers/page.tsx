@@ -103,7 +103,7 @@ export default function CustomersPage() {
                   onClick={() => setPlatform(p)}
                   className={cn(
                     "px-3 py-1.5 text-xs rounded-lg border border-border hover:bg-accent transition-all",
-                    p === platform ? "bg-action text-action-foreground border-action" : "bg-background"
+                    p === platform ? "border-primary bg-accent font-bold text-foreground" : "bg-background"
                   )}
                 >
                   {p === 'All' ? t('customers.allPlatforms') : p}

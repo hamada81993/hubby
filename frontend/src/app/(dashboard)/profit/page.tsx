@@ -148,7 +148,7 @@ export default function ProfitPage() {
     if (!summary) return [];
     const revenue = Number(summary.net_revenue);
     const rows = [
-      { key: 'cogs', value: Number(summary.cogs), color: 'bg-primary' },
+      { key: 'cogs', value: Number(summary.cogs), color: 'bg-[var(--chart-alt)]' },
       { key: 'fees', value: Number(summary.fees), color: 'bg-orange-400' },
       { key: 'adSpend', value: Number(summary.ad_spend), color: 'bg-purple-400' },
       { key: 'expenses', value: Number(summary.expenses), color: 'bg-rose-400' },
@@ -197,7 +197,7 @@ export default function ProfitPage() {
                 onClick={() => setDays(d)}
                 className={cn(
                   'px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
-                  d === days ? 'bg-action text-action-foreground' : 'hover:bg-accent',
+                  d === days ? 'bg-accent font-bold text-foreground' : 'text-muted-foreground hover:bg-accent',
                 )}
               >
                 {t(`profit.ranges.d${d}`)}
@@ -267,8 +267,8 @@ export default function ProfitPage() {
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="pnlRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.25} />
-                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                        <stop offset="5%" stopColor="var(--chart-alt)" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="var(--chart-alt)" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="pnlProfit" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#4FD34A" stopOpacity={0.35} />
@@ -284,7 +284,7 @@ export default function ProfitPage() {
                       type="monotone"
                       dataKey="revenue"
                       name={t('profit.timeline.revenue')}
-                      stroke="var(--primary)"
+                      stroke="var(--chart-alt)"
                       strokeWidth={2.5}
                       fill="url(#pnlRevenue)"
                     />
