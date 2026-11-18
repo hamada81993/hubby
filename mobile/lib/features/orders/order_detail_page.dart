@@ -103,7 +103,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   Text(context.t('common.status'), style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   if (cancelled)
-                    Row(children: const [
+                    Row(children: [
                       Icon(LucideIcons.xCircle, color: AppPalette.destructive, size: 18),
                       SizedBox(width: 8),
                       Text('Cancelled', style: TextStyle(color: AppPalette.destructive, fontWeight: FontWeight.w600)),
@@ -133,7 +133,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     Text(context.t('orders.items'), style: const TextStyle(fontWeight: FontWeight.bold)),
                     const Spacer(),
                     Text('${items.length} product(s)',
-                        style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                        style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
                   ]),
                   const SizedBox(height: 8),
                   ...items.map((it) {
@@ -147,7 +147,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             Text(it['product_name']?.toString() ?? it['name']?.toString() ?? '',
                                 maxLines: 1, overflow: TextOverflow.ellipsis),
                             Text('SKU ${it['sku']?.toString() ?? 'N/A'}  ·  ${formatMoney(price, currency)} × $qty',
-                                style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                                style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                           ]),
                         ),
                         const SizedBox(width: 10),
@@ -216,20 +216,20 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             radius: 18,
             backgroundColor: AppPalette.primary.withValues(alpha: 0.12),
             child: Text((o['customer_name']?.toString() ?? 'G').characters.first.toUpperCase(),
-                style: const TextStyle(color: AppPalette.primary, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: AppPalette.primary, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(o['customer_name']?.toString() ?? 'Guest', style: const TextStyle(fontWeight: FontWeight.w600)),
               if (email.isNotEmpty)
-                Text(email, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                Text(email, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
             ]),
           ),
         ]),
         const SizedBox(height: 6),
         Text('Placed ${df.format(DateTime.tryParse(o['created_at']?.toString() ?? '') ?? DateTime(2020))}',
-            style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+            style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
         if (email.isNotEmpty) ...[
           const SizedBox(height: 8),
           OutlinedButton.icon(
@@ -254,7 +254,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           const SizedBox(width: 10),
           Expanded(child: Text(store?['name']?.toString() ?? meta.name,
               style: const TextStyle(fontWeight: FontWeight.w600))),
-          Text(meta.name, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+          Text(meta.name, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
         ]),
         const SizedBox(height: 8),
         _kv('Original order ID', o['external_id']?.toString() ?? '—'),
@@ -266,7 +266,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Widget _kv(String k, String v) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 3),
         child: Row(children: [
-          Text(k, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+          Text(k, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
           const Spacer(),
           Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
         ]),

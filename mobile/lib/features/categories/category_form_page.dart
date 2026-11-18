@@ -109,7 +109,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
               child: FilledButton(
                 onPressed: _saving ? null : _save,
                 child: _saving
-                    ? const SizedBox(height: 18, width: 18,
+                    ? SizedBox(height: 18, width: 18,
                         child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
                     : Text(widget.isEdit ? 'Save changes' : 'Create category'),
               ),

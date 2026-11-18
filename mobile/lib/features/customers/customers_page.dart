@@ -78,9 +78,9 @@ class _CustomersPageState extends State<CustomersPage> {
                         onSelected: (_) { setState(() => _platform = p); _reload(); },
                         selectedColor: AppPalette.primary,
                         labelStyle: TextStyle(
-                            color: _platform == p ? Colors.white : AppPalette.foreground, fontSize: 12),
+                            color: _platform == p ? AppPalette.onPrimary : AppPalette.foreground, fontSize: 12),
                         backgroundColor: AppPalette.card,
-                        side: const BorderSide(color: AppPalette.border),
+                        side: BorderSide(color: AppPalette.border),
                       ),
                     ),
                 ]),
@@ -113,7 +113,7 @@ class _CustomersPageState extends State<CustomersPage> {
                             radius: 22,
                             backgroundColor: AppPalette.primary.withValues(alpha: 0.12),
                             child: Text((c['name']?.toString() ?? 'C').characters.first.toUpperCase(),
-                                style: const TextStyle(color: AppPalette.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+                                style: TextStyle(color: AppPalette.primary, fontWeight: FontWeight.bold, fontSize: 16)),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -125,7 +125,7 @@ class _CustomersPageState extends State<CustomersPage> {
                                     style: const TextStyle(fontWeight: FontWeight.w600)),
                                 Text(c['customer_email']?.toString() ?? '',
                                     maxLines: 1, overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                                    style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
                                 if (platformsCsv.isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 5),
@@ -150,7 +150,7 @@ class _CustomersPageState extends State<CustomersPage> {
                                   style: AppText.number(size: 15, color: AppPalette.secondary)),
                               const SizedBox(height: 2),
                               Text('${c['total_orders'] ?? 0} ${context.t('customers.orders')}',
-                                  style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                                  style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                             ],
                           ),
                         ]),

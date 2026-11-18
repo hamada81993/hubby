@@ -117,9 +117,9 @@ class _InventoryPageState extends State<InventoryPage> {
                                       onSelected: (_) => setState(() => _filter = f[0]),
                                       selectedColor: AppPalette.primary,
                                       labelStyle: TextStyle(
-                                          color: _filter == f[0] ? Colors.white : AppPalette.foreground, fontSize: 12),
+                                          color: _filter == f[0] ? AppPalette.onPrimary : AppPalette.foreground, fontSize: 12),
                                       backgroundColor: AppPalette.card,
-                                      side: const BorderSide(color: AppPalette.border),
+                                      side: BorderSide(color: AppPalette.border),
                                     ),
                                   ),
                               ]),
@@ -166,7 +166,7 @@ class _InventoryPageState extends State<InventoryPage> {
                     style: const TextStyle(fontWeight: FontWeight.w600)),
                 Row(children: [
                   Text(item['sku']?.toString() ?? 'NO-SKU',
-                      style: const TextStyle(color: AppPalette.primary, fontSize: 11, fontWeight: FontWeight.w600)),
+                      style: TextStyle(color: AppPalette.primary, fontSize: 11, fontWeight: FontWeight.w600)),
                   const SizedBox(width: 8),
                   Text(out ? context.t('products.outOfStock') : low ? context.t('products.lowStock') : context.t('inventory.inSync'),
                       style: TextStyle(
@@ -178,7 +178,7 @@ class _InventoryPageState extends State<InventoryPage> {
             Text('$stock', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,
                 color: out ? AppPalette.destructive : low ? AppPalette.warning : AppPalette.foreground)),
             const SizedBox(width: 8),
-            const Icon(LucideIcons.chevronRight, size: 16, color: AppPalette.mutedForeground),
+            Icon(LucideIcons.chevronRight, size: 16, color: AppPalette.mutedForeground),
           ]),
         ),
     );
@@ -191,7 +191,7 @@ class _InventoryPageState extends State<InventoryPage> {
     return AppCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Icon(LucideIcons.refreshCw, color: AppPalette.primary, size: 18),
+          Icon(LucideIcons.refreshCw, color: AppPalette.primary, size: 18),
           const SizedBox(width: 8),
           Expanded(child: Text(context.t('inventory.syncHealth'), style: const TextStyle(fontWeight: FontWeight.bold))),
           Text('$connected / $total stores', style: const TextStyle(color: AppPalette.secondary, fontSize: 12)),
@@ -224,7 +224,7 @@ class _InventoryPageState extends State<InventoryPage> {
               Expanded(child: Text(log['product']?['name']?.toString() ?? 'Product',
                   maxLines: 1, overflow: TextOverflow.ellipsis)),
               Text('${log['source'] ?? ''} • ${df.format(DateTime.tryParse(log['created_at']?.toString() ?? '') ?? DateTime(2020))}',
-                  style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                  style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
               const SizedBox(width: 8),
               Text('${up ? '+' : ''}$change',
                   style: TextStyle(fontWeight: FontWeight.bold,

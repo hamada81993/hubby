@@ -233,7 +233,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
       bottomNavigationBar: _loadingMeta
           ? null
           : Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppPalette.card,
                 border: Border(top: BorderSide(color: AppPalette.border)),
                 boxShadow: [BoxShadow(color: Color(0x141E293B), blurRadius: 20, offset: Offset(0, -8))],
@@ -248,7 +248,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     child: FilledButton.icon(
                       onPressed: _saving ? null : _save,
                       icon: _saving
-                          ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
+                          ? SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
                           : const Icon(LucideIcons.check, size: 18),
                       label: Text(_saving
                           ? 'Saving…'
@@ -268,7 +268,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
           Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
           if (subtitle != null) ...[
             const SizedBox(height: 2),
-            Text(subtitle, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+            Text(subtitle, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
           ],
           const SizedBox(height: 14),
           ...children,
@@ -306,7 +306,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
             image: url.isNotEmpty ? DecorationImage(image: NetworkImage(url), fit: BoxFit.cover) : null,
           ),
           child: url.isEmpty
-              ? const Icon(LucideIcons.image, color: AppPalette.mutedForeground)
+              ? Icon(LucideIcons.image, color: AppPalette.mutedForeground)
               : null,
         ),
         const SizedBox(width: 14),
@@ -321,7 +321,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
             ),
             const SizedBox(height: 4),
             Text(url.isNotEmpty ? 'JPG/PNG/WEBP · 1000×1000 recommended' : 'Max 8MB · JPG, PNG, WEBP',
-                style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
             if (url.isNotEmpty)
               TextButton.icon(
                 onPressed: () => setState(() => _imageUrl.clear()),
@@ -360,7 +360,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
   Widget _storesSection(List stores) {
     return _section(context.t('products.channels'), context.t('products.channelsSub'), [
       if (stores.isEmpty)
-        Row(children: const [
+        Row(children: [
           Icon(LucideIcons.plugZap, size: 16, color: AppPalette.mutedForeground),
           SizedBox(width: 8),
           Expanded(child: Text('No connected stores yet — connect one to start syncing.',
@@ -377,9 +377,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
               selected: selected,
               onSelected: (v) => setState(() => v ? _storeIds.add(id) : _storeIds.remove(id)),
               selectedColor: AppPalette.primary,
-              checkmarkColor: Colors.white,
+              checkmarkColor: AppPalette.onPrimary,
               labelStyle: TextStyle(
-                  color: selected ? Colors.white : AppPalette.foreground, fontSize: 12, fontWeight: FontWeight.w500),
+                  color: selected ? AppPalette.onPrimary : AppPalette.foreground, fontSize: 12, fontWeight: FontWeight.w500),
               backgroundColor: AppPalette.surfaceAlt,
               side: BorderSide(color: selected ? AppPalette.primary : AppPalette.borderStrong),
             );
@@ -391,7 +391,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
   Widget _variantsSection() {
     return _section(context.t('products.variants'), null, [
       if (_variants.isEmpty)
-        Row(children: const [
+        Row(children: [
           Icon(LucideIcons.shapes, size: 16, color: AppPalette.mutedForeground),
           SizedBox(width: 8),
           Expanded(child: Text('Add variants for sizes, colors, or materials. The base price/stock applies otherwise.',
@@ -429,7 +429,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
             ),
           ),
           IconButton(
-            icon: const Icon(LucideIcons.trash2, size: 18, color: AppPalette.destructive),
+            icon: Icon(LucideIcons.trash2, size: 18, color: AppPalette.destructive),
             onPressed: () => setState(() => _variants.removeAt(i)..dispose()),
           ),
         ]),

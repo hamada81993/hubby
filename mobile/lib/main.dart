@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'app.dart';
 import 'core/locale/locale_cubit.dart';
+import 'core/theme/theme_cubit.dart';
 import 'core/network/api_client.dart';
 import 'core/storage/session_store.dart';
 import 'data/repositories/auth_repository.dart';
@@ -25,6 +26,9 @@ Future<void> main() async {
 
   final authBloc = AuthBloc(authRepo, session)..add(const AuthStarted());
   final localeCubit = LocaleCubit(session)..load();
+  // Awaited so the first frame is already in the saved theme.
+  final themeCubit = ThemeCubit(session);
+  await themeCubit.load();
   final storesCubit = StoresCubit(api);
 
   // Any 401 anywhere logs the user out cleanly. Cached warehouse data must not outlive the
@@ -47,6 +51,7 @@ Future<void> main() async {
         providers: [
           BlocProvider.value(value: authBloc),
           BlocProvider.value(value: localeCubit),
+          BlocProvider.value(value: themeCubit),
           BlocProvider.value(value: storesCubit),
         ],
         child: const HubbyApp(),

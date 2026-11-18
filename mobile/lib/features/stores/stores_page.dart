@@ -72,7 +72,7 @@ class StoresPage extends StatelessWidget {
                       Text(c[1] as String,
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: c[2] as Color)),
                       Text(c[0] as String,
-                          style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 10)),
+                          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 10)),
                     ]),
                   ),
                 ),
@@ -94,21 +94,21 @@ class StoresPage extends StatelessWidget {
             height: 34, width: 34,
             decoration: BoxDecoration(
                 color: AppPalette.primary.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(LucideIcons.crown, color: AppPalette.primary, size: 18),
+            child: Icon(LucideIcons.crown, color: AppPalette.primary, size: 18),
           ),
           const SizedBox(width: 10),
           Expanded(child: Text(context.t('stores.masterStore'), style: const TextStyle(fontWeight: FontWeight.bold))),
         ]),
         const SizedBox(height: 8),
-        const Text(
+        Text(
             'Your master store is the central inventory source. When stock changes there, Hubby pushes the update to every other connected store.',
             style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
         const SizedBox(height: 8),
         Row(children: [
-          const Icon(LucideIcons.refreshCw, size: 14, color: AppPalette.mutedForeground),
+          Icon(LucideIcons.refreshCw, size: 14, color: AppPalette.mutedForeground),
           const SizedBox(width: 6),
           Text('Last network sync ${_timeAgo(latest)}',
-              style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+              style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
         ]),
       ]),
     );
@@ -155,18 +155,18 @@ class StoresPage extends StatelessWidget {
                   ]),
                   if (domain.isNotEmpty)
                     Text(domain, maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                        style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                   Text('Last synced ${_timeAgo(s['last_synced_at']?.toString())}',
-                      style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                      style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                 ],
               ),
             ),
             if (s['is_master'] == true)
               Tooltip(message: context.t('stores.masterStore'),
-                  child: const Icon(LucideIcons.crown, color: AppPalette.primary, size: 18))
+                  child: Icon(LucideIcons.crown, color: AppPalette.primary, size: 18))
             else
               IconButton(
-                icon: const Icon(LucideIcons.crown, size: 18, color: AppPalette.mutedForeground),
+                icon: Icon(LucideIcons.crown, size: 18, color: AppPalette.mutedForeground),
                 tooltip: context.t('stores.setMaster'),
                 onPressed: () async {
                   await context.read<ApiClient>().dio.post('/stores/${s['id']}/set-master');
@@ -187,7 +187,7 @@ class StoresPage extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: const Icon(LucideIcons.trash2, size: 18, color: AppPalette.destructive),
+              icon: Icon(LucideIcons.trash2, size: 18, color: AppPalette.destructive),
               tooltip: context.t('common.disconnect'),
               onPressed: () => _confirmDelete(context, s),
             ),
@@ -198,7 +198,7 @@ class StoresPage extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                   color: AppPalette.destructive.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10)),
-              child: Row(children: const [
+              child: Row(children: [
                 Icon(LucideIcons.alertTriangle, size: 16, color: AppPalette.destructive),
                 SizedBox(width: 8),
                 Expanded(child: Text('Sync failed. Reconnect this store to restore syncing.',

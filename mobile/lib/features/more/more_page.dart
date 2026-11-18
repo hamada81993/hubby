@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/locale/locale_cubit.dart';
+import '../../core/theme/theme_cubit.dart';
 import '../../core/theme/app_palette.dart';
 import '../../l10n/strings.dart';
 import '../../shared/widgets/app_widgets.dart';
@@ -41,7 +42,7 @@ class MorePage extends StatelessWidget {
               CircleAvatar(
                 backgroundColor: AppPalette.primary.withValues(alpha: 0.12),
                 child: Text(s.userName.isNotEmpty ? s.userName[0].toUpperCase() : '?',
-                    style: const TextStyle(color: AppPalette.primary, fontWeight: FontWeight.bold)),
+                    style: TextStyle(color: AppPalette.primary, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -49,7 +50,7 @@ class MorePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(s.userName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text(s.userEmail, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                    Text(s.userEmail, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
                   ],
                 ),
               ),
@@ -65,7 +66,7 @@ class MorePage extends StatelessWidget {
                 ListTile(
                   leading: Icon(it.$1, size: 20, color: AppPalette.foreground),
                   title: Text(it.$2),
-                  trailing: const Icon(LucideIcons.chevronRight, size: 18, color: AppPalette.mutedForeground),
+                  trailing: Icon(LucideIcons.chevronRight, size: 18, color: AppPalette.mutedForeground),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => it.$3)),
                 ),
             ],
@@ -80,12 +81,22 @@ class MorePage extends StatelessWidget {
               title: Text(context.t('settings.language')),
               trailing: Text(
                   Localizations.localeOf(context).languageCode == 'ar' ? 'العربية' : 'English',
-                  style: const TextStyle(color: AppPalette.mutedForeground)),
+                  style: TextStyle(color: AppPalette.mutedForeground)),
               onTap: () => context.read<LocaleCubit>().toggle(),
             ),
             ListTile(
-              leading: const Icon(LucideIcons.logOut, size: 20, color: AppPalette.destructive),
-              title: Text(context.t('common.logout'), style: const TextStyle(color: AppPalette.destructive)),
+              leading: Icon(AppPalette.isDark ? LucideIcons.moon : LucideIcons.sun, size: 20),
+              title: Text(Localizations.localeOf(context).languageCode == 'ar' ? 'المظهر' : 'Appearance'),
+              trailing: Text(
+                  Localizations.localeOf(context).languageCode == 'ar'
+                      ? (AppPalette.isDark ? 'داكن' : 'فاتح')
+                      : (AppPalette.isDark ? 'Dark' : 'Light'),
+                  style: TextStyle(color: AppPalette.mutedForeground)),
+              onTap: () => context.read<ThemeCubit>().toggle(),
+            ),
+            ListTile(
+              leading: Icon(LucideIcons.logOut, size: 20, color: AppPalette.destructive),
+              title: Text(context.t('common.logout'), style: TextStyle(color: AppPalette.destructive)),
               onTap: () => context.read<AuthBloc>().add(const AuthLoggedOut()),
             ),
           ]),

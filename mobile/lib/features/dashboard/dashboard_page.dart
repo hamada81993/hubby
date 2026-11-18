@@ -157,7 +157,7 @@ class _DashboardPageState extends State<DashboardPage> {
         const Spacer(),
         value,
         const SizedBox(height: 2),
-        Text(label, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12, fontWeight: FontWeight.w500)),
+        Text(label, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12, fontWeight: FontWeight.w500)),
       ]),
     );
   }
@@ -186,7 +186,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   child: Text('${d}d',
                       style: TextStyle(
                           fontSize: 11,
-                          color: _days == d ? Colors.white : AppPalette.mutedForeground,
+                          color: _days == d ? AppPalette.onPrimary : AppPalette.mutedForeground,
                           fontWeight: FontWeight.w600)),
                 ),
               ),
@@ -238,7 +238,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           style: const TextStyle(fontSize: 13)),
                       if (date != null)
                         Text('${meta.name} · ${DateFormat.MMMd().format(date)}',
-                            style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                            style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                     ]),
                   ),
                   MoneyText(o['total'], compact: true, style: const TextStyle(fontWeight: FontWeight.w600)),

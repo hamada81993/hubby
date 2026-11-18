@@ -40,7 +40,7 @@ class _AppShellState extends State<AppShell> {
     return Scaffold(
       body: SafeArea(child: IndexedStack(index: _index, children: pages)),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppPalette.card,
           border: Border(top: BorderSide(color: AppPalette.border)),
           boxShadow: [BoxShadow(color: Color(0x0A1E293B), blurRadius: 16, offset: Offset(0, -6))],

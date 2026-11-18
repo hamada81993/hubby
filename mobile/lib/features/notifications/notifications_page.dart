@@ -66,7 +66,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                   child: Row(children: [
                     Text('$unreadCount ${context.t('notifications.unread')}',
-                        style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 13)),
+                        style: TextStyle(color: AppPalette.mutedForeground, fontSize: 13)),
                     const Spacer(),
                     TextButton(onPressed: () => _markAllRead(items), child: Text(context.t('notifications.markAllRead'))),
                   ]),
@@ -103,19 +103,19 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                       style: TextStyle(
                                           fontWeight: unread ? FontWeight.bold : FontWeight.w500)),
                                   Text(n['message']?.toString() ?? '',
-                                      style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 13)),
+                                      style: TextStyle(color: AppPalette.mutedForeground, fontSize: 13)),
                                   if (date != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4),
                                       child: Text(df.format(date),
-                                          style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                                          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                                     ),
                                 ],
                               ),
                             ),
                             if (unread)
                               Container(width: 8, height: 8,
-                                  decoration: const BoxDecoration(color: AppPalette.primary, shape: BoxShape.circle)),
+                                  decoration: BoxDecoration(color: AppPalette.primary, shape: BoxShape.circle)),
                           ]),
                         ),
                       ),

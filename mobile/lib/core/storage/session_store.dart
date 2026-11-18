@@ -7,6 +7,7 @@ class SessionStore {
   static const _kUser = 'auth_user';
   static const _kOrg = 'active_org_id';
   static const _kLocale = 'locale';
+  static const _kTheme = 'theme';
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
@@ -38,6 +39,10 @@ class SessionStore {
 
   Future<String> get localeCode async => (await _prefs).getString(_kLocale) ?? 'en';
   Future<void> setLocale(String code) async => (await _prefs).setString(_kLocale, code);
+
+  /// Dark is the brand default; only an explicit choice of light is stored as such.
+  Future<bool> get darkTheme async => (await _prefs).getString(_kTheme) != 'light';
+  Future<void> setDarkTheme(bool dark) async => (await _prefs).setString(_kTheme, dark ? 'dark' : 'light');
 
   Future<void> clear() async {
     final p = await _prefs;

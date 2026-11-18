@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'app_palette.dart';
 
-/// World-class light theme for Hubby.
+/// The Hubby theme, dark or light: the colours come from [AppPalette], which
+/// follows `AppPalette.isDark`.
 ///
 /// Satoshi for Latin (the Hubby brand face), Alexandria for Arabic — both
 /// self-bundled (see pubspec fonts). Soft layered elevation, tabular figures
@@ -9,10 +10,11 @@ import 'app_palette.dart';
 const String _kFontLatin = 'Satoshi';
 const String _kFontArabic = 'Alexandria';
 class AppTheme {
-  static ThemeData light(String localeCode) {
+  static ThemeData build(String localeCode) {
+    final brightness = AppPalette.isDark ? Brightness.dark : Brightness.light;
     final base = ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
+      brightness: brightness,
       scaffoldBackgroundColor: AppPalette.background,
       splashFactory: InkSparkle.splashFactory,
       colorScheme: ColorScheme.fromSeed(
@@ -21,7 +23,7 @@ class AppTheme {
         secondary: AppPalette.secondary,
         error: AppPalette.destructive,
         surface: AppPalette.card,
-        brightness: Brightness.light,
+        brightness: brightness,
       ),
     );
 
@@ -33,13 +35,13 @@ class AppTheme {
     return base.copyWith(
       textTheme: textTheme,
       dividerColor: AppPalette.border,
-      dividerTheme: const DividerThemeData(color: AppPalette.border, thickness: 1, space: 1),
+      dividerTheme: DividerThemeData(color: AppPalette.border, thickness: 1, space: 1),
       cardTheme: CardThemeData(
         color: AppPalette.card,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppPalette.rLg),
-          side: const BorderSide(color: AppPalette.border),
+          side: BorderSide(color: AppPalette.border),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -54,10 +56,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppPalette.card,
-        hintStyle: const TextStyle(color: AppPalette.mutedForeground),
-        labelStyle: const TextStyle(color: AppPalette.mutedForeground),
-        floatingLabelStyle: const TextStyle(color: AppPalette.primary, fontWeight: FontWeight.w600),
-        helperStyle: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11),
+        hintStyle: TextStyle(color: AppPalette.mutedForeground),
+        labelStyle: TextStyle(color: AppPalette.mutedForeground),
+        floatingLabelStyle: TextStyle(color: AppPalette.primary, fontWeight: FontWeight.w600),
+        helperStyle: TextStyle(color: AppPalette.mutedForeground, fontSize: 11),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
         prefixIconColor: AppPalette.mutedForeground,
         border: _inputBorder(AppPalette.borderStrong),
@@ -68,8 +70,8 @@ class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: AppPalette.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: AppPalette.action,
+          foregroundColor: AppPalette.onAction,
           // Readable disabled state — grey on grey, never white-on-light.
           disabledBackgroundColor: AppPalette.surfaceAlt,
           disabledForegroundColor: AppPalette.mutedForeground,
@@ -83,7 +85,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppPalette.foregroundSoft,
           backgroundColor: AppPalette.card,
-          side: const BorderSide(color: AppPalette.borderStrong),
+          side: BorderSide(color: AppPalette.borderStrong),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppPalette.rMd)),
           textStyle: _heading(localeCode, 14, FontWeight.w600),
@@ -115,16 +117,16 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppPalette.card,
         selectedColor: AppPalette.primary,
-        side: const BorderSide(color: AppPalette.borderStrong),
-        labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppPalette.foreground),
-        secondaryLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
-        iconTheme: const IconThemeData(color: AppPalette.foregroundSoft, size: 16),
+        side: BorderSide(color: AppPalette.borderStrong),
+        labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppPalette.foreground),
+        secondaryLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppPalette.onPrimary),
+        iconTheme: IconThemeData(color: AppPalette.foregroundSoft, size: 16),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppPalette.rPill)),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith(
-            (s) => s.contains(WidgetState.selected) ? AppPalette.primary : Colors.white),
+            (s) => s.contains(WidgetState.selected) ? AppPalette.primary : AppPalette.foregroundSoft),
         trackColor: WidgetStateProperty.resolveWith(
             (s) => s.contains(WidgetState.selected) ? AppPalette.primarySoft : AppPalette.surfaceAlt),
         trackOutlineColor: WidgetStateProperty.all(AppPalette.borderStrong),
@@ -133,13 +135,13 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppPalette.card,
         elevation: 6,
-        contentTextStyle: const TextStyle(color: AppPalette.foreground),
+        contentTextStyle: TextStyle(color: AppPalette.foreground),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppPalette.rMd),
-          side: const BorderSide(color: AppPalette.border),
+          side: BorderSide(color: AppPalette.border),
         ),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
+      bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: AppPalette.card,
         surfaceTintColor: Colors.transparent,
       ),
@@ -149,7 +151,7 @@ class AppTheme {
         elevation: 12,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppPalette.rXl)),
       ),
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
+      progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppPalette.primary,
         linearTrackColor: AppPalette.surfaceAlt,
       ),

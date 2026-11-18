@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 6),
                     Text(context.t('auth.signInSub'),
-                        style: const TextStyle(color: AppPalette.mutedForeground)),
+                        style: TextStyle(color: AppPalette.mutedForeground)),
                     const SizedBox(height: 24),
                     BlocConsumer<AuthBloc, AuthState>(
                       listenWhen: (p, c) => c.error != null && c.error != p.error,
@@ -98,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                             FilledButton(
                               onPressed: loading ? null : _submit,
                               child: loading
-                                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
+                                  ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
                                   : Text(context.t('auth.signIn')),
                             ),
                           ],
@@ -110,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(context.t('auth.noAccount'),
-                            style: const TextStyle(color: AppPalette.mutedForeground)),
+                            style: TextStyle(color: AppPalette.mutedForeground)),
                         TextButton(
                           onPressed: () => context.push('/register'),
                           child: Text(context.t('auth.signUp')),
@@ -141,7 +141,7 @@ class _ErrorBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppPalette.destructive.withValues(alpha: 0.3)),
       ),
-      child: Text(message, style: const TextStyle(color: AppPalette.destructive, fontSize: 13)),
+      child: Text(message, style: TextStyle(color: AppPalette.destructive, fontSize: 13)),
     );
   }
 }

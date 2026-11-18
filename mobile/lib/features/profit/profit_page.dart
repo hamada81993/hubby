@@ -87,7 +87,7 @@ class _ProfitPageState extends State<ProfitPage> {
             padding: const EdgeInsets.all(16),
             children: [
               Text(context.t('profit.subtitle'),
-                  style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                  style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
               const SizedBox(height: 12),
               _rangeSelector(),
               const SizedBox(height: 16),
@@ -140,12 +140,12 @@ class _ProfitPageState extends State<ProfitPage> {
             showCheckmark: false,
             selectedColor: AppPalette.primary,
             labelStyle: TextStyle(
-              color: selected ? Colors.white : AppPalette.foreground,
+              color: selected ? AppPalette.onPrimary : AppPalette.foreground,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
             backgroundColor: AppPalette.card,
-            side: const BorderSide(color: AppPalette.border),
+            side: BorderSide(color: AppPalette.border),
           ),
         );
       }).toList(),
@@ -175,7 +175,7 @@ class _ProfitPageState extends State<ProfitPage> {
           Icon(complete ? Icons.verified_outlined : Icons.info_outline, size: 18, color: color),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(message, style: const TextStyle(fontSize: 12, color: AppPalette.foregroundSoft)),
+            child: Text(message, style: TextStyle(fontSize: 12, color: AppPalette.foregroundSoft)),
           ),
         ],
       ),
@@ -191,13 +191,13 @@ class _ProfitPageState extends State<ProfitPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label.toUpperCase(),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 10, fontWeight: FontWeight.bold, color: AppPalette.mutedForeground, letterSpacing: 0.5)),
                 const SizedBox(height: 4),
                 value,
                 if (hint != null) ...[
                   const SizedBox(height: 2),
-                  Text(hint, style: const TextStyle(fontSize: 10, color: AppPalette.mutedForeground)),
+                  Text(hint, style: TextStyle(fontSize: 10, color: AppPalette.mutedForeground)),
                 ],
               ],
             ),
@@ -212,13 +212,13 @@ class _ProfitPageState extends State<ProfitPage> {
           const SizedBox(width: 12),
           tile(context.t('profit.cogs'),
               MoneyText(summary['cogs'],
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppPalette.mutedForeground))),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppPalette.mutedForeground))),
         ]),
         const SizedBox(height: 12),
         Row(children: [
           tile(context.t('profit.fees'),
               MoneyText(summary['fees'],
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppPalette.mutedForeground))),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppPalette.mutedForeground))),
           const SizedBox(width: 12),
           tile(
             context.t('profit.netProfit'),
@@ -288,7 +288,7 @@ class _ProfitPageState extends State<ProfitPage> {
   Widget _legendDot(Color color, String label) => Row(mainAxisSize: MainAxisSize.min, children: [
         Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 6),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppPalette.mutedForeground)),
+        Text(label, style: TextStyle(fontSize: 11, color: AppPalette.mutedForeground)),
       ]);
 
   Widget _bySkuCard(List bySku) {
@@ -316,7 +316,7 @@ class _ProfitPageState extends State<ProfitPage> {
                   Text(
                     '${row['units'] ?? 0} ${context.t('profit.units')}'
                     '${margin == null ? '' : ' · ${margin.toStringAsFixed(0)}%'}',
-                    style: const TextStyle(fontSize: 11, color: AppPalette.mutedForeground),
+                    style: TextStyle(fontSize: 11, color: AppPalette.mutedForeground),
                   ),
                 ]),
               ),
@@ -351,7 +351,7 @@ class _ProfitPageState extends State<ProfitPage> {
                   Text(
                     '${row['orders'] ?? 0} ${context.t('profit.orders')}'
                     '${margin == null ? '' : ' · ${margin.toStringAsFixed(0)}%'}',
-                    style: const TextStyle(fontSize: 11, color: AppPalette.mutedForeground),
+                    style: TextStyle(fontSize: 11, color: AppPalette.mutedForeground),
                   ),
                 ]),
               ),
@@ -373,6 +373,6 @@ class _ProfitPageState extends State<ProfitPage> {
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(context.t('profit.estimated'),
-            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppPalette.warning)),
+            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppPalette.warning)),
       );
 }

@@ -42,7 +42,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 6),
                   Text(context.t('auth.resetSub'),
-                      style: const TextStyle(color: AppPalette.mutedForeground)),
+                      style: TextStyle(color: AppPalette.mutedForeground)),
                   const SizedBox(height: 24),
                   if (_sent)
                     Container(
@@ -74,7 +74,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     FilledButton(
                       onPressed: _loading ? null : _submit,
                       child: _loading
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
+                          ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
                           : Text(context.t('auth.sendLink')),
                     ),
                   ],

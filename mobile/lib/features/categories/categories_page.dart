@@ -61,7 +61,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
             Text('Delete “${category['name']}”?'),
             if (hasChildren) ...[
               const SizedBox(height: 12),
-              const Text('This category has subcategories. What should happen to them?',
+              Text('This category has subcategories. What should happen to them?',
                   style: TextStyle(fontSize: 13, color: AppPalette.mutedForeground)),
               const SizedBox(height: 8),
               Wrap(spacing: 8, children: [
@@ -75,9 +75,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     onSelected: (_) => setLocal(() => strategy = opt[0]),
                     selectedColor: AppPalette.primary,
                     labelStyle: TextStyle(
-                        color: strategy == opt[0] ? Colors.white : AppPalette.foreground, fontSize: 12),
+                        color: strategy == opt[0] ? AppPalette.onPrimary : AppPalette.foreground, fontSize: 12),
                     backgroundColor: AppPalette.card,
-                    side: const BorderSide(color: AppPalette.border),
+                    side: BorderSide(color: AppPalette.border),
                   ),
               ]),
             ],
@@ -124,11 +124,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   child: AppCard(
                     padding: const EdgeInsets.all(28),
                     child: Column(children: [
-                      const Icon(LucideIcons.folderTree, size: 32, color: AppPalette.primary),
+                      Icon(LucideIcons.folderTree, size: 32, color: AppPalette.primary),
                       const SizedBox(height: 12),
                       const Text('No categories yet', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       const SizedBox(height: 6),
-                      const Text('Group your products by creating your first category.',
+                      Text('Group your products by creating your first category.',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: AppPalette.mutedForeground, fontSize: 13)),
                       const SizedBox(height: 16),
@@ -163,7 +163,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                           if ((c['description']?.toString() ?? '').isNotEmpty)
                             Text(c['description'].toString(),
                                 maxLines: 1, overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                                style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
                         ]),
                       ),
                       IconButton(
@@ -171,7 +171,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         onPressed: () => _openForm((c as Map).cast<String, dynamic>()),
                       ),
                       IconButton(
-                        icon: const Icon(LucideIcons.trash2, size: 18, color: AppPalette.destructive),
+                        icon: Icon(LucideIcons.trash2, size: 18, color: AppPalette.destructive),
                         onPressed: () => _delete(c),
                       ),
                     ]),

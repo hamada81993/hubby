@@ -76,11 +76,11 @@ class _ConnectSheetState extends State<_ConnectSheet> {
             Text('Connect ${p.name}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ]),
           const SizedBox(height: 8),
-          Text(p.help, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+          Text(p.help, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
           const SizedBox(height: 16),
           if (_error != null)
             Padding(padding: const EdgeInsets.only(bottom: 10),
-                child: Text(_error!, style: const TextStyle(color: AppPalette.destructive))),
+                child: Text(_error!, style: TextStyle(color: AppPalette.destructive))),
           _field(_name, 'Store name'),
           const SizedBox(height: 10),
           _field(_domain, p.domainLabel, hint: p.domainHint),
@@ -94,7 +94,7 @@ class _ConnectSheetState extends State<_ConnectSheet> {
           FilledButton(
             onPressed: _loading ? null : () => _submit(p),
             child: _loading
-                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
+                ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
                 : const Text('Connect store'),
           ),
           const SizedBox(height: 8),

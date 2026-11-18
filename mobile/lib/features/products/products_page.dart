@@ -230,7 +230,7 @@ class _ProductsPageState extends State<ProductsPage> {
                         padding: const EdgeInsets.all(24),
                         child: Center(
                           child: Text(context.t('products.noMatch'),
-                              style: const TextStyle(color: AppPalette.mutedForeground)),
+                              style: TextStyle(color: AppPalette.mutedForeground)),
                         ),
                       ),
                     )
@@ -278,7 +278,7 @@ class _ProductsPageState extends State<ProductsPage> {
       ),
       child: PopupMenuButton<String>(
         tooltip: 'Sort & filter',
-        icon: const Icon(LucideIcons.slidersHorizontal, size: 18, color: AppPalette.foregroundSoft),
+        icon: Icon(LucideIcons.slidersHorizontal, size: 18, color: AppPalette.foregroundSoft),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppPalette.rMd)),
         onSelected: (v) => setState(() {
           switch (v) {
@@ -297,14 +297,14 @@ class _ProductsPageState extends State<ProductsPage> {
           }
         }),
         itemBuilder: (_) => [
-          PopupMenuItem(enabled: false, child: Text(context.t('products.sortBy'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppPalette.mutedForeground))),
+          PopupMenuItem(enabled: false, child: Text(context.t('products.sortBy'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppPalette.mutedForeground))),
           _menuItem('newest', context.t('products.newest'), _sort == _Sort.newest),
           _menuItem('priceHigh', context.t('products.priceHigh'), _sort == _Sort.priceHigh),
           _menuItem('priceLow', context.t('products.priceLow'), _sort == _Sort.priceLow),
           _menuItem('stockLow', context.t('products.stockLow'), _sort == _Sort.stockLow),
           _menuItem('nameAz', context.t('products.nameAz'), _sort == _Sort.nameAz),
           const PopupMenuDivider(),
-          PopupMenuItem(enabled: false, child: Text(context.t('common.stock'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppPalette.mutedForeground))),
+          PopupMenuItem(enabled: false, child: Text(context.t('common.stock'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppPalette.mutedForeground))),
           _menuItem('all', context.t('products.allProducts'), _stockFilter == 'all'),
           _menuItem('low', context.t('products.lowStock'), _stockFilter == 'low'),
           _menuItem('out', context.t('products.outOfStock'), _stockFilter == 'out'),
@@ -327,7 +327,7 @@ class _ProductsPageState extends State<ProductsPage> {
     final filtered = shown != total || _stockFilter != 'all';
     return Row(children: [
       Text(filtered ? '$shown / $total ${context.t('products.count')}' : '$total ${context.t('products.count')}',
-          style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12, fontWeight: FontWeight.w500)),
+          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12, fontWeight: FontWeight.w500)),
       const Spacer(),
       if (!_selecting)
         TextButton.icon(
@@ -371,7 +371,7 @@ class _ProductsPageState extends State<ProductsPage> {
                         : null,
                   ),
                   child: p['image_url'] == null
-                      ? const Center(child: Icon(LucideIcons.image, color: AppPalette.mutedForeground, size: 26))
+                      ? Center(child: Icon(LucideIcons.image, color: AppPalette.mutedForeground, size: 26))
                       : null,
                 ),
               ),
@@ -391,7 +391,7 @@ class _ProductsPageState extends State<ProductsPage> {
                     ),
                     padding: const EdgeInsets.all(2),
                     child: Icon(selected ? LucideIcons.check : LucideIcons.circle,
-                        size: 16, color: selected ? Colors.white : Colors.transparent),
+                        size: 16, color: selected ? AppPalette.onPrimary : Colors.transparent),
                   ),
                 ),
             ]),
@@ -403,7 +403,7 @@ class _ProductsPageState extends State<ProductsPage> {
             Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text(p['sku'].toString(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                  style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
             ),
           const Spacer(),
           Row(children: [
@@ -425,11 +425,11 @@ class _ProductsPageState extends State<ProductsPage> {
         ),
         child: Text(text,
             style: TextStyle(
-                color: soft ? color : Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                color: soft ? color : (color.computeLuminance() > 0.4 ? AppPalette.ink : Colors.white), fontSize: 11, fontWeight: FontWeight.w700)),
       );
 
   Widget _bulkBar() => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppPalette.card,
           border: Border(top: BorderSide(color: AppPalette.border)),
           boxShadow: [BoxShadow(color: Color(0x141E293B), blurRadius: 20, offset: Offset(0, -8))],
@@ -452,7 +452,7 @@ class _ProductsPageState extends State<ProductsPage> {
                   style: FilledButton.styleFrom(backgroundColor: AppPalette.destructive),
                   onPressed: _bulkBusy ? null : _bulkDelete,
                   icon: _bulkBusy
-                      ? const SizedBox(height: 16, width: 16,
+                      ? SizedBox(height: 16, width: 16,
                           child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
                       : const Icon(LucideIcons.trash2, size: 16),
                   label: Text(context.t('common.delete')),

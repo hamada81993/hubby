@@ -91,7 +91,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       child: Scaffold(
         appBar: AppBar(title: const Text('Product'), actions: [
           IconButton(
-              icon: const Icon(LucideIcons.trash2, size: 20, color: AppPalette.destructive),
+              icon: Icon(LucideIcons.trash2, size: 20, color: AppPalette.destructive),
               tooltip: context.t('common.delete'),
               onPressed: _delete),
         ]),
@@ -136,7 +136,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       Text(context.t('products.description'), style: const TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       Text(p['description'].toString(),
-                          style: const TextStyle(color: AppPalette.foregroundSoft, height: 1.5)),
+                          style: TextStyle(color: AppPalette.foregroundSoft, height: 1.5)),
                     ]),
                   ),
                 ],
@@ -171,7 +171,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               : null,
         ),
         child: (url == null || url.isEmpty)
-            ? const Center(child: Icon(LucideIcons.image, color: AppPalette.mutedForeground, size: 40))
+            ? Center(child: Icon(LucideIcons.image, color: AppPalette.mutedForeground, size: 40))
             : null,
       ),
     );
@@ -237,7 +237,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
           const SizedBox(height: 10),
           value,
-          Text(label, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+          Text(label, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
         ]),
       );
 
@@ -247,7 +247,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         Row(children: [
           Text(context.t('products.variants'), style: const TextStyle(fontWeight: FontWeight.bold)),
           const Spacer(),
-          Text('${variants.length}', style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+          Text('${variants.length}', style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
         ]),
         const SizedBox(height: 4),
         ...variants.map((v) {
@@ -262,7 +262,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   if ((v['sku']?.toString() ?? '').isNotEmpty)
                     Text(v['sku'].toString(),
-                        style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                        style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                 ]),
               ),
               Container(
@@ -284,10 +284,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           Container(
             height: 36, width: 36,
             decoration: BoxDecoration(color: AppPalette.surfaceAlt, borderRadius: BorderRadius.circular(AppPalette.rSm)),
-            child: const Icon(LucideIcons.store, size: 18, color: AppPalette.mutedForeground),
+            child: Icon(LucideIcons.store, size: 18, color: AppPalette.mutedForeground),
           ),
           const SizedBox(width: 12),
-          const Expanded(child: Text('Not linked to any store yet.\nEdit the product to push it to your channels.',
+          Expanded(child: Text('Not linked to any store yet.\nEdit the product to push it to your channels.',
               style: TextStyle(color: AppPalette.mutedForeground, fontSize: 13, height: 1.4))),
         ]),
       );
@@ -296,7 +296,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(context.t('products.channels'), style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 2),
-        const Text('Toggle per-channel sync. Disabled channels keep their own stock.',
+        Text('Toggle per-channel sync. Disabled channels keep their own stock.',
             style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
         const SizedBox(height: 6),
         ...platformProducts.map((pp) {
@@ -325,7 +325,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   Text(sub.isEmpty ? meta.name : sub,
                       maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                      style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                 ]),
               ),
               Switch(

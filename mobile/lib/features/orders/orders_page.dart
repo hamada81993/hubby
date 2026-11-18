@@ -179,13 +179,13 @@ class _OrdersPageState extends State<OrdersPage> {
                                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                                     Text(o['customer_name']?.toString() ?? 'Guest',
                                         maxLines: 1, overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                                        style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
                                     if (email.isNotEmpty)
                                       Text(email, maxLines: 1, overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                                          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                                     if (date != null)
                                       Text(DateFormat.yMMMd().add_jm().format(date),
-                                          style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                                          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                                   ],
                                 ),
                               ),
@@ -229,7 +229,8 @@ class _OrdersPageState extends State<OrdersPage> {
     }
   }
 
-  Widget _chip(String label, bool active, VoidCallback onTap, [Color color = AppPalette.primary]) {
+  Widget _chip(String label, bool active, VoidCallback onTap, [Color? tone]) {
+    final color = tone ?? AppPalette.primary;
     return Padding(
       padding: const EdgeInsetsDirectional.only(end: 8),
       child: ChoiceChip(
@@ -237,9 +238,9 @@ class _OrdersPageState extends State<OrdersPage> {
         selected: active,
         onSelected: (_) => onTap(),
         selectedColor: color,
-        labelStyle: TextStyle(color: active ? Colors.white : AppPalette.foreground, fontSize: 12),
+        labelStyle: TextStyle(color: active ? AppPalette.onPrimary : AppPalette.foreground, fontSize: 12),
         backgroundColor: AppPalette.card,
-        side: const BorderSide(color: AppPalette.border),
+        side: BorderSide(color: AppPalette.border),
       ),
     );
   }

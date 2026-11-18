@@ -186,7 +186,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _saveButton(String label, bool loading, VoidCallback onTap) => FilledButton(
         onPressed: loading ? null : onTap,
         child: loading
-            ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
+            ? SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
             : Text(label),
       );
 }

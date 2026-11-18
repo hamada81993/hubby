@@ -65,7 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 12),
                                 child: Text(state.error!,
-                                    style: const TextStyle(color: AppPalette.destructive)),
+                                    style: TextStyle(color: AppPalette.destructive)),
                               ),
                             _field(_name, context.t('auth.name'), (v) => v!.isEmpty ? 'Required' : null,
                                 keyboard: TextInputType.name, hints: const [AutofillHints.name]),
@@ -84,7 +84,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             FilledButton(
                               onPressed: loading ? null : _submit,
                               child: loading
-                                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
+                                  ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
                                   : Text(context.t('auth.createAccount')),
                             ),
                           ],

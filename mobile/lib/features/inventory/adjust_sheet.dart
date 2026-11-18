@@ -76,7 +76,7 @@ class _AdjustSheetState extends State<_AdjustSheet> {
           const SizedBox(height: 16),
           if (_error != null)
             Padding(padding: const EdgeInsets.only(bottom: 10),
-                child: Text(_error!, style: const TextStyle(color: AppPalette.destructive))),
+                child: Text(_error!, style: TextStyle(color: AppPalette.destructive))),
           if (variants.isNotEmpty)
             DropdownButtonFormField<int>(
               initialValue: _variantId,
@@ -105,7 +105,7 @@ class _AdjustSheetState extends State<_AdjustSheet> {
           FilledButton(
             onPressed: _loading ? null : _submit,
             child: _loading
-                ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
+                ? SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
                 : const Text('Apply adjustment'),
           ),
           const SizedBox(height: 8),

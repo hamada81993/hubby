@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'core/locale/locale_cubit.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_cubit.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 import 'shared/widgets/brand_mark.dart';
 
@@ -19,9 +20,12 @@ class _HubbyAppState extends State<HubbyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild from the top when the theme flips: the palette is read by const
+    // widgets too, so the app is keyed on the theme to remount them.
+    final dark = context.watch<ThemeCubit>().state;
     return BlocBuilder<LocaleCubit, Locale>(
       builder: (context, locale) {
-        final theme = AppTheme.light(locale.languageCode);
+        final theme = AppTheme.build(locale.languageCode);
         const delegates = [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -48,6 +52,7 @@ class _HubbyAppState extends State<HubbyApp> {
               );
             }
             return MaterialApp.router(
+              key: ValueKey(dark),
               title: 'Hubby',
               debugShowCheckedModeBanner: false,
               theme: theme,

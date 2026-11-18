@@ -79,15 +79,15 @@ class _BillingPageState extends State<BillingPage> {
             padding: const EdgeInsets.only(bottom: 16),
             child: AppCard(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(context.t('billing.currentPlan'), style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                Text(context.t('billing.currentPlan'), style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
                 const SizedBox(height: 4),
                 Text(sub['plan']?['name']?.toString() ?? 'Active',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text('Status: ${sub['status'] ?? ''}', style: const TextStyle(color: AppPalette.mutedForeground)),
+                Text('Status: ${sub['status'] ?? ''}', style: TextStyle(color: AppPalette.mutedForeground)),
                 if (sub['ends_at'] != null)
                   Text(
                       '${context.t('billing.nextBilling')} ${DateFormat.yMMMd().format(DateTime.tryParse(sub['ends_at'].toString()) ?? DateTime(2020))}',
-                      style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                      style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
                 if (sub['status'] == 'active') ...[
                   const SizedBox(height: 12),
                   OutlinedButton(
@@ -118,16 +118,16 @@ class _BillingPageState extends State<BillingPage> {
                           decoration: BoxDecoration(
                               color: AppPalette.primary, borderRadius: BorderRadius.circular(20)),
                           child: Text(context.t('billing.recommended'),
-                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
+                              style: TextStyle(color: AppPalette.onPrimary, fontSize: 10, fontWeight: FontWeight.w700)),
                         ),
                       ],
                     ]),
                     MoneyText(p['price'], suffix: ' / mo',
-                        style: const TextStyle(color: AppPalette.mutedForeground)),
+                        style: TextStyle(color: AppPalette.mutedForeground)),
                     if ((p['description']?.toString() ?? '').isNotEmpty) ...[
                       const SizedBox(height: 6),
                       Text(p['description'].toString(),
-                          style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 13)),
+                          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 13)),
                     ],
                     const SizedBox(height: 10),
                     ...features.map((f) => Padding(
@@ -144,7 +144,7 @@ class _BillingPageState extends State<BillingPage> {
                       child: FilledButton(
                         onPressed: isCurrent || _busyPlan == p['id'] ? null : () => _subscribe(p['id']),
                         child: _busyPlan == p['id']
-                            ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
+                            ? SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppPalette.primary))
                             : Text(isCurrent ? context.t('billing.currentPlan') : 'Switch to ${p['name']}'),
                       ),
                     ),

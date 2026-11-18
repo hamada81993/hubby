@@ -51,7 +51,7 @@ void main() {
         child: MultiBlocProvider(
           providers: [BlocProvider(create: (_) => StoresCubit(api))],
           child: MaterialApp(
-            theme: AppTheme.light('en'),
+            theme: AppTheme.build('en'),
             home: const Scaffold(body: ProductsPage()),
           ),
         ),

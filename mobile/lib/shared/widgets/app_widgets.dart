@@ -95,7 +95,7 @@ class EmptyState extends StatelessWidget {
             if (subtitle != null) ...[
               const SizedBox(height: 6),
               Text(subtitle!, textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 13, height: 1.4)),
+                  style: TextStyle(color: AppPalette.mutedForeground, fontSize: 13, height: 1.4)),
             ],
           ],
         ),
@@ -160,10 +160,10 @@ class ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(LucideIcons.alertCircle, color: AppPalette.destructive, size: 32),
+            Icon(LucideIcons.alertCircle, color: AppPalette.destructive, size: 32),
             const SizedBox(height: 12),
             Text(message, textAlign: TextAlign.center,
-                style: const TextStyle(color: AppPalette.mutedForeground)),
+                style: TextStyle(color: AppPalette.mutedForeground)),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
               OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
@@ -192,14 +192,14 @@ class ConnectPrompt extends StatelessWidget {
               color: AppPalette.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Icon(LucideIcons.plug, color: AppPalette.primary, size: 28),
+            child: Icon(LucideIcons.plug, color: AppPalette.primary, size: 28),
           ),
           const SizedBox(height: 16),
           const Text('No platforms connected yet',
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text(description, textAlign: TextAlign.center,
-              style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 13)),
+              style: TextStyle(color: AppPalette.mutedForeground, fontSize: 13)),
           const SizedBox(height: 18),
           FilledButton.icon(
             onPressed: () => context.push('/stores'),
@@ -234,11 +234,11 @@ void showToast(BuildContext context, String message, [ToastKind kind = ToastKind
       content: Row(children: [
         Icon(icon, color: color, size: 18),
         const SizedBox(width: 10),
-        Expanded(child: Text(message, style: const TextStyle(color: AppPalette.foreground))),
+        Expanded(child: Text(message, style: TextStyle(color: AppPalette.foreground))),
       ]),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppPalette.border),
+        side: BorderSide(color: AppPalette.border),
       ),
     ));
 }

@@ -39,7 +39,7 @@ const List<PlatformMeta> kPlatforms = [
   ),
   PlatformMeta(
     id: 'salla', name: 'Salla', icon: LucideIcons.globe,
-    color: AppPalette.primary, auth: 'oauth',
+    color: Color(0xFF00C7B1), auth: 'oauth',
     domainLabel: 'Store URL', domainHint: 'your-store.salla.sa',
     tokenLabel: 'Access token', help: 'Salla Partners portal → your app → Tokens.',
   ),
@@ -88,7 +88,7 @@ final Map<String, PlatformMeta> _byId = {for (final p in kPlatforms) p.id: p};
 
 PlatformMeta platformFor(String? id) =>
     _byId[id] ??
-    const PlatformMeta(
+    PlatformMeta(
       id: 'other', name: 'Other', icon: LucideIcons.store,
       color: AppPalette.mutedForeground, auth: 'manual',
       domainLabel: 'Store URL', domainHint: 'your-store.example.com',

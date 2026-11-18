@@ -48,7 +48,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             children: [
               const Text('Revenue overview', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 4),
-              const Text('Last 30 days', style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+              Text('Last 30 days', style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
               const SizedBox(height: 10),
               if (timeline.length > 1) _revenueChart(timeline),
               const SizedBox(height: 20),
@@ -69,7 +69,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text(meta.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                             Text('${p['count'] ?? 0} orders · ${pct.toStringAsFixed(0)}%',
-                                style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                                style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                           ]),
                         ),
                         MoneyText(revenue, style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -89,7 +89,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                           Expanded(child: Text(p['name']?.toString() ?? '',
                               maxLines: 1, overflow: TextOverflow.ellipsis)),
                           Text('${p['units_sold'] ?? 0} sold',
-                              style: const TextStyle(color: AppPalette.mutedForeground)),
+                              style: TextStyle(color: AppPalette.mutedForeground)),
                         ]),
                       )).toList(),
                 ),
@@ -99,7 +99,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               const SizedBox(height: 10),
               AppCard(
                 child: topCustomers.isEmpty
-                    ? const Text('No customer data yet.',
+                    ? Text('No customer data yet.',
                         style: TextStyle(color: AppPalette.mutedForeground))
                     : Column(
                         children: topCustomers.map((c) => Padding(
@@ -112,7 +112,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                     (c['customer_name']?.toString().trim().isNotEmpty ?? false)
                                         ? c['customer_name'].toString()[0].toUpperCase()
                                         : '?',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         color: AppPalette.primary, fontWeight: FontWeight.bold, fontSize: 12),
                                   ),
                                 ),
@@ -123,7 +123,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                         maxLines: 1, overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                                     Text('${c['orders_count'] ?? 0} orders',
-                                        style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                                        style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                                   ]),
                                 ),
                                 MoneyText(c['total_spent'],

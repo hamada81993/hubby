@@ -76,13 +76,13 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
                     radius: 28,
                     backgroundColor: AppPalette.primary.withValues(alpha: 0.12),
                     child: Text((c['name']?.toString() ?? 'C').characters.first.toUpperCase(),
-                        style: const TextStyle(color: AppPalette.primary, fontWeight: FontWeight.bold, fontSize: 22)),
+                        style: TextStyle(color: AppPalette.primary, fontWeight: FontWeight.bold, fontSize: 22)),
                   ),
                   const SizedBox(height: 10),
                   Text(c['name']?.toString() ?? 'Anonymous',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                   Text(c['email']?.toString() ?? widget.email,
-                      style: const TextStyle(color: AppPalette.mutedForeground)),
+                      style: TextStyle(color: AppPalette.mutedForeground)),
                   const SizedBox(height: 16),
                   Row(children: [
                     Expanded(child: _stat('Orders',
@@ -115,7 +115,7 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
                   child: AppCard(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
-                        const Icon(LucideIcons.award, size: 16, color: AppPalette.primary),
+                        Icon(LucideIcons.award, size: 16, color: AppPalette.primary),
                         const SizedBox(width: 8),
                         Text(context.t('customers.loyalty'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                       ]),
@@ -128,7 +128,7 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
                       ),
                       const SizedBox(height: 8),
                       Text('Lifetime ${formatMoney(totalSpend, currency)}',
-                          style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                     ]),
                   ),
                 ),
@@ -139,7 +139,7 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
                   Text(context.t('customers.orderHistory'), style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   if (orders.isEmpty)
-                    const Text('No orders yet.', style: TextStyle(color: AppPalette.mutedForeground))
+                    Text('No orders yet.', style: TextStyle(color: AppPalette.mutedForeground))
                   else
                     ...orders.map((o) {
                       final meta = platformFor(o['store']?['platform']);
@@ -160,7 +160,7 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
                                 Text(
                                     '${o['store']?['name']?.toString() ?? meta.name} · '
                                     '${df.format(DateTime.tryParse(o['created_at']?.toString() ?? '') ?? DateTime(2020))}',
-                                    style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                                    style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
                               ]),
                             ),
                             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -183,7 +183,7 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
 
   Widget _stat(String label, Widget value) => Column(children: [
         value,
-        Text(label, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+        Text(label, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
       ]);
 
   Widget _kv(IconData icon, String label, String value) => Padding(
@@ -191,7 +191,7 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
         child: Row(children: [
           Icon(icon, size: 15, color: AppPalette.mutedForeground),
           const SizedBox(width: 8),
-          Text(label, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+          Text(label, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
           const Spacer(),
           Flexible(child: Text(value, overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12))),
@@ -208,7 +208,7 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
           const SizedBox(height: 8),
           ...lines.map((l) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Text(l, style: const TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
+                child: Text(l, style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
               )),
         ]),
       );
