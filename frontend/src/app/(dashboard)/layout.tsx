@@ -1,6 +1,7 @@
 import AppShell from '@/components/layout/AppShell';
 import { ToastProvider } from '@/components/ui/Toast';
 import { StoresProvider } from '@/components/providers/StoresProvider';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { I18nProvider } from '@/i18n';
 
 // The dashboard is auth-gated and entirely data-driven, so there's nothing to
@@ -11,11 +12,13 @@ export const dynamic = 'force-dynamic';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <I18nProvider>
+      <ThemeProvider>
       <ToastProvider>
         <StoresProvider>
           <AppShell>{children}</AppShell>
         </StoresProvider>
       </ToastProvider>
+      </ThemeProvider>
     </I18nProvider>
   );
 }

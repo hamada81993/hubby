@@ -166,7 +166,7 @@ export default function SettingsPage() {
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
                 activeTab === tab.id
-                  ? 'bg-action text-action-foreground shadow-lg shadow-action/20'
+                  ? 'bg-accent text-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-accent hover:text-foreground'
               )}
             >

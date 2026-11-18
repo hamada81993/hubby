@@ -267,24 +267,24 @@ export default function ProfitPage() {
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="pnlRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#0B5A5C" stopOpacity={0.25} />
-                        <stop offset="95%" stopColor="#0B5A5C" stopOpacity={0} />
+                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="pnlProfit" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#4FD34A" stopOpacity={0.35} />
                         <stop offset="95%" stopColor="#4FD34A" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DCE5E8" />
-                    <XAxis dataKey="date" stroke="#60727A" fontSize={11} tickLine={false} axisLine={false} minTickGap={24} />
-                    <YAxis stroke="#60727A" fontSize={11} tickLine={false} axisLine={false} width={56} />
-                    <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #DCE5E8' }} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                    <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} minTickGap={24} />
+                    <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} width={56} />
+                    <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)' }} />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
                     <Area
                       type="monotone"
                       dataKey="revenue"
                       name={t('profit.timeline.revenue')}
-                      stroke="#0B5A5C"
+                      stroke="var(--primary)"
                       strokeWidth={2.5}
                       fill="url(#pnlRevenue)"
                     />

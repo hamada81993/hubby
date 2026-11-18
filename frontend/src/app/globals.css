@@ -76,6 +76,15 @@
   --input: #1C4F4B;
   --glass-bg: rgba(10, 38, 37, 0.7);
   --glass-border: rgba(255, 255, 255, 0.1);
+
+  /* ---- Status text that stays readable on the surface of each theme ---- */
+  --positive: #5FE39A;
+  --caution: #F9C566;
+  --negative: #FF8A8A;
+
+  /* ---- The hub (dashboard hero) ---- */
+  --hub-pulse: #C7FF46;
+  --hub-stage: radial-gradient(circle at 50% 50%, #0E3B38 0%, #082322 46%, #061C1B 100%);
 }
 
 /* ---- Surface colors: LIGHT (applied to the dashboard) ---- */
@@ -89,12 +98,17 @@
   --card-foreground: #183238;
   --popover: #FFFFFF;
   --popover-foreground: #183238;
-  --muted: #EEF2F4;              /* brand soft gray      */
+  --muted: #E1E9E8;              /* surface soft         */
   --muted-foreground: #60727A;    /* brand text secondary */
-  --accent: #EEF2F4;             /* brand soft gray hover */
+  --accent: #E1E9E8;             /* surface soft (hover + active) */
   --accent-foreground: #183238;
-  --border: #DCE5E8;             /* brand border         */
-  --input: #DCE5E8;
+  --border: #C7D5DA;             /* brand border         */
+  --input: #C7D5DA;
+  --positive: #0F7A40;
+  --caution: #8A5A00;
+  --negative: #B42323;
+  --hub-pulse: #0B5A5C;
+  --hub-stage: radial-gradient(circle at 50% 50%, #DDF5DB 0%, #F4FAF8 52%, #FFFFFF 100%);
   --glass-bg: rgba(255, 255, 255, 0.92);
   --glass-border: rgba(11, 90, 92, 0.10);
 }
@@ -124,6 +138,9 @@
   --color-success-foreground: var(--success-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  --color-positive: var(--positive);
+  --color-caution: var(--caution);
+  --color-negative: var(--negative);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -198,6 +215,43 @@ body {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------------------------------------------------------------------------
+   Dashboard motion: things arrive once; only the hub keeps moving.
+   --------------------------------------------------------------------------- */
+.hub-stage {
+  background: var(--hub-stage);
+}
+
+@keyframes hb-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hb-rise {
+  animation: hb-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes hb-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.16); opacity: 0.5; }
+}
+
+.hb-breathe {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: hb-breathe 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-rise,
+  .hb-breathe {
+    animation: none;
+  }
+  .hb-pulse {
+    display: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------

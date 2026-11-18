@@ -8,14 +8,17 @@ import Topbar from './Topbar';
 import { useStores } from '@/components/providers/StoresProvider';
 import { useToast } from '@/components/ui/Toast';
 import { useI18n } from '@/i18n';
+import { useTheme } from '@/components/providers/ThemeProvider';
+import { cn } from '@/lib/utils';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { dir } = useI18n();
+  const { theme } = useTheme();
 
   return (
-    <div dir={dir} className="theme-light min-h-screen bg-background text-foreground flex">
+    <div dir={dir} className={cn("min-h-screen bg-background text-foreground flex", theme === 'light' && "theme-light")}>
       <div className="hidden md:flex shrink-0"><Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} /></div>
       {mobileMenuOpen && <div className="fixed inset-0 z-50 md:hidden">
         <button className="absolute inset-0 bg-black/40" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} />

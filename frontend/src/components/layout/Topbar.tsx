@@ -14,18 +14,22 @@ import {
   LogOut,
   Settings,
   ChevronDown,
-  Menu
+  Menu,
+  Moon,
+  Sun
 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/i18n';
+import { useTheme } from '@/components/providers/ThemeProvider';
 import GlobalSearch from '@/components/operations/GlobalSearch';
 
 export default function Topbar({ onOpenMenu }: { onOpenMenu?: () => void }) {
   const router = useRouter();
   const { t, locale, setLocale } = useI18n();
+  const { theme, toggleTheme } = useTheme();
   const { user, organizations, activeOrgId, setActiveOrgId, logout } = useAuthStore();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -115,6 +119,16 @@ export default function Topbar({ onOpenMenu }: { onOpenMenu?: () => void }) {
         >
           <Globe size={16} className="text-muted-foreground" />
           {locale === 'ar' ? 'EN' : 'عربي'}
+        </button>
+
+        <button
+          onClick={toggleTheme}
+          className="p-2 hover:bg-accent rounded-full transition-colors"
+          aria-label={theme === 'dark'
+            ? (locale === 'ar' ? 'الوضع الفاتح' : 'Switch to light mode')
+            : (locale === 'ar' ? 'الوضع الداكن' : 'Switch to dark mode')}
+        >
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
         </button>
 
         <div className="relative" ref={notificationRef}>
