@@ -24,7 +24,7 @@ const sampleStores = [
   { id: 5, name: 'Zid', platform: 'zid', state: 'healthy', revenue: 1350 },
 ];
 const channels = [
-  ['Shopify', 'shopify'], ['Salla', 'salla'], ['Amazon', 'amazon'], ['Noon', 'noon'],
+  ['Shopify', 'shopify'], ['Salla', 'marks/salla'], ['Amazon', 'marks/amazon'], ['Noon', 'noon'],
   ['Zid', 'marks/zid'], ['WooCommerce', 'woocommerce'], ['Trendyol', 'trendyol'],
 ];
 
@@ -124,7 +124,7 @@ function Landing() {
                 centreValue="128"
                 centreLabel={c.liveCentre}
                 ariaLabel={c.liveAria}
-                shareLabel={pct => `${pct}% ${c.liveShare}`}
+                shareLabel={pct => `${pct}%`}
                 moreLabel={n => `+${n}`}
                 stateLabel={state => state === 'failed' ? { text: locale === 'ar' ? 'أعد الربط' : 'Reconnect', ok: false } : { text: locale === 'ar' ? 'مباشر' : 'Live', ok: true }}
               />
