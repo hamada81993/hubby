@@ -197,7 +197,7 @@ export default function ProfitPage() {
                 onClick={() => setDays(d)}
                 className={cn(
                   'px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
-                  d === days ? 'bg-primary text-white' : 'hover:bg-accent',
+                  d === days ? 'bg-action text-action-foreground' : 'hover:bg-accent',
                 )}
               >
                 {t(`profit.ranges.d${d}`)}

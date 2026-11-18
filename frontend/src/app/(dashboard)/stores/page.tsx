@@ -172,7 +172,7 @@ export default function StoresPage() {
               store.is_master ? "ring-2 ring-primary border-transparent shadow-2xl shadow-primary/10" : "hover:border-primary/30"
             )}>
               {store.is_master && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-xl flex items-center gap-2">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-action text-action-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-xl flex items-center gap-2">
                   <Crown size={12} />
                   {t('stores.master.badge')}
                 </div>

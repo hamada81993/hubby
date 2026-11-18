@@ -73,7 +73,7 @@ const CategoryNode = ({
         
         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button 
-            className="p-1.5 bg-background rounded-md border border-border hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm"
+            className="p-1.5 bg-background rounded-md border border-border hover:bg-action hover:text-action-foreground hover:border-action transition-all shadow-sm"
             onClick={(e) => { e.stopPropagation(); onEdit(category.id); }}
             title={t('categories.editTooltip')}
           >

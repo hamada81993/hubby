@@ -158,7 +158,7 @@ export default function BillingPage() {
                 isCurrent ? "border-primary shadow-2xl shadow-primary/10" : "border-border"
               )}>
                 {plan.name === 'Pro' && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest shadow-xl">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-action text-action-foreground text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest shadow-xl">
                     {t('billing.recommended')}
                   </div>
                 )}

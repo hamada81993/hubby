@@ -193,7 +193,7 @@ export default function ShipmentDetailPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium capitalize">{r.carrier_code}</span>
                     <span className="text-xs text-muted-foreground">{r.service_name}</span>
-                    {r.rank === 1 && <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-primary text-white">{t('shipping.recommended')}</span>}
+                    {r.rank === 1 && <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-action text-action-foreground">{t('shipping.recommended')}</span>}
                     {r.is_estimate && <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-500">{t('shipping.estimate')}</span>}
                   </div>
                   <div className="flex items-center gap-3">

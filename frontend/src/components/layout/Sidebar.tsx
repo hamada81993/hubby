@@ -95,12 +95,12 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean; setIsO
             href={item.href}
             className={cn(
               "flex items-center p-3 rounded-xl transition-all hover:bg-primary/10 group",
-              pathname.startsWith(item.href) ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-muted-foreground"
+              pathname.startsWith(item.href) ? "bg-accent text-foreground font-semibold" : "text-muted-foreground"
             )}
           >
             <item.icon size={22} className={cn(
               "min-w-[22px]",
-              pathname.startsWith(item.href) ? "text-white" : "group-hover:text-primary"
+              pathname.startsWith(item.href) ? "text-primary" : "group-hover:text-primary"
             )} />
             {isOpen && <span className="ms-4 font-medium">{t('nav.' + item.key)}</span>}
           </Link>

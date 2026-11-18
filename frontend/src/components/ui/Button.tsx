@@ -17,8 +17,8 @@ export default function Button({
   ...props 
 }: ButtonProps) {
   const variants = {
-    primary: 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20',
-    secondary: 'bg-secondary text-white hover:bg-secondary/90 shadow-lg shadow-secondary/20',
+    primary: 'bg-action text-action-foreground hover:bg-action/90 shadow-lg shadow-action/20',
+    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-lg shadow-secondary/20',
     outline: 'border border-border bg-transparent hover:bg-accent',
     ghost: 'hover:bg-accent text-muted-foreground hover:text-foreground',
     danger: 'bg-destructive text-white hover:bg-destructive/90',

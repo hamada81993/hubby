@@ -28,7 +28,7 @@ export default function ConnectPrompt({
       </div>
       <Link
         href="/stores"
-        className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+        className="inline-flex items-center gap-2 rounded-xl bg-action px-5 py-2.5 text-sm font-semibold text-action-foreground transition hover:opacity-90"
       >
         <Store size={16} />
         Connect a store

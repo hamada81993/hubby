@@ -62,7 +62,7 @@ export default function InvoicesPage() {
                 key={f || 'all'}
                 onClick={() => setStatus(f)}
                 className={cn('px-3 py-1.5 text-xs rounded-lg border border-border transition-all',
-                  f === status ? 'bg-primary text-white border-primary' : 'bg-background hover:bg-accent')}
+                  f === status ? 'bg-action text-action-foreground border-action' : 'bg-background hover:bg-accent')}
               >
                 {f === '' ? t('invoices.all') : t(`invoices.statuses.${f}`)}
               </button>
