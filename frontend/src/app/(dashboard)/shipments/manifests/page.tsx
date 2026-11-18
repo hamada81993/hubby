@@ -108,7 +108,7 @@ export default function ManifestsPage() {
         <ChevronLeft size={16} /> {t('shipping.back')}
       </button>
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-3"><Truck className="text-primary" />{t('shipping.manifestsTitle')}</h1>
+        <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] flex items-center gap-3"><Truck className="text-primary" />{t('shipping.manifestsTitle')}</h1>
         <p className="text-muted-foreground text-sm">{t('shipping.manifestsHint')}</p>
       </div>
 
@@ -123,7 +123,7 @@ export default function ManifestsPage() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-start text-sm">
-            <thead><tr className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+            <thead><tr className="border-b border-border text-xs font-bold text-muted-foreground">
               <th className="py-2">{t('shipping.colRef')}</th><th>{t('shipping.colCarrier')}</th>
               <th className="text-center">{t('shipping.colCount')}</th><th>{t('shipping.colDate')}</th><th>{t('shipping.colStatus')}</th><th />
             </tr></thead>

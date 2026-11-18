@@ -127,7 +127,7 @@ export default function OrderDetailsPage() {
             <ChevronLeft size={20} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3">
+            <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] flex items-center gap-3">
               {t('orders.detail.order')} #{order.external_id.slice(-6).toUpperCase()}
               <span className={cn(
                 "px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5",
@@ -203,7 +203,7 @@ export default function OrderDetailsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-start">
                 <thead>
-                  <tr className="bg-accent/30 text-muted-foreground text-[10px] uppercase font-bold tracking-wider">
+                  <tr className="border-b border-border text-xs font-bold text-muted-foreground">
                     <th className="px-6 py-3">{t('orders.items.product')}</th>
                     <th className="px-6 py-3">{t('orders.items.sku')}</th>
                     <th className="px-6 py-3">{t('orders.items.price')}</th>

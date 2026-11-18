@@ -83,7 +83,7 @@ export default function CustomerProfilePage() {
           <ChevronLeft size={20} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold">{t('customers.profileTitle')}</h1>
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('customers.profileTitle')}</h1>
           <p className="text-xs text-muted-foreground mt-1 tracking-wide">{customer.email}</p>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function CustomerProfilePage() {
             <div className="overflow-x-auto">
               <table className="w-full text-start">
                 <thead>
-                  <tr className="bg-accent/30 text-muted-foreground text-[10px] uppercase font-bold tracking-wider">
+                  <tr className="border-b border-border text-xs font-bold text-muted-foreground">
                     <th className="px-6 py-3">{t('customers.colOrderId')}</th>
                     <th className="px-6 py-3">{t('customers.colStore')}</th>
                     <th className="px-6 py-3">{t('customers.colDate')}</th>

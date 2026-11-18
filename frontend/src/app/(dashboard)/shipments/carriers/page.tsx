@@ -91,7 +91,7 @@ export default function CarrierAccountsPage() {
       </button>
 
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-3"><Plug className="text-primary" />{t('shipping.accountsTitle')}</h1>
+        <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] flex items-center gap-3"><Plug className="text-primary" />{t('shipping.accountsTitle')}</h1>
         <p className="text-muted-foreground text-sm">{t('shipping.accountsHint')}</p>
       </div>
 

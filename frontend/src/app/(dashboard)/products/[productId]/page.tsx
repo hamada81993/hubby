@@ -114,7 +114,7 @@ export default function ProductDetailsPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-border"></span>
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{t('products.detail.globalProduct')}</span>
             </div>
-            <h1 className="text-2xl font-bold mt-1">{product.name}</h1>
+            <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] mt-1">{product.name}</h1>
             {product.category && (
               <div className="flex items-center gap-1.5 mt-1">
                 <Tag size={12} className="text-primary" />

@@ -41,7 +41,7 @@ export default function EditRulePage() {
       <button onClick={() => router.push('/automation')} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
         <ChevronLeft size={16} /> {t('automation.title')}
       </button>
-      <h1 className="text-2xl font-bold">{t('automation.editRule')}</h1>
+      <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('automation.editRule')}</h1>
       {schema && initial ? (
         <RuleBuilder schema={schema} initial={initial} />
       ) : (

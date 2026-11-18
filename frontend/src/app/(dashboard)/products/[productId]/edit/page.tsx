@@ -202,7 +202,7 @@ export default function EditProductPage() {
             <ChevronLeft size={20} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">{t('products.form.editTitle')}</h1>
+            <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('products.form.editTitle')}</h1>
             <p className="text-sm text-muted-foreground">{t('products.form.editSubtitle')}</p>
           </div>
         </div>

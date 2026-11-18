@@ -72,7 +72,7 @@ export default function NewRulePage() {
       >
         <ChevronLeft size={16} /> {initial ? t('automation.builder.startTemplate') : t('automation.title')}
       </button>
-      <h1 className="text-2xl font-bold">{t('automation.newRule')}</h1>
+      <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('automation.newRule')}</h1>
 
       {!schema ? (
         <div className="flex items-center justify-center py-20">

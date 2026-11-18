@@ -112,7 +112,7 @@ export default function ShipmentDetailPage() {
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-3">
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] flex items-center gap-3">
             <Truck className="text-primary" size={22} />
             {t('shipping.detailTitle')} <span className="font-mono text-lg">{shipment.reference}</span>
             <span className={cn('px-3 py-1 rounded-full text-xs font-bold uppercase', shipmentStatusColor(status))}>

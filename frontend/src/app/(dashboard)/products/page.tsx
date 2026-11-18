@@ -157,7 +157,7 @@ export default function ProductsPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">{t('products.list.title')}</h1>
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('products.list.title')}</h1>
           <p className="text-muted-foreground text-sm">{t('products.list.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">

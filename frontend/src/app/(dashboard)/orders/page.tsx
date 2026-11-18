@@ -114,7 +114,7 @@ export default function OrdersPage() {
       <OrderWorkspaceTools filters={{search, platform, status}} apply={f => {setSearch(f.search);setPlatform(f.platform);setStatus(f.status);setPage(1);}} selected={selected} clear={() => setSelected([])} />
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">{t('orders.title')}</h1>
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('orders.title')}</h1>
           <p className="text-muted-foreground text-sm">{t('orders.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
@@ -188,7 +188,7 @@ export default function OrdersPage() {
           ) : (
             <table className="w-full text-start">
               <thead>
-                <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
+                <tr className="border-b border-border text-xs font-bold text-muted-foreground">
                   <th className="px-3"><input type="checkbox" aria-label="Select current page" checked={orders.length > 0 && selected.length === orders.length} onChange={e => setSelected(e.target.checked ? orders.map(o => o.id) : [])}/></th>
                   <th className="px-6 py-4">{t('orders.columns.orderId')}</th>
                   <th className="px-6 py-4">{t('orders.columns.customer')}</th>

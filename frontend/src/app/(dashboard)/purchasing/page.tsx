@@ -150,7 +150,7 @@ export default function PurchasingPage() {
     "rounded-xl border border-border bg-background px-3 py-2 text-sm";
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">
+      <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">
         {l("Purchase with a plan.", "خطط لمشترياتك.")}
       </h1>
       <p className="text-sm text-muted-foreground">

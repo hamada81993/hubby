@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import { PLATFORMS, getPlatform } from '@/lib/platforms';
 import { PlatformLogo } from '@/components/ui/PlatformLogo';
+import { Logo } from '@/components/ui/Logo';
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
@@ -49,8 +50,9 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-background to-background">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen flex flex-col items-center p-6 bg-background">
+      <Logo variant="dark" className="h-8 w-auto mt-4 mb-10" />
+      <div className="w-full max-w-2xl my-auto pb-16">
         <div className="flex items-center justify-center gap-4 mb-12">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-center">
@@ -69,7 +71,7 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="space-y-8 text-center">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Connect your first store</h2>
+              <h2 className="text-4xl font-black tracking-[-0.03em] mb-3">Connect your first store</h2>
               <p className="text-muted-foreground text-sm">Select your e-commerce platform to get started.</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -77,9 +79,9 @@ export default function OnboardingPage() {
                 <button
                   key={p.id}
                   onClick={() => handlePlatformSelect(p.id)}
-                  className="bg-card border border-border p-6 rounded-2xl flex flex-col items-center gap-3 hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all group"
+                  className="bg-card border border-border p-6 rounded-[22px] flex flex-col items-center gap-3 hover:border-primary hover:bg-accent transition-colors group"
                 >
-                  <PlatformLogo platform={p.id} size={32} className="transition-transform group-hover:scale-110" />
+                  <PlatformLogo platform={p.id} size={30} />
                   <span className="text-sm font-semibold">{p.name}</span>
                 </button>
               ))}
@@ -92,11 +94,11 @@ export default function OnboardingPage() {
 
           return (
             <Card className="p-8 text-center space-y-6">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-2">
+              <div className="mx-auto min-w-16 w-fit h-16 px-3 bg-white rounded-2xl flex items-center justify-center mb-2">
                 <PlatformLogo platform={selectedPlatform} size={32} />
               </div>
               <div>
-                <h2 className="text-2xl font-bold mb-1">Connect {platform?.name}</h2>
+                <h2 className="text-3xl font-black tracking-[-0.03em] mb-2">Connect {platform?.name}</h2>
                 <p className="text-muted-foreground text-sm">We'll need your permission to manage your orders and products.</p>
               </div>
               <div className="bg-background border border-border p-4 rounded-xl text-start flex items-start gap-3">
@@ -117,7 +119,7 @@ export default function OnboardingPage() {
           <Card className="p-12 text-center space-y-6">
             <Loader2 className="animate-spin text-primary mx-auto" size={48} />
             <div>
-              <h2 className="text-2xl font-bold mb-2">Synchronizing Data</h2>
+              <h2 className="text-3xl font-black tracking-[-0.03em] mb-2">Synchronizing Data</h2>
               <p className="text-muted-foreground text-sm">We're importing your products and orders. This may take a moment.</p>
             </div>
             <div className="w-full bg-accent h-1.5 rounded-full overflow-hidden">
@@ -128,11 +130,11 @@ export default function OnboardingPage() {
 
         {step === 4 && (
           <Card className="p-12 text-center space-y-6">
-            <div className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center text-secondary mx-auto mb-2 animate-bounce">
+            <div className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center text-secondary mx-auto mb-2 ">
               <CheckCircle2 size={48} />
             </div>
             <div>
-              <h2 className="text-3xl font-bold mb-2">You're all set!</h2>
+              <h2 className="text-4xl font-black tracking-[-0.03em] mb-2">You're all set!</h2>
               <p className="text-muted-foreground text-sm">Your {getPlatform(selectedPlatform).name} store is successfully connected.</p>
             </div>
             <Button onClick={() => router.push('/dashboard')} className="w-full group">

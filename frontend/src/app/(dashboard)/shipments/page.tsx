@@ -52,7 +52,7 @@ export default function ShipmentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-3">
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] flex items-center gap-3">
             <Truck className="text-primary" />
             {t('shipping.title')}
           </h1>
@@ -113,7 +113,7 @@ export default function ShipmentsPage() {
           ) : (
             <table className="w-full text-start text-sm">
               <thead>
-                <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
+                <tr className="border-b border-border text-xs font-bold text-muted-foreground">
                   <th className="px-5 py-3">{t('shipping.colRef')}</th>
                   <th className="px-5 py-3">{t('shipping.colCarrier')}</th>
                   <th className="px-5 py-3">{t('shipping.colTracking')}</th>

@@ -310,7 +310,7 @@ export default function ProfitPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-start">
                 <thead>
-                  <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
+                  <tr className="border-b border-border text-xs font-bold text-muted-foreground">
                     <th className="px-5 py-3">{t('profit.bySku.colSku')}</th>
                     <th className="px-5 py-3 text-center">{t('profit.bySku.colUnits')}</th>
                     <th className="px-5 py-3">{t('profit.bySku.colRevenue')}</th>
@@ -373,7 +373,7 @@ export default function ProfitPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-start">
                   <thead>
-                    <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
+                    <tr className="border-b border-border text-xs font-bold text-muted-foreground">
                       <th className="px-5 py-3">{t('profit.byChannel.colChannel')}</th>
                       <th className="px-5 py-3 text-center">{t('profit.byChannel.colOrders')}</th>
                       <th className="px-5 py-3">{t('profit.byChannel.colRevenue')}</th>
@@ -420,7 +420,7 @@ export default function ProfitPage() {
 function Header({ t }: { t: (key: string) => string }) {
   return (
     <div>
-      <h1 className="text-2xl font-bold flex items-center gap-3">
+      <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] flex items-center gap-3">
         <Coins className="text-primary" />
         {t('profit.title')}
       </h1>

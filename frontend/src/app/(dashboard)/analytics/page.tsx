@@ -130,7 +130,7 @@ export default function AnalyticsPage() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">{t('analytics.title')}</h1>
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('analytics.title')}</h1>
           <p className="text-muted-foreground text-sm">{t('analytics.subtitle')}</p>
         </div>
         <button

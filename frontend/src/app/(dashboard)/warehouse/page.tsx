@@ -159,7 +159,7 @@ export default function WarehousePage() {
         <p className="text-primary text-xs uppercase tracking-widest">
           Hubby / {l("Operations", "العمليات")}
         </p>
-        <h1 className="text-3xl font-bold mt-2">
+        <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] mt-2">
           {l("Warehouse workspace", "إدارة المخازن")}
         </h1>
         <p className="text-muted-foreground mt-2 text-sm">

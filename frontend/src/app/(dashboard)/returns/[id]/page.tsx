@@ -98,7 +98,7 @@ export default function ReturnDetailPage() {
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-3">
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] flex items-center gap-3">
             {t('returns.detailTitle')} <span className="font-mono text-lg">{rma.rma_number}</span>
             <span className={cn('px-3 py-1 rounded-full text-xs font-bold uppercase', statusColor(status))}>
               {t(`returns.statuses.${status}`)}
@@ -129,7 +129,7 @@ export default function ReturnDetailPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-start text-sm">
               <thead>
-                <tr className="bg-accent/40 text-muted-foreground text-[10px] uppercase tracking-wider font-bold">
+                <tr className="border-b border-border text-xs font-bold text-muted-foreground">
                   <th className="px-4 py-2">SKU</th>
                   <th className="px-4 py-2 text-center">{t('returns.qtyRequested')}</th>
                   <th className="px-4 py-2 text-center">{t('returns.qtyApproved')}</th>

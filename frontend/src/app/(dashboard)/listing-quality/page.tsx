@@ -54,7 +54,7 @@ export default function ListingQualityPage() {
   }, [org, search, page]);
   return (
     <div className="space-y-5">
-      <h1 className="text-3xl font-bold">
+      <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">
         {ar ? "جودة الكتالوج" : "Catalog quality"}
       </h1>
       <p className="text-sm text-muted-foreground">

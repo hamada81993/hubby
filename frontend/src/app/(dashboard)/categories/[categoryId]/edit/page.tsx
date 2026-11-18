@@ -113,7 +113,7 @@ export default function EditCategoryPage() {
           <ChevronLeft size={20} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{t('categories.editTitle')}</h1>
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('categories.editTitle')}</h1>
           <p className="text-sm text-muted-foreground">{t('categories.editSubtitle')}</p>
         </div>
       </div>

@@ -113,7 +113,7 @@ export default function StoresPage() {
       <ChannelBuffers />
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">{t('stores.title')}</h1>
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('stores.title')}</h1>
           <p className="text-muted-foreground text-sm">{t('stores.subtitle')}</p>
         </div>
         <Button variant="primary" size="sm" onClick={() => setConnectPlatform(PLATFORMS[0].id)}>

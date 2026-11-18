@@ -99,6 +99,8 @@ export default function InventoryPage() {
   const totalStockOf = (item: any) =>
     item.variants?.reduce((acc: number, v: any) => acc + (v.stock || 0), 0) ?? item.stock ?? 0;
 
+  const stockOf = (item: any): number =>
+    item.variants?.reduce((acc: number, v: any) => acc + (v.stock || 0), 0) || item.stock || 0;
   const filteredInventory = inventory.filter((item) => {
     const matchesSearch =
       item.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -118,7 +120,7 @@ export default function InventoryPage() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">{t('inventory.title')}</h1>
+          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('inventory.title')}</h1>
           <p className="text-muted-foreground text-sm">{t('inventory.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
@@ -153,6 +155,27 @@ export default function InventoryPage() {
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
+          {/* The three numbers that decide what to look at; each one filters the table. */}
+          <div className="grid grid-cols-3 gap-3">
+            {([
+              { k: 'all', label: t('inventory.filterAll'), value: inventory.length, tone: 'text-foreground' },
+              { k: 'low', label: t('inventory.filterLow'), value: inventory.filter((i) => { const n = stockOf(i); return n > 0 && n < 10; }).length, tone: 'text-warning' },
+              { k: 'out', label: t('inventory.filterOut'), value: inventory.filter((i) => stockOf(i) === 0).length, tone: 'text-destructive' },
+            ] as const).map((tile) => (
+              <button
+                key={tile.k}
+                onClick={() => setStockFilter(tile.k)}
+                aria-pressed={stockFilter === tile.k}
+                className={cn(
+                  'rounded-[22px] border p-4 text-start transition-colors',
+                  stockFilter === tile.k ? 'border-primary bg-accent' : 'border-border bg-card hover:bg-accent',
+                )}
+              >
+                <span className="block text-xs font-medium text-muted-foreground">{tile.label}</span>
+                <span className={cn('mt-2 block text-3xl font-black tabular-nums tracking-[-0.03em]', tile.value > 0 ? tile.tone : 'text-foreground')}>{tile.value}</span>
+              </button>
+            ))}
+          </div>
           <Card className="p-0 overflow-hidden">
             <div className="p-4 border-b border-border bg-card/30 flex items-center justify-between">
               <div className="relative w-full max-w-sm">
@@ -189,7 +212,7 @@ export default function InventoryPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-start">
                 <thead>
-                  <tr className="bg-accent/50 text-muted-foreground text-[10px] uppercase font-bold tracking-wider">
+                  <tr className="border-b border-border text-xs font-bold text-muted-foreground">
                     <th className="px-6 py-4">{t('inventory.colProduct')}</th>
                     <th className="px-6 py-4">{t('inventory.colStock')}</th>
                     <th className="px-6 py-4">{t('inventory.colStores')}</th>
