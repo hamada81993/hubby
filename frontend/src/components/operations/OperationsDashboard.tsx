@@ -275,7 +275,7 @@ export default function OperationsDashboard() {
             })}{" "}
             · {l("live", "مباشر")}
           </p>
-          <h1 className="mt-1 text-3xl md:text-[34px] font-black tracking-[-0.025em] leading-tight">
+          <h1 className="mt-1 text-2xl md:text-[28px] font-black tracking-[-0.02em] leading-tight">
             {health.length > 1
               ? l(`${health.length} stores. One heartbeat.`, `${health.length} متاجر. نبض واحد.`)
               : l("Every store. One heartbeat.", "كل متاجرك. نبض واحد.")}
@@ -332,7 +332,7 @@ export default function OperationsDashboard() {
               <TrendingUp size={18} className="text-primary" />
               {l(`Revenue · last ${days} days`, `الإيرادات · آخر ${days} يوماً`)}
             </p>
-            <div className="mt-1 text-[44px] font-black leading-[1.1] tracking-[-0.035em] tabular-nums">
+            <div className="mt-1 text-[32px] font-black leading-[1.15] tracking-[-0.03em] tabular-nums">
               {totals ? (
                 <Money amount={totals.total_revenue} currency={summary?.base_currency} />
               ) : (
@@ -353,10 +353,10 @@ export default function OperationsDashboard() {
               style={{ animationDelay: "80ms" }}
             >
               <div className="flex items-end gap-3.5">
-                <span className="text-[88px] font-black leading-[0.9] tracking-[-0.05em] tabular-nums">
+                <span className="text-[56px] font-black leading-[0.95] tracking-[-0.04em] tabular-nums">
                   {waiting}
                 </span>
-                <span className="pb-1.5 text-xl font-bold leading-tight">
+                <span className="pb-1 text-base font-bold leading-tight">
                   {l("orders waiting", "طلب في انتظار")}
                   <br />
                   {l("to be packed", "التجهيز")}

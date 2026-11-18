@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { PlatformLogo } from "@/components/ui/PlatformLogo";
 import { getPlatform } from "@/lib/platforms";
 import { cn } from "@/lib/utils";
@@ -99,13 +100,53 @@ export default function LiveHub({
     };
   });
 
+  // The stores float: each card drifts a few pixels on its own beat, and its
+  // line and pulses follow it. Written straight to the DOM so React does not
+  // re-render sixty times a second; skipped when the viewer asks for less motion.
+  const stage = useRef<HTMLDivElement>(null);
+  const layout = useRef(nodes);
+  layout.current = nodes;
+  useEffect(() => {
+    const el = stage.current;
+    if (!el || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = now / 1000;
+      const scale = el.clientWidth / W;
+      const cards = el.querySelectorAll<HTMLElement>("[data-hub-card]");
+      const lines = el.querySelectorAll<SVGPathElement>("[data-hub-line]");
+      layout.current.forEach((n, i) => {
+        const phase = i * 1.3;
+        const dx = Math.sin(t * 0.45 + phase * 2) * 2;
+        const dy = Math.sin(t * 0.9 + phase) * 7;
+        const x = n.x + dx;
+        const y = n.y + dy;
+        const mx = (x + CX) / 2 - (y - CY) * 0.16;
+        const my = (y + CY) / 2 + (x - CX) * 0.16;
+        if (cards[i]) cards[i].style.transform = `translate(${(dx * scale).toFixed(2)}px, ${(dy * scale).toFixed(2)}px)`;
+        lines[i]?.setAttribute("d", `M${x.toFixed(1)} ${y.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${CX} ${CY}`);
+        const dur = 5 - n.weight * 2.8;
+        el.querySelectorAll<SVGCircleElement>(`[data-hub-pulse="${i}"]`).forEach((dot, k) => {
+          const u = (t / dur + k * 0.5 + phase) % 1;
+          const v = 1 - u;
+          dot.setAttribute("cx", (v * v * x + 2 * v * u * mx + u * u * CX).toFixed(1));
+          dot.setAttribute("cy", (v * v * y + 2 * v * u * my + u * u * CY).toFixed(1));
+          dot.setAttribute("opacity", "1");
+        });
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   return (
     <section
       aria-label={ariaLabel}
       className="hub-stage relative overflow-hidden rounded-[28px] border border-border"
     >
       {/* Wide screens: the hub itself. */}
-      <div className="relative hidden sm:block" style={{ aspectRatio: `${W} / ${H}` }}>
+      <div ref={stage} className="relative hidden sm:block" style={{ aspectRatio: `${W} / ${H}` }}>
         <svg
           role="img"
           aria-label={ariaLabel}
@@ -116,24 +157,14 @@ export default function LiveHub({
           <circle cx={CX} cy={CY} r={270} fill="none" stroke="var(--action)" strokeOpacity={0.1} strokeWidth={1.5} strokeDasharray="3 9" />
           <g fill="none" stroke="var(--action)" strokeLinecap="round" strokeOpacity={0.55}>
             {nodes.map((n) => (
-              <path key={n.store.id} d={n.path} strokeWidth={2.5 + n.weight * 7.5} />
+              <path key={n.store.id} data-hub-line d={n.path} strokeWidth={2.5 + n.weight * 7.5} />
             ))}
           </g>
-          <g fill="var(--hub-pulse)" className="hb-pulse">
-            {nodes.map((n) =>
-              (n.weight > 0.6 ? [0, 0.5] : [0]).map((offset) => {
-                const dur = 5 - n.weight * 2.8;
-                return (
-                  <circle key={`${n.store.id}-${offset}`} r={3.5 + n.weight * 1.5}>
-                    <animateMotion
-                      dur={`${dur.toFixed(2)}s`}
-                      begin={`-${(dur * offset + n.store.id * 0.37).toFixed(2)}s`}
-                      repeatCount="indefinite"
-                      path={n.path}
-                    />
-                  </circle>
-                );
-              }),
+          <g fill="var(--hub-pulse)">
+            {nodes.map((n, i) =>
+              (n.weight > 0.6 ? [0, 1] : [0]).map((k) => (
+                <circle key={`${n.store.id}-${k}`} data-hub-pulse={i} r={3.5 + n.weight * 1.5} opacity={0} />
+              )),
             )}
           </g>
           <circle cx={CX} cy={CY} r={128} fill="var(--action)" fillOpacity={0.16} className="hb-breathe" />
@@ -144,10 +175,10 @@ export default function LiveHub({
           className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center text-action-foreground"
           style={{ left: "50%", top: "50%", width: `${(190 / W) * 100}%` }}
         >
-          <span className="text-[clamp(2.25rem,6.2vw,4.75rem)] font-black leading-none tracking-[-0.03em] tabular-nums">
+          <span className="text-[clamp(2rem,4.4vw,3.5rem)] font-black leading-none tracking-[-0.03em] tabular-nums">
             {centreValue}
           </span>
-          <span className="mt-1 text-[clamp(0.7rem,1.3vw,1rem)] font-bold leading-tight">{centreLabel}</span>
+          <span className="mt-1 text-[clamp(0.7rem,1.1vw,0.875rem)] font-bold leading-tight">{centreLabel}</span>
         </div>
 
         {nodes.map((n, i) => {
@@ -155,12 +186,13 @@ export default function LiveHub({
           return (
             <div
               key={n.store.id}
-              className="hb-rise absolute flex w-[31%] min-w-[160px] -translate-x-1/2 -translate-y-1/2 items-center gap-3 rounded-[20px] border border-border bg-card p-3"
-              style={{
-                left: `${(n.x / W) * 100}%`,
-                top: `${(n.y / H) * 100}%`,
-                animationDelay: `${120 + i * 70}ms`,
-              }}
+              data-hub-card
+              className="absolute w-[31%] min-w-[160px] -translate-x-1/2 -translate-y-1/2 will-change-transform"
+              style={{ left: `${(n.x / W) * 100}%`, top: `${(n.y / H) * 100}%` }}
+            >
+            <div
+              className="hb-rise flex items-center gap-3 rounded-[20px] border border-border bg-card p-3"
+              style={{ animationDelay: `${120 + i * 70}ms` }}
             >
               <PlatformMark platform={n.store.platform} />
               <span className="flex min-w-0 flex-1 flex-col">
@@ -172,6 +204,7 @@ export default function LiveHub({
                   </span>
                 </span>
               </span>
+            </div>
             </div>
           );
         })}
