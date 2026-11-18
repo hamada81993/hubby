@@ -351,8 +351,8 @@ export default function OrderDetailsPage() {
               {t('orders.detail.storeDetails')}
             </h3>
             <div className="p-4 rounded-2xl bg-accent/20 border border-border flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center shadow-sm">
-                <PlatformLogo platform={order.store?.platform} size={24} />
+              <div className="h-10 min-w-10 shrink-0 rounded-xl bg-card px-2 flex items-center justify-center">
+                <PlatformLogo platform={order.store?.platform} size={20} />
               </div>
               <div>
                 <p className="text-xs font-bold">{order.store?.name}</p>
