@@ -20,7 +20,14 @@ export const copy = {
       { title: 'Bring your stores.', body: 'Create your workspace and connect the sales channels you already use.' },
       { title: 'Find your rhythm.', body: 'Organise products, choose your master store and set up your team’s workflow.' },
       { title: 'Grow your way.', body: 'Manage the everyday from one place, with more space to focus on what comes next.' },
-    ], closingLabel: 'YOUR NEXT CHAPTER STARTS HERE.', closingTitle: 'More connected.', closingAccent: 'More possible.', closingFoot: 'YOUR STORES. YOUR TEAM. YOUR HUBBY.', footer: '© 2026 Hubby. Built for the way you grow.', back: 'Back to the top',
+    ],
+    liveLabel: 'THE HUB, LIVE', liveTitle: 'Every store.', liveAccent: 'One heartbeat.', liveBody: 'This is the first screen you see in Hubby. Each line is a store, as thick as its share of your sales, with orders flowing into one place as they happen.', liveFacts: ['The thicker the line, the more that store is selling', 'A store that stops syncing turns red before your customers notice', 'One number in the middle: what came in today'], liveCentre: 'orders today', liveShare: 'of sales', liveNote: 'Sample data, for illustration.', liveAria: 'Orders flowing from five stores into one hub',
+    aiTitle: 'Hubby AI', aiSoon: 'COMING SOON', aiBody: 'We are building an assistant into Hubby that reads your stores the way you would if you had the time. It is not live yet. This is what it will do first.', aiItems: [
+      { title: 'Writes your listings', body: 'Product titles and descriptions in Arabic and English, shaped for each marketplace.' },
+      { title: 'Sees the season coming', body: 'Stock forecasts that know about Ramadan, White Friday and your own slow weeks.' },
+      { title: 'Flags what looks wrong', body: 'A sudden drop in a store, a fee that jumped, a product selling below cost.' },
+    ],
+    closingLabel: 'YOUR NEXT CHAPTER STARTS HERE.', closingTitle: 'More connected.', closingAccent: 'More possible.', closingFoot: 'YOUR STORES. YOUR TEAM. YOUR HUBBY.', footer: '© 2026 Hubby. Built for the way you grow.', back: 'Back to the top',
   },
   ar: {
     skip: 'انتقل إلى المحتوى', navigation: 'التنقل الرئيسي', menu: 'افتح القائمة', close: 'أغلق القائمة', nav: ['عالم هَبّي', 'المنصة', 'التكاملات', 'كيف تعمل'], login: 'تسجيل الدخول', start: 'اكتشف مركزك الجديد', world: 'تجارتك، متصلة', scroll: 'اكتشف المزيد',
@@ -40,6 +47,13 @@ export const copy = {
       { title: 'اجمع متاجرك.', body: 'أنشئ مساحة عملك واربط قنوات البيع التي تستخدمها بالفعل.' },
       { title: 'اضبط إيقاعك.', body: 'نظّم منتجاتك واختر متجرك الرئيسي وجهّز سير عمل فريقك.' },
       { title: 'انمُ بطريقتك.', body: 'أدر التفاصيل اليومية من مكان واحد، بمساحة أكبر للتركيز على خطوتك القادمة.' },
-    ], closingLabel: 'فصلك القادم يبدأ هنا.', closingTitle: 'ترابط أكبر.', closingAccent: 'آفاق أوسع.', closingFoot: 'متاجرك. فريقك. هَبّي.', footer: '© ٢٠٢٦ هَبّي. صُمّم لينمو معك.', back: 'العودة للأعلى',
+    ],
+    liveLabel: 'المركز، مباشر', liveTitle: 'كل متاجرك.', liveAccent: 'نبض واحد.', liveBody: 'هذه أول شاشة تراها في هَبّي. كل خط هو متجر، وسُمكه بحجم نصيبه من مبيعاتك، والطلبات تتدفق إلى مكان واحد لحظة وصولها.', liveFacts: ['كلما زاد سُمك الخط، زادت مبيعات ذلك المتجر', 'المتجر الذي يتوقف عن المزامنة يتحول للأحمر قبل أن يلاحظ عملاؤك', 'رقم واحد في المنتصف: ما وصلك اليوم'], liveCentre: 'طلب اليوم', liveShare: 'من المبيعات', liveNote: 'بيانات تجريبية للتوضيح.', liveAria: 'الطلبات تتدفق من خمسة متاجر إلى مركز واحد',
+    aiTitle: 'Hubby AI', aiSoon: 'قريباً', aiBody: 'نبني داخل هَبّي مساعداً يقرأ متاجرك كما كنت ستقرؤها لو كان لديك الوقت. لم يُطلق بعد. هذا ما سيفعله أولاً.', aiItems: [
+      { title: 'يكتب وصف منتجاتك', body: 'عناوين وأوصاف بالعربية والإنجليزية، مناسبة لكل منصة بيع.' },
+      { title: 'يرى الموسم قبل وصوله', body: 'توقعات للمخزون تعرف رمضان والجمعة البيضاء وأسابيعك الهادئة.' },
+      { title: 'ينبهك لما يبدو خطأ', body: 'هبوط مفاجئ في متجر، رسوم ارتفعت، منتج يُباع بأقل من تكلفته.' },
+    ],
+    closingLabel: 'فصلك القادم يبدأ هنا.', closingTitle: 'ترابط أكبر.', closingAccent: 'آفاق أوسع.', closingFoot: 'متاجرك. فريقك. هَبّي.', footer: '© ٢٠٢٦ هَبّي. صُمّم لينمو معك.', back: 'العودة للأعلى',
   },
 };

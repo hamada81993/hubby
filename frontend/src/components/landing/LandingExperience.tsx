@@ -7,12 +7,26 @@ import { ArrowDown, ArrowUpRight, Check, Menu, Minus, Plus, X } from 'lucide-rea
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Logo } from '@/components/ui/Logo';
+import LiveHub from '@/components/operations/LiveHub';
 import { I18nProvider, useI18n } from './i18n';
 import { copy } from './redesign-copy';
 import styles from './landing.module.css';
 
 const CommerceWorld = dynamic(() => import('./scene/CommerceWorld'), { ssr: false });
 gsap.registerPlugin(ScrollTrigger);
+
+// Illustrative stores for the hub on this page; the real hub reads the merchant's own.
+const sampleStores = [
+  { id: 1, name: 'Salla', platform: 'salla', state: 'healthy', revenue: 16940 },
+  { id: 2, name: 'Shopify', platform: 'shopify', state: 'healthy', revenue: 11280 },
+  { id: 3, name: 'Noon', platform: 'noon', state: 'failed', revenue: 7420 },
+  { id: 4, name: 'Amazon.sa', platform: 'amazon', state: 'healthy', revenue: 4870 },
+  { id: 5, name: 'Zid', platform: 'zid', state: 'healthy', revenue: 1350 },
+];
+const channels = [
+  ['Shopify', 'shopify'], ['Salla', 'salla'], ['Amazon', 'amazon'], ['Noon', 'noon'],
+  ['Zid', 'marks/zid'], ['WooCommerce', 'woocommerce'], ['Trendyol', 'trendyol'],
+];
 
 export default function LandingExperience() {
   return <I18nProvider><Landing /></I18nProvider>;
@@ -96,6 +110,28 @@ function Landing() {
           <p className={styles.eyebrow}>{c.introLabel}</p><h2>{c.introTitle}<span>{c.introAccent}</span></h2>
           <div className={styles.introBottom}><span className={styles.asterisk} aria-hidden="true">✳</span><p>{c.introBody}</p></div>
         </section>
+        <section className={styles.live} aria-labelledby="live-title">
+          <p className={styles.eyebrow}><span className={styles.liveDot} />{c.liveLabel}</p>
+          <div className={styles.liveGrid}>
+            <div data-reveal>
+              <h2 id="live-title">{c.liveTitle}<br /><em>{c.liveAccent}</em></h2>
+              <p className={styles.liveBody}>{c.liveBody}</p>
+              <ul className={styles.liveFacts}>{c.liveFacts.map(fact => <li key={fact}><b aria-hidden="true" />{fact}</li>)}</ul>
+            </div>
+            <div className={styles.liveStage}>
+              <LiveHub
+                stores={sampleStores}
+                centreValue="128"
+                centreLabel={c.liveCentre}
+                ariaLabel={c.liveAria}
+                shareLabel={pct => `${pct}% ${c.liveShare}`}
+                moreLabel={n => `+${n}`}
+                stateLabel={state => state === 'failed' ? { text: locale === 'ar' ? 'أعد الربط' : 'Reconnect', ok: false } : { text: locale === 'ar' ? 'مباشر' : 'Live', ok: true }}
+              />
+              <p className={styles.liveNote}>{c.liveNote}</p>
+            </div>
+          </div>
+        </section>
         <section id="platform" className={styles.platform}>
           <div className={styles.sectionTop} data-reveal><p className={styles.eyebrow}>01 / {c.platformLabel}</p><span>{c.platformNote}</span></div>
           <div className={styles.platformGrid}>
@@ -116,8 +152,13 @@ function Landing() {
         <section id="connections" className={styles.connections}>
           <div className={styles.sectionTop}><p className={styles.eyebrow}>02 / {c.connectionsLabel}</p><span>7 {c.channels}</span></div>
           <h2 data-reveal>{c.connectionsTitle}<br /><em>{c.connectionsAccent}</em></h2><p className={styles.connectionsBody}>{c.connectionsBody}</p>
-          <div className={styles.channelGrid}>{['Shopify', 'Salla', 'Amazon', 'Noon', 'Zid', 'WooCommerce', 'Trendyol'].map((name, i) => <div key={name} className={styles.channel}><span>0{i + 1}</span><strong>{name}</strong><ArrowUpRight size={18} /></div>)}</div>
+          <div className={styles.channelGrid}>{channels.map(([name, file], i) => <div key={name} className={styles.channel}><span>0{i + 1}</span>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={`/platforms/${file}.svg`} alt="" /><strong>{name}</strong><ArrowUpRight size={18} /></div>)}</div>
           <div className={styles.connectionFooter}><span className={styles.liveDot} />{c.connectionFoot}<Link href="/register">{c.connect}<ArrowUpRight size={18} /></Link></div>
+        </section>
+        <section className={styles.ai} aria-labelledby="ai-title">
+          <div className={styles.aiTop}><h2 id="ai-title">{c.aiTitle}</h2><span className={styles.aiSoon}>{c.aiSoon}</span></div>
+          <p className={styles.aiBody}>{c.aiBody}</p>
+          <div className={styles.aiGrid}>{c.aiItems.map(item => <article key={item.title} data-reveal><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>
         </section>
         <section id="how-it-works" className={styles.steps}>
           <div className={styles.sectionTop}><p className={styles.eyebrow}>03 / {c.stepsLabel}</p><span>{c.stepsNote}</span></div><h2 data-reveal>{c.stepsTitle}</h2>
