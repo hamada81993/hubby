@@ -170,7 +170,7 @@ function Page() {
               <div className={styles.cardText}><h3>{c.desk.scan.title}</h3><p>{c.desk.scan.body}</p></div>
               <div className={styles.scan} aria-hidden="true"><ScanLine size={30} /><div className={styles.barcode} /><span><b>37 / 37</b> {c.desk.scan.done}</span></div>
             </article>
-            <article className={`${styles.card} ${styles.wide}`} data-reveal>
+            <article className={`${styles.card} ${styles.full}`} data-reveal>
               <div className={styles.cardText}><h3>{c.desk.rule.title}</h3><p>{c.desk.rule.body}</p></div>
               <div className={styles.rule} aria-hidden="true">
                 <p><b>{c.desk.rule.when}</b>{c.desk.rule.whenText}</p>
