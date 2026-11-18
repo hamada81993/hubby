@@ -14,6 +14,7 @@ import '../../shared/widgets/money_text.dart';
 import '../../shared/widgets/platform_logo.dart';
 import '../orders/order_detail_page.dart';
 import '../stores/cubit/stores_cubit.dart';
+import 'live_hub.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -33,7 +34,28 @@ class _DashboardPageState extends State<DashboardPage> {
       api.dio.get('/orders', queryParameters: {'per_page': 6}),
       api.dio.get('/analytics/orders-timeline', queryParameters: {'days': _days}),
     ]);
+    // The hub's extras are optional: finance reports can be restricted by role,
+    // and the screen still works without them.
+    Future<dynamic> optional(String path, [Map<String, dynamic>? query]) async {
+      try {
+        return (await api.dio.get(path, queryParameters: query)).data;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    final end = DateTime.now();
+    final start = end.subtract(Duration(days: _days - 1));
+    String day(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
+    final extra = await Future.wait([
+      optional('/operations/health'),
+      optional('/analytics/profit/by-channel', {'start_date': day(start), 'end_date': day(end)}),
+      optional('/operations'),
+    ]);
     return {
+      'health': extra[0] is List ? extra[0] : const [],
+      'channels': extra[1] is List ? extra[1] : null,
+      'queues': extra[2] is Map ? (extra[2]['queues'] as List? ?? const []) : const [],
       'summary': (r[0].data as Map).cast<String, dynamic>(),
       'recent': (r[1].data['data'] as List?) ?? [],
       'timeline': (r[2].data as List?) ?? [],
@@ -90,8 +112,55 @@ class _DashboardPageState extends State<DashboardPage> {
               final s = (data['summary'] as Map).cast<String, dynamic>();
               final recent = (data['recent'] as List?) ?? [];
               final timeline = (data['timeline'] as List?) ?? [];
+              final health = (data['health'] as List?) ?? const [];
+              final channels = data['channels'] as List?;
+              final revenue = <int, double>{
+                for (final c in channels ?? const []) (c['store_id'] as num).toInt(): _num(c['net_revenue']),
+              };
+              final total = revenue.values.fold<double>(0, (a, b) => a + b);
+              final hubStores = [
+                for (final h in health)
+                  HubStore(
+                    id: (h['id'] as num).toInt(),
+                    name: '${h['name'] ?? ''}',
+                    platform: '${h['platform'] ?? ''}',
+                    healthy: h['state'] != 'failed' && h['state'] != 'stalled',
+                    share: channels == null || total <= 0 ? null : (revenue[(h['id'] as num).toInt()] ?? 0) / total,
+                  ),
+              ];
+              final ar = Localizations.localeOf(context).languageCode == 'ar';
+              var waiting = 0;
+              for (final q in (data['queues'] as List?) ?? const []) {
+                if (q['key'] == 'fulfillment') waiting = (q['count'] as num?)?.toInt() ?? 0;
+              }
               return Column(
                 children: [
+                  if (hubStores.isNotEmpty) ...[
+                    LiveHub(
+                      stores: hubStores,
+                      centreValue: '${s['total_orders'] ?? 0}',
+                      centreLabel: ar ? 'طلب في $_days يوماً' : 'orders in $_days days',
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  if (waiting > 0) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                      decoration: BoxDecoration(color: AppPalette.action, borderRadius: BorderRadius.circular(24)),
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                        Text('$waiting',
+                            style: AppText.number(size: 44, weight: FontWeight.w900, color: AppPalette.onAction)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(ar ? 'طلب في انتظار التجهيز' : 'orders waiting to be packed',
+                              style: const TextStyle(
+                                  fontSize: 15, height: 1.2, fontWeight: FontWeight.w700, color: AppPalette.onAction)),
+                        ),
+                      ]),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   GridView.count(
                     crossAxisCount: 2, shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
