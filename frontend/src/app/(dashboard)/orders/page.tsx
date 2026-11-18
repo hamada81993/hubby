@@ -162,7 +162,7 @@ export default function OrdersPage() {
                   onClick={() => { setPlatform(p); setPage(1); }}
                   className={cn(
                     "px-3 py-1.5 text-xs rounded-lg border border-border hover:bg-accent transition-all",
-                    p === platform ? "bg-primary text-white border-primary" : "bg-background"
+                    p === platform ? "bg-action text-action-foreground border-action" : "bg-background"
                   )}
                 >
                   {p === 'All' ? t('orders.filters.all') : p}
@@ -181,7 +181,7 @@ export default function OrdersPage() {
                     onClick={() => { setStatus(s); setPage(1); }}
                     className={cn(
                       "px-3 py-1.5 text-xs rounded-lg border border-border hover:bg-accent transition-all",
-                      s === status ? "bg-secondary text-white border-secondary" : "bg-background"
+                      s === status ? "bg-secondary text-secondary-foreground border-secondary" : "bg-background"
                     )}
                   >
                     {s === 'All' ? t('orders.filters.all') : t(`orders.status.${s.toLowerCase()}`)}
@@ -264,7 +264,7 @@ export default function OrdersPage() {
                             <button 
                               className={cn(
                                 "p-2 rounded-lg transition-all",
-                                isMenuOpen ? "bg-primary text-white" : "hover:bg-accent opacity-40 group-hover:opacity-100"
+                                isMenuOpen ? "bg-action text-action-foreground" : "hover:bg-accent opacity-40 group-hover:opacity-100"
                               )}
                               onClick={(e) => {
                                 e.stopPropagation();

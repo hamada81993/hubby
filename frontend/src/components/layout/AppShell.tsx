@@ -8,14 +8,17 @@ import Topbar from './Topbar';
 import { useStores } from '@/components/providers/StoresProvider';
 import { useToast } from '@/components/ui/Toast';
 import { useI18n } from '@/i18n';
+import { useTheme } from '@/components/providers/ThemeProvider';
+import { cn } from '@/lib/utils';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { dir } = useI18n();
+  const { theme } = useTheme();
 
   return (
-    <div dir={dir} className="theme-light min-h-screen bg-background text-foreground flex">
+    <div dir={dir} className={cn("min-h-screen bg-background text-foreground flex", theme === 'light' && "theme-light")}>
       <div className="hidden md:flex shrink-0"><Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} /></div>
       {mobileMenuOpen && <div className="fixed inset-0 z-50 md:hidden">
         <button className="absolute inset-0 bg-black/40" aria-label="Close navigation" onClick={() => setMobileMenuOpen(false)} />
@@ -69,7 +72,7 @@ function ConnectBanner() {
       <div className="flex items-center gap-2">
         <Link
           href="/stores"
-          className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-xl bg-action px-4 py-2 text-xs font-semibold text-action-foreground transition hover:opacity-90"
         >
           {t('connect.cta')}
           <ArrowRight size={14} className={dir === 'rtl' ? 'rotate-180' : ''} />

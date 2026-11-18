@@ -27,6 +27,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/ui/Logo';
 import { useI18n } from '@/i18n';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 const menuItems = [
   { icon: LayoutDashboard, key: 'dashboard', href: '/dashboard' },
@@ -52,6 +53,7 @@ const menuItems = [
 export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolean) => void }) {
   const pathname = usePathname();
   const { t, dir } = useI18n();
+  const { theme } = useTheme();
   const { organizations, activeOrgId, setActiveOrgId } = useAuthStore();
   const activeOrg = organizations.find(o => o.id === activeOrgId);
 
@@ -63,7 +65,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean; setIsO
       <div className="p-4 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           {isOpen
-            ? <Logo variant="color" className="h-7 w-auto" />
+            ? <Logo variant={theme === 'dark' ? 'dark' : 'color'} className="h-7 w-auto" />
             : <Logo variant="icon" className="h-8 w-8" />}
           <button 
             onClick={() => setIsOpen(!isOpen)}
@@ -94,13 +96,13 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean; setIsO
             key={item.href}
             href={item.href}
             className={cn(
-              "flex items-center p-3 rounded-xl transition-all hover:bg-primary/10 group",
-              pathname.startsWith(item.href) ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-muted-foreground"
+              "flex items-center p-3 rounded-xl transition-all hover:bg-accent group",
+              pathname.startsWith(item.href) ? "bg-accent text-foreground font-semibold" : "text-muted-foreground"
             )}
           >
             <item.icon size={22} className={cn(
               "min-w-[22px]",
-              pathname.startsWith(item.href) ? "text-white" : "group-hover:text-primary"
+              pathname.startsWith(item.href) ? "text-primary" : "group-hover:text-primary"
             )} />
             {isOpen && <span className="ms-4 font-medium">{t('nav.' + item.key)}</span>}
           </Link>

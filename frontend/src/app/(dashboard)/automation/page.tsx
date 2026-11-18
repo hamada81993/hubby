@@ -90,7 +90,7 @@ export default function AutomationPage() {
         </div>
         <button
           onClick={() => router.push('/automation/new')}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors self-start"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-action text-action-foreground rounded-lg text-sm font-medium shadow-lg shadow-action/20 hover:bg-action/90 transition-colors self-start"
         >
           <Plus size={16} />
           {t('automation.newRule')}

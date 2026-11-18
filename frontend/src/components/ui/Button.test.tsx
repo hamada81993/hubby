@@ -18,7 +18,7 @@ describe('Button Component', () => {
 
   it('applies primary variant classes', () => {
     const { container } = render(<Button variant="primary">Primary</Button>);
-    expect(container.firstChild).toHaveClass('bg-primary');
+    expect(container.firstChild).toHaveClass('bg-action');
   });
 
   it('is disabled when isLoading is true', () => {

@@ -56,8 +56,8 @@ export default function OnboardingPage() {
             <div key={i} className="flex items-center">
               <div className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all",
-                step === i ? "bg-primary text-white ring-4 ring-primary/20" : 
-                step > i ? "bg-secondary text-white" : "bg-accent text-muted-foreground"
+                step === i ? "bg-action text-action-foreground ring-4 ring-action/20" : 
+                step > i ? "bg-secondary text-secondary-foreground" : "bg-accent text-muted-foreground"
               )}>
                 {step > i ? <CheckCircle2 size={16} /> : i}
               </div>

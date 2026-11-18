@@ -33,11 +33,14 @@
      LIGHT (the `.theme-light` block — applied to the dashboard).
    =========================================================================== */
 :root {
-  /* ---- Brand colors (Hubby identity — theme-independent) ----
-     Deep Teal is the primary/anchor (accessible with white text); vivid Green
-     is the accent (highlights, active states, success), rendered with dark text. */
-  --primary: #0B5A5C;            /* deep teal */
-  --primary-foreground: #FFFFFF;
+  /* ---- Brand colors (Hubby identity) ----
+     Green is the action: every filled button, in both themes, always with dark text
+     (white on green is 2:1 and fails). `--primary` is the link / active colour and
+     follows the theme: green on the dark surfaces here, Deep Teal on light (below). */
+  --action: #4FD34A;             /* brand green — filled buttons */
+  --action-foreground: #06312F;
+  --primary: #4FD34A;            /* links + active states on dark */
+  --primary-foreground: #06312F;
   --secondary: #4FD34A;          /* brand green */
   --secondary-foreground: #06312F;
   --destructive: #F24B4B;        /* error */
@@ -48,7 +51,9 @@
   --success-foreground: #FFFFFF;
   --info: #22D3EE;               /* AI / automation / info */
   --info-foreground: #05323A;
-  --ring: #0B5A5C;
+  --ai-from: #22D3EE;            /* Hubby AI gradient: cyan into green */
+  --ai-to: #4FD34A;
+  --ring: #4FD34A;
   --radius: 0.75rem;
 
   /* ---- Fonts (self-hosted; @font-face above). Var name kept for compatibility. ---- */
@@ -57,36 +62,53 @@
   --font-arabic: 'Alexandria', var(--font-geist-sans);
 
   /* ---- Surface colors: DARK (default — landing + auth) — brand teal-black ---- */
-  --background: #051E1D;
+  --background: #041817;
   --foreground: #F1F7F6;
-  --card: #0B2B2A;
+  --card: #0A2625;
   --card-foreground: #F1F7F6;
-  --popover: #051E1D;
+  --popover: #0A2625;
   --popover-foreground: #F1F7F6;
-  --muted: #123C3A;
+  --muted: #14403D;
   --muted-foreground: #93B4B1;
-  --accent: #0B2B2A;
+  --accent: #0F3331;
   --accent-foreground: #F1F7F6;
-  --border: #16433F;
-  --input: #16433F;
-  --glass-bg: rgba(11, 43, 42, 0.7);
+  --border: #1C4F4B;
+  --input: #1C4F4B;
+  --glass-bg: rgba(10, 38, 37, 0.7);
   --glass-border: rgba(255, 255, 255, 0.1);
+
+  /* ---- Status text that stays readable on the surface of each theme ---- */
+  --positive: #5FE39A;
+  --caution: #F9C566;
+  --negative: #FF8A8A;
+
+  /* ---- The hub (dashboard hero) ---- */
+  --hub-pulse: #C7FF46;
+  --hub-stage: radial-gradient(circle at 50% 50%, #0E3B38 0%, #082322 46%, #061C1B 100%);
 }
 
 /* ---- Surface colors: LIGHT (applied to the dashboard) ---- */
 .theme-light {
-  --background: #F8FAFB;          /* brand app background */
+  --primary: #0B5A5C;            /* Deep Teal — links + active states on light */
+  --primary-foreground: #FFFFFF;
+  --ring: #0B5A5C;
+  --background: #F3F7F6;          /* brand app background */
   --foreground: #183238;          /* brand text primary  */
   --card: #FFFFFF;
   --card-foreground: #183238;
   --popover: #FFFFFF;
   --popover-foreground: #183238;
-  --muted: #EEF2F4;              /* brand soft gray      */
+  --muted: #E1E9E8;              /* surface soft         */
   --muted-foreground: #60727A;    /* brand text secondary */
-  --accent: #EEF2F4;             /* brand soft gray hover */
+  --accent: #E1E9E8;             /* surface soft (hover + active) */
   --accent-foreground: #183238;
-  --border: #DCE5E8;             /* brand border         */
-  --input: #DCE5E8;
+  --border: #C7D5DA;             /* brand border         */
+  --input: #C7D5DA;
+  --positive: #0F7A40;
+  --caution: #8A5A00;
+  --negative: #B42323;
+  --hub-pulse: #0B5A5C;
+  --hub-stage: radial-gradient(circle at 50% 50%, #DDF5DB 0%, #F4FAF8 52%, #FFFFFF 100%);
   --glass-bg: rgba(255, 255, 255, 0.92);
   --glass-border: rgba(11, 90, 92, 0.10);
 }
@@ -100,6 +122,8 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-action: var(--action);
+  --color-action-foreground: var(--action-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -114,6 +138,9 @@
   --color-success-foreground: var(--success-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  --color-positive: var(--positive);
+  --color-caution: var(--caution);
+  --color-negative: var(--negative);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -188,6 +215,40 @@ body {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------------------------------------------------------------------------
+   Dashboard motion: things arrive once; only the hub keeps moving.
+   --------------------------------------------------------------------------- */
+.hub-stage {
+  background: var(--hub-stage);
+}
+
+@keyframes hb-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hb-rise {
+  animation: hb-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes hb-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.16); opacity: 0.5; }
+}
+
+.hb-breathe {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: hb-breathe 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-rise,
+  .hb-breathe {
+    animation: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------

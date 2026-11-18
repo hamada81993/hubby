@@ -135,7 +135,7 @@ export default function AnalyticsPage() {
         </div>
         <button
           onClick={downloadReport}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-action text-action-foreground rounded-lg text-sm font-medium shadow-lg shadow-action/20 hover:bg-action/90 transition-colors"
         >
           <Download size={16} />
           {t('analytics.downloadReport')}
@@ -178,15 +178,15 @@ export default function AnalyticsPage() {
               <AreaChart data={timeline}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0B5A5C" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#0B5A5C" stopOpacity={0} />
+                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DCE5E8" />
-                <XAxis dataKey="date" stroke="#60727A" fontSize={11} tickLine={false} axisLine={false} minTickGap={24} />
-                <YAxis stroke="#60727A" fontSize={11} tickLine={false} axisLine={false} width={48} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #DCE5E8' }} />
-                <Area type="monotone" dataKey="revenue" stroke="#0B5A5C" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} minTickGap={24} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} width={48} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)' }} />
+                <Area type="monotone" dataKey="revenue" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -234,10 +234,10 @@ export default function AnalyticsPage() {
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={timeline}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DCE5E8" />
-              <XAxis dataKey="date" stroke="#60727A" fontSize={11} tickLine={false} axisLine={false} minTickGap={24} />
-              <YAxis stroke="#60727A" fontSize={11} tickLine={false} axisLine={false} width={36} allowDecimals={false} />
-              <Tooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} contentStyle={{ borderRadius: 12, border: '1px solid #DCE5E8' }} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+              <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} minTickGap={24} />
+              <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} width={36} allowDecimals={false} />
+              <Tooltip cursor={{ fill: 'var(--accent)' }} contentStyle={{ borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)' }} />
               <Bar dataKey="orders" fill="#4FD34A" radius={[6, 6, 0, 0]} maxBarSize={40} />
             </BarChart>
           </ResponsiveContainer>

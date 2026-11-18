@@ -283,7 +283,7 @@ export default function ProductsPage() {
                   )}
                   <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                     <button 
-                      className="p-2 bg-background rounded-full border border-border hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl"
+                      className="p-2 bg-background rounded-full border border-border hover:bg-action hover:text-action-foreground hover:border-action transition-all shadow-xl"
                       onClick={(e) => {
                         e.stopPropagation();
                         router.push(`/products/${product.id}/edit`);

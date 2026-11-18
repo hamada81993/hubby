@@ -24,7 +24,7 @@ export function PlatformLogo({
         src={`/platforms/${id}.svg`}
         alt={getPlatform(id).name}
         style={{ height: size, width: 'auto', maxWidth: size * 3 }}
-        className={cn('object-contain shrink-0', className)}
+        className={cn('object-contain shrink-0 rounded-[5px] bg-white p-0.5', className)}
       />
     );
   }

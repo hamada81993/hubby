@@ -86,7 +86,7 @@ export default function ShipmentsPage() {
                 key={f || 'all'}
                 onClick={() => setStatus(f)}
                 className={cn('px-3 py-1.5 text-xs rounded-lg border border-border transition-all',
-                  f === status ? 'bg-primary text-white border-primary' : 'bg-background hover:bg-accent')}
+                  f === status ? 'bg-action text-action-foreground border-action' : 'bg-background hover:bg-accent')}
               >
                 {f === '' ? t('shipping.all') : t(`shipping.statuses.${f}`)}
               </button>
@@ -105,7 +105,7 @@ export default function ShipmentsPage() {
               <p className="text-sm text-muted-foreground">{t('shipping.emptyHint')}</p>
               <Link
                 href="/shipments/carriers"
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-primary text-white hover:opacity-90 transition-opacity"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-action text-action-foreground hover:opacity-90 transition-opacity"
               >
                 <Settings2 size={16} /> {t('shipping.setupCarriers')}
               </Link>
