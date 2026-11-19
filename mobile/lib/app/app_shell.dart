@@ -9,6 +9,7 @@ import '../features/products/products_page.dart';
 import '../features/inventory/inventory_page.dart';
 import '../features/more/more_page.dart';
 import '../l10n/strings.dart';
+import 'package:go_router/go_router.dart';
 
 /// Bottom-nav shell. Five primary tabs; secondary sections live under "More".
 class AppShell extends StatefulWidget {
@@ -39,6 +40,16 @@ class _AppShellState extends State<AppShell> {
     ];
     return Scaffold(
       body: SafeArea(child: IndexedStack(index: _index, children: pages)),
+      // The scanner is the warehouse team's main tool, so it is one tap away on every tab.
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/warehouse'),
+        backgroundColor: AppPalette.action,
+        foregroundColor: AppPalette.onAction,
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        tooltip: context.t('nav.warehouse'),
+        child: const Icon(LucideIcons.scanLine, size: 26),
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppPalette.card,

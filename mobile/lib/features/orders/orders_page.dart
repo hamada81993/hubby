@@ -126,20 +126,21 @@ class _OrdersPageState extends State<OrdersPage> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(children: [
-                  for (final p in ['All', ...stores.connectedPlatforms.map((e) => platformFor(e).name)])
-                    _chip(p == 'All' ? context.t('common.all') : p, _platform == p,
-                        () { setState(() => _platform = p); _reload(); }),
-                ]),
-              ),
-              const SizedBox(height: 6),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(children: [
                   for (final s in ['All', 'Pending', 'Processing', 'Paid', 'Shipped', 'Cancelled'])
-                    _chip(_statusLabel(context, s), _status == s,
-                        () { setState(() => _status = s); _reload(); }, AppPalette.secondary),
+                    _chip(_statusLabel(context, s), _status == s, () { setState(() => _status = s); _reload(); }),
                 ]),
               ),
+              if (stores.connectedPlatforms.length > 1) ...[
+                const SizedBox(height: 6),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(children: [
+                    for (final p in ['All', ...stores.connectedPlatforms.map((e) => platformFor(e).name)])
+                      _chip(p == 'All' ? context.t('common.all') : p, _platform == p,
+                          () { setState(() => _platform = p); _reload(); }),
+                  ]),
+                ),
+              ],
             ],
           ),
         ),
@@ -156,57 +157,72 @@ class _OrdersPageState extends State<OrdersPage> {
                       if (orders.isEmpty) {
                         return EmptyState(icon: LucideIcons.shoppingCart, title: context.t('orders.none'));
                       }
-                      return ListView.separated(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: orders.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 10),
-                        itemBuilder: (context, i) {
-                          final o = orders[i];
-                          final meta = platformFor(o['store']?['platform']);
-                          final email = o['customer_email']?.toString() ?? '';
-                          final date = DateTime.tryParse(o['created_at']?.toString() ?? '');
-                          return AppCard(
-                            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                                builder: (_) => OrderDetailPage(orderId: o['id'] as int))),
-                            child: Row(children: [
-                              PlatformLogo(platformId: meta.id, size: 22),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('#${(o['external_id'] ?? '').toString().toUpperCase()}',
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                    Text(o['customer_name']?.toString() ?? 'Guest',
-                                        maxLines: 1, overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
-                                    if (email.isNotEmpty)
-                                      Text(email, maxLines: 1, overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
-                                    if (date != null)
-                                      Text(DateFormat.yMMMd().add_jm().format(date),
-                                          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  MoneyText(o['total'], code: o['currency']?.toString(),
-                                      style: AppText.number(size: 14)),
-                                  const SizedBox(height: 4),
-                                  _statusBadge(o['status']?.toString() ?? ''),
-                                ],
-                              ),
+                      // One card, one row per order: the id and total lead, the rest is detail.
+                      return ListView(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                        children: [
+                          Container(
+                            clipBehavior: Clip.antiAlias,
+                            decoration: BoxDecoration(
+                              color: AppPalette.card,
+                              borderRadius: BorderRadius.circular(22),
+                              border: Border.all(color: AppPalette.border),
+                            ),
+                            child: Column(children: [
+                              for (var i = 0; i < orders.length; i++) _orderRow(context, orders[i], last: i == orders.length - 1),
                             ]),
-                          );
-                        },
+                          ),
+                        ],
                       );
                     },
                   ),
                 ),
         ),
       ],
+    );
+  }
+
+  Widget _orderRow(BuildContext context, dynamic o, {required bool last}) {
+    final meta = platformFor(o['store']?['platform']);
+    final date = DateTime.tryParse(o['created_at']?.toString() ?? '');
+    return InkWell(
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => OrderDetailPage(orderId: o['id'] as int))),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        decoration: BoxDecoration(
+          border: last ? null : Border(bottom: BorderSide(color: AppPalette.accent)),
+        ),
+        child: Column(children: [
+          Row(children: [
+            Expanded(
+              child: Text('#${(o['external_id'] ?? '').toString().toUpperCase()}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+            ),
+            MoneyText(o['total'], code: o['currency']?.toString(), style: AppText.number(size: 15)),
+          ]),
+          const SizedBox(height: 6),
+          Row(children: [
+            PlatformLogo(platformId: meta.id, size: 14),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                [
+                  o['customer_name']?.toString() ?? 'Guest',
+                  if (date != null) DateFormat.MMMd().add_jm().format(date),
+                ].join(' · '),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12.5),
+              ),
+            ),
+            const SizedBox(width: 8),
+            _statusBadge(o['status']?.toString() ?? ''),
+          ]),
+        ]),
+      ),
     );
   }
 
@@ -229,24 +245,22 @@ class _OrdersPageState extends State<OrdersPage> {
     }
   }
 
-  Widget _chip(String label, bool active, VoidCallback onTap, [Color? tone]) {
-    final color = tone ?? AppPalette.primary;
+  // A selected filter is marked by its outline and weight; green stays for actions.
+  Widget _chip(String label, bool active, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsetsDirectional.only(end: 8),
       child: ChoiceChip(
         label: Text(label),
         selected: active,
+        showCheckmark: false,
         onSelected: (_) => onTap(),
-        selectedColor: color,
-        // Text on the selected chip follows the fill: dark ink on a light fill, white on a dark one.
+        selectedColor: AppPalette.accent,
         labelStyle: TextStyle(
-            color: !active
-                ? AppPalette.foreground
-                : (color.computeLuminance() > 0.4 ? AppPalette.ink : Colors.white),
-            fontSize: 12),
-        checkmarkColor: color.computeLuminance() > 0.4 ? AppPalette.ink : Colors.white,
+            color: active ? AppPalette.foreground : AppPalette.mutedForeground,
+            fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+            fontSize: 13),
         backgroundColor: AppPalette.card,
-        side: BorderSide(color: AppPalette.border),
+        side: BorderSide(color: active ? AppPalette.primary : AppPalette.border, width: active ? 1.5 : 1),
       ),
     );
   }

@@ -6,6 +6,7 @@ import '../../core/format.dart';
 import '../../core/network/api_client.dart';
 import '../../core/platforms.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/theme/app_theme.dart';
 import '../../l10n/strings.dart';
 import '../../shared/widgets/app_widgets.dart';
 import '../../shared/widgets/async_builder.dart';
@@ -80,25 +81,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           final subtotal = items.fold<double>(
               0, (a, it) => a + asNum(it['price']) * ((it['quantity'] ?? 1) as num).toDouble());
           final total = asNum(o['total']);
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              AppCard(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    PlatformLogo(platformId: meta.id, size: 22),
-                    const SizedBox(width: 10),
-                    Text('#${(o['external_id'] ?? '').toString().toUpperCase()}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    const Spacer(),
-                    MoneyText(total, code: currency,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  ]),
-                ]),
-              ),
-              const SizedBox(height: 16),
-              _statusActions(status, cancelled),
-              AppCard(
+          final placed = DateTime.tryParse(o['created_at']?.toString() ?? '');
+          final statusCard =               AppCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(context.t('common.status'), style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
@@ -125,8 +109,45 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       );
                     }),
                 ]),
-              ),
+              );
+          final actions = _statusActions(status, cancelled);
+          return Column(children: [
+            Expanded(
+              child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              // The order at a glance: who sold it, what it is worth, where it stands.
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('#${(o['external_id'] ?? '').toString().toUpperCase()}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22, letterSpacing: -0.4)),
+                    const SizedBox(height: 4),
+                    Row(children: [
+                      PlatformLogo(platformId: meta.id, size: 14),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          [
+                            o['store']?['name']?.toString() ?? meta.name,
+                            if (placed != null) DateFormat.MMMd().add_jm().format(placed),
+                          ].join(' · '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12.5),
+                        ),
+                      ),
+                    ]),
+                  ]),
+                ),
+                const SizedBox(width: 12),
+                MoneyText(total, code: currency, style: AppText.number(size: 22, weight: FontWeight.w900)),
+              ]),
               const SizedBox(height: 16),
+              _customerCard(o),
+              const SizedBox(height: 12),
               AppCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
@@ -140,19 +161,30 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     final qty = (it['quantity'] ?? 1) as num;
                     final price = asNum(it['price']);
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      padding: const EdgeInsets.symmetric(vertical: 7),
+                      child: Row(children: [
+                        Container(
+                          width: 34,
+                          height: 34,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: AppPalette.surfaceAlt, borderRadius: BorderRadius.circular(10)),
+                          child: Text('×$qty', style: AppText.number(size: 13)),
+                        ),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text(it['product_name']?.toString() ?? it['name']?.toString() ?? '',
-                                maxLines: 1, overflow: TextOverflow.ellipsis),
-                            Text('SKU ${it['sku']?.toString() ?? 'N/A'}  ·  ${formatMoney(price, currency)} × $qty',
-                                style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontWeight: FontWeight.w700)),
+                            Text('${it['sku']?.toString() ?? '—'} · ${formatMoney(price, currency)}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
                           ]),
                         ),
                         const SizedBox(width: 10),
-                        MoneyText(price * qty.toDouble(), code: currency,
-                            style: const TextStyle(fontWeight: FontWeight.w600)),
+                        MoneyText(price * qty.toDouble(), code: currency, style: AppText.number(size: 14)),
                       ]),
                     );
                   }),
@@ -162,18 +194,30 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   _totalRow(context.t('common.total'), total, currency, bold: true),
                 ]),
               ),
-              const SizedBox(height: 16),
-              _customerCard(o),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
+              statusCard,
+              const SizedBox(height: 12),
               _storeCard(o, meta, currency),
             ],
-          );
+              ),
+            ),
+            // What to do next stays within thumb reach.
+            if (actions != null)
+              Container(
+                padding: EdgeInsets.fromLTRB(16, 10, 16, 10 + MediaQuery.of(context).padding.bottom),
+                decoration: BoxDecoration(
+                  color: AppPalette.background,
+                  border: Border(top: BorderSide(color: AppPalette.border)),
+                ),
+                child: actions,
+              ),
+          ]);
         },
       ),
     );
   }
 
-  Widget _statusActions(String status, bool cancelled) {
+  Widget? _statusActions(String status, bool cancelled) {
     final buttons = <Widget>[];
     if (status == 'pending') {
       buttons.add(FilledButton.icon(
@@ -197,11 +241,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         label: Text(context.t('orders.cancelOrder')),
       ));
     }
-    if (buttons.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Wrap(spacing: 10, runSpacing: 10, children: buttons),
-    );
+    if (buttons.isEmpty) return null;
+    return Row(children: [
+      for (var i = 0; i < buttons.length; i++) ...[
+        if (i > 0) const SizedBox(width: 10),
+        Expanded(flex: i == 0 ? 3 : 2, child: buttons[i]),
+      ],
+    ]);
   }
 
   Widget _customerCard(Map o) {
