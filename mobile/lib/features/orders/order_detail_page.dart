@@ -67,7 +67,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Widget build(BuildContext context) {
     const steps = ['paid', 'processing', 'shipped', 'delivered'];
     return Scaffold(
-      appBar: AppBar(title: const Text('Order')),
+      appBar: AppBar(title: Text(context.t('orders.order'))),
       body: AsyncView<Map<String, dynamic>>(
         future: _future,
         onRetry: () => setState(() => _future = _load()),
@@ -90,7 +90,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     Row(children: [
                       Icon(LucideIcons.xCircle, color: AppPalette.destructive, size: 18),
                       SizedBox(width: 8),
-                      Text('Cancelled', style: TextStyle(color: AppPalette.destructive, fontWeight: FontWeight.w600)),
+                      Text(context.t('orders.cancelled'), style: TextStyle(color: AppPalette.destructive, fontWeight: FontWeight.w600)),
                     ])
                   else
                     ...List.generate(steps.length, (i) {
@@ -101,7 +101,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           Icon(done ? LucideIcons.checkCircle2 : LucideIcons.circle,
                               size: 18, color: done ? AppPalette.secondary : AppPalette.border),
                           const SizedBox(width: 10),
-                          Text(steps[i][0].toUpperCase() + steps[i].substring(1),
+                          Text(context.t('orders.${steps[i]}'),
                               style: TextStyle(
                                   color: done ? AppPalette.foreground : AppPalette.mutedForeground,
                                   fontWeight: i == currentStep ? FontWeight.bold : FontWeight.normal)),
@@ -153,7 +153,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   Row(children: [
                     Text(context.t('orders.items'), style: const TextStyle(fontWeight: FontWeight.bold)),
                     const Spacer(),
-                    Text('${items.length} product(s)',
+                    Text('${items.length} ${context.t('orders.productsCount')}',
                         style: TextStyle(color: AppPalette.mutedForeground, fontSize: 12)),
                   ]),
                   const SizedBox(height: 8),
