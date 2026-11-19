@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import Card from '@/components/ui/Card';
+import { PlatformLogo } from '@/components/ui/PlatformLogo';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { 
@@ -242,115 +243,103 @@ export default function ProductsPage() {
       {!isLoading && !hasConnectedStore && products.length === 0 ? (
         <ConnectPrompt description={t('products.list.connectPromptDesc')} />
       ) : (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <Card className="p-0 overflow-hidden">
         {isLoading ? (
-          <div className="col-span-full py-20 text-center">
+          <div className="py-20 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-muted-foreground">{t('products.list.loading')}</p>
           </div>
         ) : (
-          <>
-            {products.map((product) => (
-              <Card 
-                key={product.id} 
-                className="p-0 overflow-hidden flex flex-col group hover:border-primary/30 transition-all cursor-pointer"
-                onClick={() => router.push(`/products/${product.id}`)}
-              >
-                <div className="aspect-square bg-accent/30 flex items-center justify-center relative overflow-hidden">
-                  <div 
-                    className="absolute top-3 start-3 z-10"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleSelect(product.id);
-                    }}
+          <div className="overflow-x-auto">
+            <table className="w-full text-start text-sm">
+              <thead>
+                <tr className="border-b border-border text-xs font-bold text-muted-foreground">
+                  <th className="w-12 ps-5 py-4" />
+                  <th className="px-3 py-4 text-start">{t('nav.products')}</th>
+                  <th className="px-3 py-4 text-start">{t('products.list.connectedStores')}</th>
+                  <th className="px-3 py-4 text-end">{t('products.list.price')}</th>
+                  <th className="px-3 py-4 text-end">{t('products.list.stock')}</th>
+                  <th className="w-24 pe-5 py-4" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {products.map((product) => (
+                  <tr
+                    key={product.id}
+                    onClick={() => router.push(`/products/${product.id}`)}
+                    className="group cursor-pointer transition-colors hover:bg-accent/40"
                   >
-                    <div className={cn(
-                      "w-5 h-5 rounded border-2 flex items-center justify-center transition-all",
-                      selectedIds.includes(product.id) ? "bg-primary border-primary" : "bg-card border-muted-foreground/40"
-                    )}>
-                      {selectedIds.includes(product.id) && <Plus size={12} className="text-white rotate-45" />}
-                    </div>
-                  </div>
-                  {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" />
-                  ) : (
-                    <ImageIcon size={48} className="text-muted-foreground/20" />
-                  )}
-                  {product.stock === 0 && (
-                    <div className="absolute top-3 start-11 bg-destructive text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
-                      {t('products.list.outOfStock')}
-                    </div>
-                  )}
-                  <div className="absolute top-3 end-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                    <button 
-                      className="p-2 bg-background rounded-full border border-border hover:bg-action hover:text-action-foreground hover:border-action transition-all shadow-xl"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/products/${product.id}/edit`);
-                      }}
-                    >
-                      <Edit2 size={14} />
-                    </button>
-                    <button 
-                      className="p-2 bg-background rounded-full border border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all shadow-xl"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteId(product.id);
-                      }}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="p-4 flex-1 flex flex-col gap-3">
-                  <div>
-                    <p className="text-[10px] font-mono font-bold text-primary uppercase tracking-widest mb-1">{product.sku}</p>
-                    <h3 className="font-semibold text-sm leading-tight line-clamp-2">{product.name}</h3>
-                  </div>
-
-                  <div className="flex items-center justify-between mt-auto pt-2 border-t border-border/50">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-muted-foreground font-medium uppercase">{t('products.list.price')}</span>
-                      <span className="font-bold"><Money amount={product.price} /></span>
-                    </div>
-                    <div className="flex flex-col text-end">
-                      <span className="text-[10px] text-muted-foreground font-medium uppercase">{t('products.list.stock')}</span>
-                      <span className={cn(
-                        "font-bold",
-                        product.stock <= 15 ? "text-warning" : "text-foreground"
-                      )}>{product.stock}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex -space-x-2">
-                      {product.stores?.map((store: any, i: number) => (
-                        <div key={i} className="w-5 h-5 rounded-full bg-accent border-2 border-card flex items-center justify-center overflow-hidden" title={store.name}>
-                          <Box size={10} className="text-primary" />
-                        </div>
-                      ))}
-                    </div>
-                    <span className="text-[10px] text-muted-foreground font-medium">
-                      {product.stores?.length || 0} {t('products.list.connectedStores')}
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            ))}
-
-            <button 
-              onClick={() => router.push('/products/new')}
-              className="aspect-square rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-primary hover:text-primary transition-all bg-card/10 group"
-            >
-              <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <td className="ps-5 py-3" onClick={(e) => { e.stopPropagation(); toggleSelect(product.id); }}>
+                      <div className={cn(
+                        "w-5 h-5 rounded border-2 flex items-center justify-center transition-all",
+                        selectedIds.includes(product.id) ? "bg-primary border-primary" : "bg-card border-muted-foreground/40"
+                      )}>
+                        {selectedIds.includes(product.id) && <Plus size={12} className="text-primary-foreground rotate-45" />}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted text-xs font-bold text-muted-foreground">
+                          {product.image_url
+                            ? <img src={product.image_url} alt="" className="h-full w-full object-cover" />
+                            : <ImageIcon size={18} />}
+                        </span>
+                        <span className="flex min-w-0 flex-col">
+                          <span className="truncate font-bold">{product.name}</span>
+                          <span className="truncate font-mono text-xs text-muted-foreground">{product.sku}</span>
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {product.stores?.map((store: any, i: number) => (
+                          <span key={i} title={store.name}><PlatformLogo platform={store.platform} size={18} /></span>
+                        ))}
+                        {!product.stores?.length && <span className="text-xs text-muted-foreground">—</span>}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-end font-bold tabular-nums"><Money amount={product.price} /></td>
+                    <td className="px-3 py-3 text-end">
+                      {product.stock === 0 ? (
+                        <span className="rounded-full bg-negative/15 px-2.5 py-1 text-xs font-bold text-negative">{t('products.list.outOfStock')}</span>
+                      ) : (
+                        <span className={cn("font-bold tabular-nums", product.stock <= 15 ? "text-warning" : "text-foreground")}>{product.stock}</span>
+                      )}
+                    </td>
+                    <td className="pe-5 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          aria-label="Edit"
+                          className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                          onClick={(e) => { e.stopPropagation(); router.push(`/products/${product.id}/edit`); }}
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          aria-label="Delete"
+                          className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                          onClick={(e) => { e.stopPropagation(); setDeleteId(product.id); }}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!products.length && (
+              <button
+                onClick={() => router.push('/products/new')}
+                className="flex w-full flex-col items-center gap-3 py-16 text-muted-foreground transition-colors hover:text-primary"
+              >
                 <Plus size={24} />
-              </div>
-              <span className="text-sm font-medium">{t('products.list.addNewProduct')}</span>
-            </button>
-          </>
+                <span className="text-sm font-medium">{t('products.list.addNewProduct')}</span>
+              </button>
+            )}
+          </div>
         )}
-      </div>
+      </Card>
       )}
       <Modal
         isOpen={isCategoryModalOpen}

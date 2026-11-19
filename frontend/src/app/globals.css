@@ -162,6 +162,11 @@
 .text-destructive { color: var(--negative); }
 .text-info { color: var(--notice); }
 
+/* Column headings line up with their cells, in either reading direction. */
+th {
+  text-align: inherit;
+}
+
 * {
   border-color: var(--border);
   scroll-behavior: smooth;
