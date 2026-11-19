@@ -21,8 +21,8 @@ export function PlatformLogo({
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        // Zid's wordmark file is white; its coloured mark is the one that shows on the white chip.
-        src={id === 'zid' ? '/platforms/marks/zid.svg' : `/platforms/${id}.svg`}
+        // Zid's wordmark file is white and Salla's is drawn tiny inside a large box, so both use their mark.
+        src={id === 'zid' || id === 'salla' ? `/platforms/marks/${id}.svg` : `/platforms/${id}.svg`}
         alt={getPlatform(id).name}
         style={{ height: size, width: 'auto', maxWidth: size * 3 }}
         className={cn('object-contain shrink-0 rounded-[5px] bg-white p-0.5', className)}
