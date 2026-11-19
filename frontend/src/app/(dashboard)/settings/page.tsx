@@ -21,15 +21,8 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
-import { useT } from '@/i18n';
-
-const tabs = [
-  { id: 'profile', icon: User },
-  { id: 'organization', icon: Building2 },
-  { id: 'shipping', icon: Truck },
-  { id: 'security', icon: Lock },
-  { id: 'notifications', icon: Bell },
-];
+import { useI18n } from '@/i18n';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 function Banner({ message, kind }: { message: string; kind: 'success' | 'error' }) {
   if (!message) return null;
@@ -48,8 +41,9 @@ function Banner({ message, kind }: { message: string; kind: 'success' | 'error' 
 }
 
 export default function SettingsPage() {
-  const t = useT();
-  const [activeTab, setActiveTab] = useState('profile');
+  const { t, locale, setLocale } = useI18n();
+  const l = (en: string, ar: string) => (locale === 'ar' ? ar : en);
+  const { theme, toggleTheme } = useTheme();
 
   const user = useAuthStore((s) => s.user);
   const organizations = useAuthStore((s) => s.organizations);
@@ -69,6 +63,17 @@ export default function SettingsPage() {
   const [orgName, setOrgName] = useState(activeOrg?.name || '');
   const [savingOrg, setSavingOrg] = useState(false);
   const [orgMsg, setOrgMsg] = useState<{ k: 'success' | 'error'; m: string } | null>(null);
+
+  // The signed-in user and organisation arrive after the first render; fill the forms once they do.
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+    }
+  }, [user]);
+  useEffect(() => {
+    if (activeOrg) setOrgName(activeOrg.name || '');
+  }, [activeOrg]);
 
   // Security
   const [currentPassword, setCurrentPassword] = useState('');
@@ -151,36 +156,18 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('settings.title')}</h1>
-        <p className="text-muted-foreground text-sm">{t('settings.subtitle')}</p>
+        <p className="text-sm text-muted-foreground">{activeOrg?.name || t('settings.subtitle')}</p>
+        <h1 className="mt-1 text-[28px] leading-tight font-black tracking-[-0.025em]">{l('Make Hubby yours.', 'اجعل هَبّي على طريقتك.')}</h1>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        <aside className="lg:w-64 flex flex-col gap-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                activeTab === tab.id
-                  ? 'bg-accent text-foreground font-semibold'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-              )}
-            >
-              <tab.icon size={18} />
-              {t(`settings.tabs.${tab.id}`)}
-            </button>
-          ))}
-        </aside>
-
-        <div className="flex-1 max-w-3xl">
-          {activeTab === 'profile' && (
-            <Card className="p-8">
-              <form onSubmit={saveProfile} className="space-y-8">
-                <div className="flex items-center gap-6 pb-8 border-b border-border">
+      {/* Everything on one page, in two columns of cards: nothing is hidden behind a tab. */}
+      <div className="columns-1 gap-[18px] xl:columns-2 [&>*]:mb-[18px] [&>*]:break-inside-avoid">
+          {(
+            <Card className="p-6 rounded-[28px]">
+              <form onSubmit={saveProfile} className="space-y-6">
+                <div className="flex items-center gap-5 pb-6 border-b border-border">
                   <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-primary/30 text-2xl font-bold uppercase">
                     {(name || user?.name || '?').charAt(0)}
                   </div>
@@ -207,8 +194,36 @@ export default function SettingsPage() {
             </Card>
           )}
 
-          {activeTab === 'organization' && (
-            <Card className="p-8">
+          <Card className="p-6 rounded-[28px] space-y-5">
+            <h3 className="text-lg font-bold">{l('Look and language', 'المظهر واللغة')}</h3>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-bold">{l('Theme', 'المظهر')}</p>
+                <p className="text-xs text-muted-foreground">{l('Dark or light, saved on this device', 'داكن أو فاتح، يُحفظ على هذا الجهاز')}</p>
+              </div>
+              <Segmented
+                label={l('Theme', 'المظهر')}
+                value={theme}
+                options={[{ value: 'dark', label: l('Dark', 'داكن') }, { value: 'light', label: l('Light', 'فاتح') }]}
+                onChange={(v) => { if (v !== theme) toggleTheme(); }}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-4 border-t border-border pt-5">
+              <div>
+                <p className="text-sm font-bold">{l('Language', 'اللغة')}</p>
+                <p className="text-xs text-muted-foreground">{l('Each person on the team keeps their own', 'كل فرد في الفريق يحتفظ بلغته')}</p>
+              </div>
+              <Segmented
+                label={l('Language', 'اللغة')}
+                value={locale}
+                options={[{ value: 'en', label: 'English' }, { value: 'ar', label: 'العربية' }]}
+                onChange={setLocale}
+              />
+            </div>
+          </Card>
+
+          {(
+            <Card className="p-6 rounded-[28px]">
               <form onSubmit={saveOrg} className="space-y-8">
                 <div>
                   <h3 className="text-lg font-bold">{t('settings.organization.title')}</h3>
@@ -230,8 +245,8 @@ export default function SettingsPage() {
             </Card>
           )}
 
-          {activeTab === 'shipping' && (
-            <Card className="p-8 space-y-6">
+          {(
+            <Card className="p-6 rounded-[28px] space-y-6">
               <div>
                 <h3 className="text-lg font-bold">{t('settings.shipping.title')}</h3>
                 <p className="text-sm text-muted-foreground">{t('settings.shipping.desc')}</p>
@@ -252,8 +267,8 @@ export default function SettingsPage() {
             </Card>
           )}
 
-          {activeTab === 'security' && (
-            <Card className="p-8">
+          {(
+            <Card className="p-6 rounded-[28px]">
               <form onSubmit={savePassword} className="space-y-8">
                 <div>
                   <h3 className="text-base font-bold">{t('settings.security.title')}</h3>
@@ -278,8 +293,8 @@ export default function SettingsPage() {
             </Card>
           )}
 
-          {activeTab === 'notifications' && (
-            <Card className="p-8 space-y-8">
+          {(
+            <Card className="p-6 rounded-[28px] space-y-6">
               <div>
                 <h3 className="text-lg font-bold">{t('settings.notifications.title')}</h3>
                 <p className="text-sm text-muted-foreground">{t('settings.notifications.desc')}</p>
@@ -304,8 +319,36 @@ export default function SettingsPage() {
               </div>
             </Card>
           )}
-        </div>
+
+          <section className="rounded-[28px] bg-action p-6 text-action-foreground">
+            <p className="text-sm font-bold">{l('Plan and billing', 'الخطة والفوترة')}</p>
+            <p className="mt-1 text-[32px] font-black leading-tight tracking-[-0.03em]">{activeOrg?.name || 'Hubby'}</p>
+            <Link href="/billing" className="mt-4 inline-flex h-11 items-center rounded-xl bg-action-foreground px-5 text-sm font-bold text-white">
+              {l('Manage plan and billing', 'إدارة الخطة والفوترة')}
+            </Link>
+          </section>
       </div>
+    </div>
+  );
+}
+
+function Segmented<T extends string>({ value, options, onChange, label }: { value: T; options: { value: T; label: string }[]; onChange: (v: T) => void; label: string }) {
+  return (
+    <div role="group" aria-label={label} className="flex shrink-0 gap-1 rounded-xl bg-muted p-1">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          aria-pressed={o.value === value}
+          onClick={() => onChange(o.value)}
+          className={cn(
+            'h-9 rounded-lg px-4 text-sm font-bold transition-colors',
+            o.value === value ? 'bg-action text-action-foreground' : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {o.label}
+        </button>
+      ))}
     </div>
   );
 }

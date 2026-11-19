@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Truck, Search, ChevronRight, Settings2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
-import { useT } from '@/i18n';
+import { useI18n } from '@/i18n';
 import { shipmentStatusColor } from '@/components/shipping/statusColor';
 
 type Shipment = {
@@ -21,15 +21,27 @@ type Shipment = {
   created_at: string;
 };
 
+// The five stages a parcel moves through, in order; each is a counter and a filter.
+const STAGES = ['label_purchased', 'awaiting_pickup', 'in_transit', 'out_for_delivery', 'delivered'];
 const FILTERS = ['', 'draft', 'label_purchased', 'in_transit', 'out_for_delivery', 'delivered', 'returned_to_origin', 'cancelled'];
 
 export default function ShipmentsPage() {
-  const t = useT();
+  const { t, locale } = useI18n();
+  const l = (en: string, ar: string) => (locale === 'ar' ? ar : en);
   const router = useRouter();
   const [rows, setRows] = useState<Shipment[]>([]);
   const [status, setStatus] = useState('');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+
+  // One small request per stage: the list endpoint already returns the total for a status.
+  useEffect(() => {
+    let live = true;
+    Promise.all(STAGES.map((stage) => api.get('/shipments', { params: { status: stage } }).then((r) => [stage, Number(r.data?.total ?? 0)] as const).catch(() => [stage, 0] as const)))
+      .then((pairs) => { if (live) setCounts(Object.fromEntries(pairs)); });
+    return () => { live = false; };
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -48,50 +60,78 @@ export default function ShipmentsPage() {
     return () => clearTimeout(timer);
   }, [load]);
 
+  const moving = STAGES.slice(0, 4).reduce((sum, stage) => sum + (counts[stage] ?? 0), 0);
+  const everything = moving + (counts.delivered ?? 0);
+  const carriers = Object.entries(
+    rows.reduce<Record<string, number>>((acc, r) => {
+      const key = r.carrier_code || '—';
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    }, {}),
+  ).sort((x, y) => y[1] - x[1]);
+  const busiest = carriers[0]?.[1] ?? 1;
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-[18px]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] flex items-center gap-3">
-            <Truck className="text-primary" />
-            {t('shipping.title')}
+          <p className="text-sm text-muted-foreground">
+            {new Date().toLocaleDateString(locale === 'ar' ? 'ar-SA-u-nu-latn-ca-gregory' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {' · '}{l(`${moving} in motion`, `${moving} في الطريق`)}
+          </p>
+          <h1 className="mt-1 text-[28px] leading-tight font-black tracking-[-0.025em]">
+            {l('Out the door, all the way home.', 'من الباب إلى باب العميل.')}
           </h1>
-          <p className="text-muted-foreground text-sm">{t('shipping.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/shipments/manifests"
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-border hover:bg-accent transition-colors"
-          >
+          <Link href="/shipments/manifests" className="inline-flex h-10 items-center gap-2 rounded-xl border border-border px-4 text-sm font-bold transition-colors hover:bg-accent">
             <Truck size={16} /> {t('shipping.manifestsTitle')}
           </Link>
-          <Link
-            href="/shipments/carriers"
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-border hover:bg-accent transition-colors"
-          >
+          <Link href="/shipments/carriers" className="inline-flex h-10 items-center gap-2 rounded-xl border border-border px-4 text-sm font-bold transition-colors hover:bg-accent">
             <Settings2 size={16} /> {t('shipping.accountsTitle')}
           </Link>
         </div>
       </div>
 
+      <section className="hb-rise rounded-[28px] border border-border bg-card p-5 md:px-7 md:py-6">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 lg:grid-cols-5">
+          {STAGES.map((stage) => (
+            <button
+              key={stage}
+              onClick={() => setStatus(status === stage ? '' : stage)}
+              aria-pressed={status === stage}
+              className={cn('rounded-2xl p-2 text-start transition-colors hover:bg-accent', status === stage && 'bg-accent')}
+            >
+              <span className={cn(
+                'block text-[40px] font-black leading-none tracking-[-0.04em] tabular-nums',
+                stage === 'delivered' ? 'text-positive' : stage === 'awaiting_pickup' && (counts[stage] ?? 0) > 0 ? 'text-caution' : 'text-foreground',
+              )}>
+                {counts[stage] ?? '—'}
+              </span>
+              <span className="mt-2 block text-sm font-bold">{t(`shipping.statuses.${stage}`)}</span>
+            </button>
+          ))}
+        </div>
+        <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+          <div className="h-full rounded-full bg-action transition-[width] duration-700" style={{ width: everything > 0 ? `${Math.round(((counts.delivered ?? 0) / everything) * 100)}%` : '0%' }} />
+        </div>
+      </section>
+
+      <div className="grid gap-[18px] xl:grid-cols-[minmax(0,1fr)_340px]">
       <Card className="p-0 overflow-hidden">
-        <div className="p-4 border-b border-border space-y-3">
-          <div className="relative w-full md:w-96">
+        <div className="flex flex-wrap items-center gap-3 border-b border-border p-4">
+          <div className="relative min-w-[220px] flex-1">
             <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <Input placeholder={t('shipping.searchPlaceholder')} className="ps-10" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
-          <div className="flex flex-wrap gap-2">
-            {FILTERS.map((f) => (
-              <button
-                key={f || 'all'}
-                onClick={() => setStatus(f)}
-                className={cn('px-3 py-1.5 text-xs rounded-lg border border-border transition-all',
-                  f === status ? 'border-primary bg-accent font-bold text-foreground' : 'bg-background hover:bg-accent')}
-              >
-                {f === '' ? t('shipping.all') : t(`shipping.statuses.${f}`)}
-              </button>
-            ))}
-          </div>
+          <select
+            aria-label={t('shipping.colStatus')}
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="h-[42px] rounded-xl border border-border bg-card px-3 text-sm"
+          >
+            {FILTERS.map((f) => <option key={f || 'all'} value={f}>{f === '' ? t('shipping.all') : t(`shipping.statuses.${f}`)}</option>)}
+          </select>
         </div>
 
         <div className="overflow-x-auto min-h-[300px]">
@@ -131,7 +171,7 @@ export default function ShipmentsPage() {
                     <td className="px-5 py-3 font-mono text-xs">{r.tracking_number || '—'}</td>
                     <td className="px-5 py-3 text-center tabular-nums">{r.items_count}</td>
                     <td className="px-5 py-3">
-                      <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold uppercase', shipmentStatusColor(r.status))}>
+                      <span className={cn('px-2.5 py-1 rounded-full text-xs font-bold', shipmentStatusColor(r.status))}>
                         {t(`shipping.statuses.${r.status}`)}
                       </span>
                     </td>
@@ -146,6 +186,24 @@ export default function ShipmentsPage() {
           )}
         </div>
       </Card>
+      <section className="hb-rise rounded-[28px] border border-border bg-card p-6" style={{ animationDelay: '80ms' }}>
+        <h2 className="text-lg font-bold">{l('By carrier', 'حسب شركة الشحن')}</h2>
+        {carriers.length ? (
+          <ul className="mt-4 space-y-4">
+            {carriers.map(([name, n]) => (
+              <li key={name} className="grid grid-cols-[88px_minmax(0,1fr)_28px] items-center gap-3 text-sm">
+                <span className="truncate font-bold capitalize">{name}</span>
+                <span className="h-2 overflow-hidden rounded-full bg-muted"><span className="block h-full rounded-full bg-action" style={{ width: `${Math.round((n / busiest) * 100)}%` }} /></span>
+                <span className="text-end font-bold tabular-nums">{n}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">{l('Carriers appear here once shipments are booked.', 'تظهر شركات الشحن هنا بعد حجز أول شحنة.')}</p>
+        )}
+        <p className="mt-5 text-xs text-muted-foreground">{l('Counted from the shipments listed here.', 'محسوبة من الشحنات المعروضة هنا.')}</p>
+      </section>
+      </div>
     </div>
   );
 }

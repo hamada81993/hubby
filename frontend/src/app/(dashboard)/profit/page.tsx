@@ -21,7 +21,7 @@ import { getPlatform } from '@/lib/platforms';
 import api from '@/lib/api';
 import { useStores } from '@/components/providers/StoresProvider';
 import ConnectPrompt from '@/components/ui/ConnectPrompt';
-import { useT } from '@/i18n';
+import { useI18n, useT } from '@/i18n';
 
 type Coverage = {
   orders_total: number;
@@ -142,6 +142,15 @@ export default function ProfitPage() {
     [timeline],
   );
 
+  // The hero chart shows profit building up over the period, not day-by-day noise.
+  const cumulative = useMemo(() => {
+    let running = 0;
+    return chartData.map((d) => {
+      running += d.profit;
+      return { date: d.date, profit: Math.round(running * 100) / 100 };
+    });
+  }, [chartData]);
+
   // A simple proportional read of where net revenue ended up. Costs are shown as a share of
   // revenue so the bar always adds to what came in — including the part that stayed.
   const breakdown = useMemo(() => {
@@ -220,56 +229,22 @@ export default function ProfitPage() {
         <>
           <CoverageBanner coverage={summary.coverage} t={t} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Kpi label={t('profit.kpis.netRevenue')} value={<Money amount={summary.net_revenue} />} />
-            <Kpi label={t('profit.kpis.cogs')} value={<Money amount={summary.cogs} />} tone="muted" />
-            <Kpi label={t('profit.kpis.fees')} value={<Money amount={summary.fees} />} tone="muted" />
-            <Kpi
-              label={t('profit.kpis.netProfit')}
-              value={<Money amount={summary.net_profit} />}
-              tone={profitValue >= 0 ? 'good' : 'bad'}
-              hint={`${pct(summary.margin_pct)} ${t('profit.kpis.margin')} · ${summary.orders} ${t('profit.kpis.orders')}`}
-              icon={profitValue >= 0 ? TrendingUp : TrendingDown}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="p-6 flex flex-col gap-5">
-              <h3 className="font-bold text-lg">{t('profit.breakdown.title')}</h3>
-              <div className="flex h-3 w-full overflow-hidden rounded-full bg-accent">
-                {breakdown.map((r) => (
-                  <div
-                    key={r.key}
-                    className={cn(r.color, 'h-full')}
-                    style={{ width: `${Math.min(100, r.share * 100)}%` }}
-                  />
-                ))}
+          <div className="grid gap-[18px] xl:grid-cols-[minmax(0,1fr)_372px]">
+            <section className="hb-rise rounded-[28px] border border-border bg-card p-6">
+              <p className="text-sm text-muted-foreground">{t('profit.kpis.netProfit')} · {t(`profit.ranges.d${days}`)}</p>
+              <div className="mt-1 flex flex-wrap items-center gap-3">
+                <span className={cn('text-[44px] font-black leading-[1.1] tracking-[-0.035em] tabular-nums', profitValue < 0 && 'text-negative')}>
+                  <Money amount={summary.net_profit} />
+                </span>
+                <span className={cn('rounded-full px-3 py-1 text-sm font-bold', profitValue >= 0 ? 'bg-action text-action-foreground' : 'bg-negative/15 text-negative')}>
+                  {pct(summary.margin_pct)} {t('profit.kpis.margin')}
+                </span>
+                <span className="text-sm text-muted-foreground">{summary.orders} {t('profit.kpis.orders')}</span>
               </div>
-              <div className="space-y-3">
-                {breakdown.map((r) => (
-                  <div key={r.key} className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2">
-                      <span className={cn('w-2.5 h-2.5 rounded-full', r.color)} />
-                      {t(`profit.breakdown.${r.key}`)}
-                    </span>
-                    <span className="font-bold tabular-nums">
-                      <Money amount={r.value} />
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            <Card className="lg:col-span-2 p-6 flex flex-col gap-5">
-              <h3 className="font-bold text-lg">{t('profit.timeline.title')}</h3>
-              <div className="h-[280px] w-full">
+              <div className="mt-4 h-[260px] w-full" dir="ltr">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
+                  <AreaChart data={cumulative}>
                     <defs>
-                      <linearGradient id="pnlRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--chart-alt)" stopOpacity={0.25} />
-                        <stop offset="95%" stopColor="var(--chart-alt)" stopOpacity={0} />
-                      </linearGradient>
                       <linearGradient id="pnlProfit" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#4FD34A" stopOpacity={0.35} />
                         <stop offset="95%" stopColor="#4FD34A" stopOpacity={0} />
@@ -279,27 +254,56 @@ export default function ProfitPage() {
                     <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} minTickGap={24} />
                     <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} width={56} />
                     <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)' }} />
-                    <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      name={t('profit.timeline.revenue')}
-                      stroke="var(--chart-alt)"
-                      strokeWidth={2.5}
-                      fill="url(#pnlRevenue)"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="profit"
-                      name={t('profit.timeline.profit')}
-                      stroke="#4FD34A"
-                      strokeWidth={2.5}
-                      fill="url(#pnlProfit)"
-                    />
+                    <Area type="monotone" dataKey="profit" name={t('profit.timeline.profit')} stroke="#4FD34A" strokeWidth={3} fill="url(#pnlProfit)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-            </Card>
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {breakdown.filter((r) => r.key !== 'netProfit').map((r) => (
+                  <div key={r.key} className="rounded-2xl bg-muted/60 p-3">
+                    <p className="truncate text-xs text-muted-foreground">{t(`profit.breakdown.${r.key}`)}</p>
+                    <p className="mt-1 text-xl font-black tracking-[-0.02em] tabular-nums">{pct(r.share)}</p>
+                    <p className="text-xs text-muted-foreground tabular-nums">− <Money amount={r.value} /></p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="hb-rise rounded-[28px] border border-border bg-card p-6" style={{ animationDelay: '80ms' }}>
+              <h2 className="text-lg font-bold">{t('profit.byChannel.title')}</h2>
+              {channels.length ? (
+                <ul className="mt-4 space-y-4">
+                  {channels.map((c) => {
+                    const margin = c.margin_pct ?? 0;
+                    return (
+                      <li key={c.store_id} className="grid grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_52px] items-center gap-3 text-sm">
+                        <span className="flex min-w-0 items-center gap-2">
+                          <PlatformLogo platform={c.platform} size={16} />
+                          <span className="truncate font-bold">{c.store_name}</span>
+                        </span>
+                        <span className="h-2 overflow-hidden rounded-full bg-muted">
+                          <span className={cn('block h-full rounded-full', margin >= 0.15 ? 'bg-action' : 'bg-warning')} style={{ width: `${Math.max(0, Math.min(100, margin * 200))}%` }} />
+                        </span>
+                        <span className="text-end font-bold tabular-nums">{pct(c.margin_pct)}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="mt-3 text-sm text-muted-foreground">{t('profit.empty')}</p>
+              )}
+              <div className="mt-6 space-y-3 border-t border-border pt-5">
+                {breakdown.map((r) => (
+                  <div key={r.key} className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-2 text-muted-foreground">
+                      <span className={cn('h-2.5 w-2.5 rounded-full', r.color)} />
+                      {t(`profit.breakdown.${r.key}`)}
+                    </span>
+                    <span className="font-bold tabular-nums"><Money amount={r.value} /></span>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
 
           <Card className="p-0 overflow-hidden">
@@ -418,13 +422,13 @@ export default function ProfitPage() {
 }
 
 function Header({ t }: { t: (key: string) => string }) {
+  const { locale } = useI18n();
   return (
     <div>
-      <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em] flex items-center gap-3">
-        <Coins className="text-primary" />
-        {t('profit.title')}
+      <p className="text-sm text-muted-foreground">{t('profit.subtitle')}</p>
+      <h1 className="mt-1 text-[28px] leading-tight font-black tracking-[-0.025em]">
+        {locale === 'ar' ? 'ما بقي لك فعلاً.' : 'What you actually kept.'}
       </h1>
-      <p className="text-muted-foreground text-sm">{t('profit.subtitle')}</p>
     </div>
   );
 }

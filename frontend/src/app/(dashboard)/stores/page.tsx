@@ -1,14 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import {
   RefreshCw,
   Trash2,
-  AlertCircle,
   Crown,
-  Clock,
   Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,7 +14,7 @@ import { PLATFORMS, getPlatform, type PlatformId } from '@/lib/platforms';
 import { PlatformLogo } from '@/components/ui/PlatformLogo';
 import ConnectStoreModal from '@/components/stores/ConnectStoreModal';
 import { useStores } from '@/components/providers/StoresProvider';
-import { useT } from '@/i18n';
+import { useI18n } from '@/i18n';
 import ChannelBuffers from '@/components/operations/ChannelBuffers';
 
 /** Visual treatment for each real store status the backend reports. Labels are
@@ -43,11 +40,14 @@ const timeAgo = (t: (key: string) => string, iso?: string | null) => {
 export default function StoresPage() {
   // Stores come from the shared provider so connect/disconnect updates the whole
   // dashboard (Orders filter, connect banner, etc.) at once — not just this page.
-  const t = useT();
+  const { t, locale } = useI18n();
+  const l = (en: string, ar: string) => (locale === 'ar' ? ar : en);
   const { stores, loading: isLoading, refresh } = useStores();
   const [busyId, setBusyId] = useState<number | null>(null);
   const [connectPlatform, setConnectPlatform] = useState<PlatformId | null>(null);
   const [oauthEnabled, setOauthEnabled] = useState<Record<string, boolean>>({});
+  const [channels, setChannels] = useState<{ store_id: number; orders: number; net_revenue: string }[] | null>(null);
+  const [syncingAll, setSyncingAll] = useState(false);
 
   useEffect(() => {
     // Re-sync on landing here in case stores changed elsewhere.
@@ -56,6 +56,13 @@ export default function StoresPage() {
     api.get('/stores/connect-options')
       .then((res) => setOauthEnabled(res.data?.oauth_enabled || {}))
       .catch(() => setOauthEnabled({}));
+    // Each store's last 30 days; finance reports can be restricted by role, so the cards work without them.
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 29);
+    api.get('/analytics/profit/by-channel', { params: { start_date: start.toISOString().slice(0, 10), end_date: end.toISOString().slice(0, 10) } })
+      .then((res) => setChannels(Array.isArray(res.data) ? res.data : null))
+      .catch(() => setChannels(null));
   }, [refresh]);
 
   const toggleMaster = async (id: number) => {
@@ -81,6 +88,18 @@ export default function StoresPage() {
     }
   };
 
+  const syncAll = async () => {
+    setSyncingAll(true);
+    try {
+      await api.post('/stores/sync-all');
+      setTimeout(refresh, 5000);
+    } catch (err) {
+      console.error('Failed to sync stores', err);
+    } finally {
+      setSyncingAll(false);
+    }
+  };
+
   const deleteStore = async (id: number) => {
     if (!window.confirm(t('stores.confirmDisconnect'))) return;
     try {
@@ -98,180 +117,155 @@ export default function StoresPage() {
     syncing: stores.filter((s) => s.status === 'syncing').length,
     error: stores.filter((s) => s.status === 'error').length,
   };
-  const lastSync = stores
-    .map((s) => s.last_synced_at)
-    .filter(Boolean)
-    .sort()
-    .pop();
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-full">{t('stores.loading')}</div>;
   }
 
+  const needsYou = stores.filter((s) => s.status === 'error' || s.status === 'disconnected').length;
+  const totalRevenue = (channels ?? []).reduce((sum, c) => sum + Number(c.net_revenue), 0);
+
   return (
-    <div className="space-y-8">
-      <ChannelBuffers />
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-[28px] leading-tight font-black tracking-[-0.025em]">{t('stores.title')}</h1>
-          <p className="text-muted-foreground text-sm">{t('stores.subtitle')}</p>
-        </div>
-        <Button variant="primary" size="sm" onClick={() => setConnectPlatform(PLATFORMS[0].id)}>
-          <Plus size={16} className="me-2" />
-          {t('stores.connect')}
-        </Button>
-      </div>
-
-      {/* Network summary */}
-      {summary.total > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            { label: t('stores.summary.stores'), value: summary.total, tone: 'text-foreground' },
-            { label: t('stores.summary.connected'), value: summary.connected, tone: 'text-secondary' },
-            { label: t('stores.summary.syncing'), value: summary.syncing, tone: 'text-warning' },
-            { label: t('stores.summary.errors'), value: summary.error, tone: 'text-destructive' },
-          ].map((s) => (
-            <Card key={s.label} className="p-4">
-              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">{s.label}</p>
-              <p className={cn('text-2xl font-bold mt-1', s.tone)}>{s.value}</p>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 glass">
-        <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0 shadow-inner">
-          <Crown size={32} />
-        </div>
-        <div className="flex-1 text-center md:text-start">
-          <h3 className="text-lg font-bold">{t('stores.master.title')}</h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            {t('stores.master.description')}
+          <p className="text-sm text-muted-foreground">
+            {l(`${summary.total} connected · ${summary.connected} live · ${needsYou} need you`, `${summary.total} متصلة · ${summary.connected} مباشرة · ${needsYou} تحتاج تدخلك`)}
           </p>
+          <h1 className="mt-1 text-[28px] leading-tight font-black tracking-[-0.025em]">
+            {l('Every door you sell through.', 'كل باب تبيع منه.')}
+          </h1>
         </div>
-        <div className="shrink-0 text-center md:text-end">
-          <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">{t('stores.master.lastNetworkSync')}</p>
-          <p className="text-sm font-bold flex items-center gap-1.5 mt-1 justify-center md:justify-end">
-            <Clock size={14} className="text-primary" />
-            {timeAgo(t, lastSync)}
-          </p>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="md" onClick={syncAll} disabled={syncingAll || !stores.length}>
+            <RefreshCw size={16} className={cn('me-2', syncingAll && 'animate-spin')} />
+            {l('Sync now', 'مزامنة الآن')}
+          </Button>
+          <Button variant="primary" size="md" onClick={() => setConnectPlatform(PLATFORMS[0].id)}>
+            <Plus size={16} className="me-2" />
+            {t('stores.connect')}
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[18px]">
         {stores.map((store) => {
-          const PlatformInfo = getPlatform(store.platform);
           const status = store.status || 'disconnected';
           const meta = STATUS_META[status] || STATUS_META.disconnected;
-          const statusKey = STATUS_META[status] ? status : 'disconnected';
           const reconnectable = status === 'disconnected' || status === 'error';
+          const channel = channels?.find((c) => c.store_id === store.id);
+          const share = channel && totalRevenue > 0 ? Math.round((Number(channel.net_revenue) / totalRevenue) * 100) : null;
 
           return (
-            <Card key={store.id} className={cn(
-              "p-6 flex flex-col gap-6 relative transition-all",
-              store.is_master ? "ring-2 ring-primary border-transparent shadow-2xl shadow-primary/10" : "hover:border-primary/30"
-            )}>
-              {store.is_master && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-action text-action-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-xl flex items-center gap-2">
-                  <Crown size={12} />
-                  {t('stores.master.badge')}
-                </div>
+            <section
+              key={store.id}
+              className={cn(
+                'hb-rise flex min-h-[230px] flex-col gap-5 rounded-[28px] border bg-card p-6',
+                reconnectable ? 'border-negative' : 'border-border',
               )}
-
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-2xl bg-background border border-border shadow-inner flex items-center justify-center">
-                    <PlatformLogo platform={store.platform} size={28} />
+            >
+              <div className="flex items-center gap-4">
+                <span className="flex h-14 min-w-14 shrink-0 items-center justify-center rounded-2xl bg-white px-2">
+                  <PlatformLogo platform={store.platform} size={30} className="!bg-transparent !p-0" />
+                </span>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h2 className="truncate text-xl font-black tracking-[-0.02em]">{store.name}</h2>
+                    <span className={cn(
+                      'shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold',
+                      reconnectable ? 'bg-negative/15 text-negative' : store.is_master ? 'bg-action text-action-foreground' : 'bg-positive/15 text-positive',
+                    )}>
+                      {reconnectable ? l('Needs you', 'يحتاج تدخلك') : store.is_master ? l('Master', 'الرئيسي') : l('Live', 'مباشر')}
+                    </span>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-lg">{store.name}</h3>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className={cn("w-2 h-2 rounded-full", meta.dot)}></span>
-                      <span className={cn("text-xs font-medium", meta.text)}>{t(`stores.status.${statusKey}`)}</span>
-                    </div>
-                  </div>
+                  <p className="truncate text-xs text-muted-foreground">{store.domain || getPlatform(store.platform).name}</p>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs p-3 rounded-xl bg-background/50 border border-border/50">
-                  <span className="text-muted-foreground">{PlatformInfo.domainLabel}</span>
-                  <span className="font-medium truncate max-w-[60%] text-end">{store.domain || '—'}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs p-3 rounded-xl bg-background/50 border border-border/50">
-                  <span className="text-muted-foreground flex items-center gap-1.5"><Clock size={12} /> {t('stores.card.lastSynced')}</span>
-                  <span className="font-medium">{timeAgo(t, store.last_synced_at)}</span>
-                </div>
-                {status === 'error' && (
-                  <div className="flex items-start gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive">
-                    <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                    <p className="text-[10px] font-medium leading-relaxed">
-                      {t('stores.card.syncError')}
-                    </p>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { value: channel ? String(channel.orders) : '—', label: l('orders, 30 days', 'طلب، 30 يوماً') },
+                  { value: channel ? Math.round(Number(channel.net_revenue)).toLocaleString('en-US') : '—', label: l('net revenue', 'صافي الإيرادات') },
+                  { value: share === null ? '—' : `${share}%`, label: l('of revenue', 'من الإيرادات') },
+                ].map((stat) => (
+                  <div key={stat.label} className="min-w-0">
+                    <p className="truncate text-[26px] font-black leading-none tracking-[-0.03em] tabular-nums">{stat.value}</p>
+                    <p className="mt-1.5 text-xs text-muted-foreground">{stat.label}</p>
                   </div>
-                )}
+                ))}
               </div>
 
-              <div className="flex items-center gap-2 mt-auto">
+              <div className="mt-auto flex items-center gap-2 text-xs">
+                <span className={cn('h-2 w-2 shrink-0 rounded-full', meta.dot)} />
+                <span className={cn('min-w-0 flex-1 truncate', reconnectable ? 'text-negative' : 'text-muted-foreground')}>
+                  {status === 'error'
+                    ? t('stores.card.syncError')
+                    : `${t('stores.card.lastSynced')} ${timeAgo(t, store.last_synced_at)}`}
+                </span>
                 {reconnectable ? (
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="flex-1 h-9 text-[10px]"
-                    onClick={() => setConnectPlatform(store.platform as PlatformId)}
-                  >
+                  <button className="font-bold text-primary hover:underline" onClick={() => setConnectPlatform(store.platform as PlatformId)}>
                     {t('stores.card.reconnect')}
-                  </Button>
+                  </button>
                 ) : (
                   <>
                     {!store.is_master && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 text-[10px] h-9"
-                        onClick={() => toggleMaster(store.id)}
-                      >
+                      <button className="font-bold text-primary hover:underline" onClick={() => toggleMaster(store.id)}>
                         {t('stores.card.setMaster')}
-                      </Button>
+                      </button>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-9 h-9 p-0 rounded-lg"
+                    <button
+                      className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                       title={t('stores.card.syncNow')}
+                      aria-label={t('stores.card.syncNow')}
                       onClick={() => syncStore(store.id)}
                     >
-                      <RefreshCw size={14} className={cn(busyId === store.id && 'animate-spin')} />
-                    </Button>
+                      <RefreshCw size={15} className={cn(busyId === store.id && 'animate-spin')} />
+                    </button>
                   </>
                 )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-9 h-9 p-0 rounded-lg hover:text-destructive"
+                <button
+                  className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                   title={t('stores.card.disconnect')}
+                  aria-label={t('stores.card.disconnect')}
                   onClick={() => deleteStore(store.id)}
                 >
-                  <Trash2 size={14} />
-                </Button>
+                  <Trash2 size={15} />
+                </button>
               </div>
-            </Card>
+            </section>
           );
         })}
 
-        {PLATFORMS.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => setConnectPlatform(p.id)}
-            className="min-h-[140px] rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-4 text-muted-foreground hover:border-primary hover:text-primary transition-all bg-card/10 group"
-          >
-            <PlatformLogo platform={p.id} size={32} className="group-hover:scale-110 transition-transform" />
-            <div className="text-center">
-              <h4 className="font-bold text-foreground">{t('stores.add')} {p.name}</h4>
-            </div>
-          </button>
-        ))}
+        <section className="flex min-h-[230px] flex-col gap-4 rounded-[28px] border-2 border-dashed border-border p-6">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-action text-action-foreground">
+            <Plus size={24} strokeWidth={2.5} />
+          </span>
+          <div>
+            <h2 className="text-xl font-black tracking-[-0.02em]">{l('Add another store', 'أضف متجراً آخر')}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{l('Pick a platform. It connects in about a minute and joins the hub straight away.', 'اختر منصة. تتصل خلال دقيقة وتنضم للمركز مباشرة.')}</p>
+          </div>
+          <div className="mt-auto flex flex-wrap gap-2">
+            {PLATFORMS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setConnectPlatform(p.id)}
+                title={`${t('stores.add')} ${p.name}`}
+                aria-label={`${t('stores.add')} ${p.name}`}
+                className="flex h-11 items-center justify-center rounded-xl bg-white px-2.5 transition-transform hover:scale-105"
+              >
+                <PlatformLogo platform={p.id} size={22} className="!bg-transparent !p-0" />
+              </button>
+            ))}
+          </div>
+        </section>
       </div>
+
+      <p className="flex items-start gap-2 text-xs text-muted-foreground">
+        <Crown size={14} className="mt-0.5 shrink-0 text-primary" />
+        <span><b className="text-foreground">{t('stores.master.title')}.</b> {t('stores.master.description')}</span>
+      </p>
+
+      <ChannelBuffers />
 
       <ConnectStoreModal
         platformId={connectPlatform}
