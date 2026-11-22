@@ -237,12 +237,18 @@ class _ProductsPageState extends State<ProductsPage> {
                   else
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      sliver: SliverGrid(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.66),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, i) => _productCard(items[i]),
-                          childCount: items.length,
+                      // One card, one row per product: a list reads faster on a phone than tall tiles.
+                      sliver: SliverToBoxAdapter(
+                        child: Container(
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            color: AppPalette.card,
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(color: AppPalette.border),
+                          ),
+                          child: Column(children: [
+                            for (var i = 0; i < items.length; i++) _productCard(items[i], last: i == items.length - 1),
+                          ]),
                         ),
                       ),
                     ),
@@ -339,14 +345,13 @@ class _ProductsPageState extends State<ProductsPage> {
     ]);
   }
 
-  Widget _productCard(dynamic p) {
+  Widget _productCard(dynamic p, {bool last = false}) {
     final id = p['id'] as int;
     final stock = _stockOf(p);
     final selected = _selected.contains(id);
     final out = stock == 0, low = stock > 0 && stock < 10;
-    final stockColor = out ? AppPalette.destructive : low ? AppPalette.warning : AppPalette.secondary;
-    return AppCard(
-      padding: const EdgeInsets.all(10),
+    final stockColor = out ? AppPalette.destructive : low ? AppPalette.warning : AppPalette.foreground;
+    return InkWell(
       onTap: () {
         if (_selecting) {
           _toggle(id);
@@ -355,78 +360,59 @@ class _ProductsPageState extends State<ProductsPage> {
         }
       },
       onLongPress: () => setState(() { _selecting = true; _selected.add(id); }),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        decoration: BoxDecoration(
+          color: selected ? AppPalette.primarySoft : null,
+          border: last ? null : Border(bottom: BorderSide(color: AppPalette.accent)),
+        ),
+        child: Row(children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppPalette.surfaceAlt,
+              borderRadius: BorderRadius.circular(14),
+              border: selected ? Border.all(color: AppPalette.primary, width: 2) : null,
+              image: p['image_url'] != null
+                  ? DecorationImage(image: NetworkImage(p['image_url']), fit: BoxFit.cover)
+                  : null,
+            ),
+            child: selected
+                ? Icon(LucideIcons.check, color: AppPalette.primary, size: 22)
+                : p['image_url'] == null
+                    ? Icon(LucideIcons.image, color: AppPalette.mutedForeground, size: 20)
+                    : null,
+          ),
+          const SizedBox(width: 12),
           Expanded(
-            child: Stack(children: [
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppPalette.surfaceAlt,
-                    borderRadius: BorderRadius.circular(AppPalette.rMd),
-                    border: selected ? Border.all(color: AppPalette.primary, width: 2) : null,
-                    image: p['image_url'] != null
-                        ? DecorationImage(image: NetworkImage(p['image_url']), fit: BoxFit.cover)
-                        : null,
-                  ),
-                  child: p['image_url'] == null
-                      ? Center(child: Icon(LucideIcons.image, color: AppPalette.mutedForeground, size: 26))
-                      : null,
-                ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(p['name']?.toString() ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5)),
+              const SizedBox(height: 2),
+              Text(
+                [
+                  if ((p['sku']?.toString() ?? '').isNotEmpty) p['sku'].toString(),
+                  if (out) context.t('products.out') else if (low) context.t('products.low'),
+                ].join(' · '),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: out || low ? stockColor : AppPalette.mutedForeground, fontSize: 12),
               ),
-              if (out || low)
-                Positioned(
-                  top: 6, left: 6,
-                  child: _pill(out ? context.t('products.out') : context.t('products.low'), stockColor),
-                ),
-              if (_selecting)
-                Positioned(
-                  top: 6, right: 6,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: selected ? AppPalette.primary : Colors.white.withValues(alpha: 0.85),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: selected ? AppPalette.primary : AppPalette.borderStrong),
-                    ),
-                    padding: const EdgeInsets.all(2),
-                    child: Icon(selected ? LucideIcons.check : LucideIcons.circle,
-                        size: 16, color: selected ? AppPalette.onPrimary : Colors.transparent),
-                  ),
-                ),
             ]),
           ),
-          const SizedBox(height: 8),
-          Text(p['name']?.toString() ?? '', maxLines: 2, overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, height: 1.25)),
-          if ((p['sku']?.toString() ?? '').isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text(p['sku'].toString(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: AppPalette.mutedForeground, fontSize: 11)),
-            ),
-          const Spacer(),
-          Row(children: [
-            Expanded(
-              child: MoneyText(p['price'], style: AppText.number(size: 15)),
-            ),
-            _pill('$stock', stockColor, soft: true),
+          const SizedBox(width: 10),
+          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            MoneyText(p['price'], style: AppText.number(size: 14.5)),
+            const SizedBox(height: 2),
+            Text('$stock', style: AppText.number(size: 13, weight: FontWeight.w700, color: stockColor)),
           ]),
-        ],
+        ]),
       ),
     );
   }
-
-  Widget _pill(String text, Color color, {bool soft = false}) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: soft ? color.withValues(alpha: 0.12) : color,
-          borderRadius: BorderRadius.circular(AppPalette.rPill),
-        ),
-        child: Text(text,
-            style: TextStyle(
-                color: soft ? color : (color.computeLuminance() > 0.4 ? AppPalette.ink : Colors.white), fontSize: 11, fontWeight: FontWeight.w700)),
-      );
 
   Widget _bulkBar() => Container(
         decoration: BoxDecoration(
