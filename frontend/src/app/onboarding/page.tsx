@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import { CheckCircle2, ArrowRight, Loader2, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
-import { PLATFORMS, getPlatform } from '@/lib/platforms';
+import { SALES_CHANNELS as PLATFORMS, getPlatform } from '@/lib/platforms';
 import { PlatformLogo } from '@/components/ui/PlatformLogo';
 import { Logo } from '@/components/ui/Logo';
 

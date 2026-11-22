@@ -24,6 +24,7 @@ import {
   ChevronRight,
   Building2,
   ListChecks,
+  Plug,
   ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -71,6 +72,7 @@ const menuGroups: { en: string; ar: string; items: NavItem[] }[] = [
     ar: 'الإعداد',
     items: [
       { icon: StoreIcon, key: 'stores', href: '/stores' },
+      { icon: Plug, key: 'integrations', href: '/integrations' },
       { icon: Workflow, key: 'automation', href: '/automation' },
       { icon: CreditCard, key: 'billing', href: '/billing' },
       { icon: Settings, key: 'settings', href: '/settings' },

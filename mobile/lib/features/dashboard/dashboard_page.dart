@@ -119,7 +119,9 @@ class _DashboardPageState extends State<DashboardPage> {
               };
               final total = revenue.values.fold<double>(0, (a, b) => a + b);
               final hubStores = [
+                // Odoo is a product source, not a place orders come from, so it stays off the hub.
                 for (final h in health)
+                  if (h['platform'] != 'odoo')
                   HubStore(
                     id: (h['id'] as num).toInt(),
                     name: '${h['name'] ?? ''}',

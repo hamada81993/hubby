@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
-import { PLATFORMS, getPlatform, type PlatformId } from '@/lib/platforms';
+import { SALES_CHANNELS as PLATFORMS, INTEGRATION_IDS, getPlatform, type PlatformId } from '@/lib/platforms';
 import { PlatformLogo } from '@/components/ui/PlatformLogo';
 import ConnectStoreModal from '@/components/stores/ConnectStoreModal';
 import { useStores } from '@/components/providers/StoresProvider';
@@ -42,7 +42,9 @@ export default function StoresPage() {
   // dashboard (Orders filter, connect banner, etc.) at once — not just this page.
   const { t, locale } = useI18n();
   const l = (en: string, ar: string) => (locale === 'ar' ? ar : en);
-  const { stores, loading: isLoading, refresh } = useStores();
+  // Integrations (Odoo) have their own page; this one is the places orders come from.
+  const { stores: allStores, loading: isLoading, refresh } = useStores();
+  const stores = allStores.filter((s) => !INTEGRATION_IDS.has(s.platform));
   const [busyId, setBusyId] = useState<number | null>(null);
   const [connectPlatform, setConnectPlatform] = useState<PlatformId | null>(null);
   const [oauthEnabled, setOauthEnabled] = useState<Record<string, boolean>>({});

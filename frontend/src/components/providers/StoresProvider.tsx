@@ -3,6 +3,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import api from '@/lib/api';
 import type { PlatformId } from '@/lib/platforms';
+import { INTEGRATION_IDS } from '@/lib/platforms';
 
 interface StoresState {
   stores: any[];
@@ -43,8 +44,9 @@ export function StoresProvider({ children }: { children: React.ReactNode }) {
     refresh();
   }, [refresh]);
 
+  // Sales channels only: an integration such as Odoo is not a place orders come from.
   const connectedPlatforms = Array.from(
-    new Set(stores.map((s) => s.platform).filter(Boolean)),
+    new Set(stores.map((s) => s.platform).filter((p) => p && !INTEGRATION_IDS.has(p))),
   ) as PlatformId[];
 
   return (

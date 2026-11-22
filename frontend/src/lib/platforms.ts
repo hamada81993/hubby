@@ -156,3 +156,9 @@ export const getPlatform = (id: string): PlatformMeta => platformMap[id] ?? FALL
 export const PLATFORM_LOGO_IDS = new Set<string>([
   'shopify', 'salla', 'amazon', 'noon', 'woocommerce', 'zid', 'trendyol',
 ]);
+
+/** Systems connected beside the stores (a product source, not a place orders come from). */
+export const INTEGRATION_IDS = new Set<string>(['odoo']);
+
+/** The platforms a merchant sells on: everything except integrations. */
+export const SALES_CHANNELS: PlatformMeta[] = PLATFORMS.filter((p) => !INTEGRATION_IDS.has(p.id));

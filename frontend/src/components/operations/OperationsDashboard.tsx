@@ -235,7 +235,8 @@ export default function OperationsDashboard() {
   const control = "rounded-xl border border-border bg-card px-3 py-2 text-sm";
   const count = (key: string) => summary?.queues.find((q) => q.key === key)?.count ?? 0;
   const waiting = count("fulfillment");
-  const hubStores: HubStore[] = health.map((s) => {
+  // The hub shows where orders come from; Odoo is a product source and stays off it.
+  const hubStores: HubStore[] = health.filter((s) => s.platform !== 'odoo').map((s) => {
     const channel = channels?.find((c) => c.store_id === s.id);
     return {
       id: s.id,

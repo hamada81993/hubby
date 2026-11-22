@@ -20,6 +20,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ListingQualityController;
 use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\IntegrationRequestController;
 use App\Http\Controllers\OAuthController;
 use App\Http\Controllers\OperationsController;
 use App\Http\Controllers\OrderController;
@@ -65,6 +66,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('org.member')->group(function () {
         // Organization settings
         Route::put('/organization', [SettingsController::class, 'updateOrganization']);
+
+        // Integrations a merchant has asked for (not built yet)
+        Route::get('/integration-requests', [IntegrationRequestController::class, 'index']);
+        Route::post('/integration-requests', [IntegrationRequestController::class, 'store']);
 
         // Organization members & roles
         Route::get('/organization/members', [OrganizationController::class, 'members']);
