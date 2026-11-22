@@ -21,6 +21,7 @@ class Store extends Model
         'shipping_settings',
         'safety_stock',
         'allocation_percent',
+        'allocation_units',
     ];
 
     protected $casts = [

@@ -113,9 +113,33 @@ class StockAllocationTest extends TestCase
 
         $sent = $this->push();
 
-        $this->assertSame(250, $sent[$this->amazon->id]); // above the real stock, by the merchant's choice
+        $this->assertSame(100, $sent[$this->amazon->id]); // capped at the real stock unless overselling is allowed
         $this->assertSame(4, $sent[$this->noon->id]);
         $this->assertSame(100, $sent[$this->trendyol->id]); // nothing chosen
+    }
+
+    public function test_manual_mode_may_exceed_the_stock_only_when_overselling_is_allowed(): void
+    {
+        $this->org->update(['stock_allocation_mode' => 'manual', 'allow_oversell' => true]);
+        PlatformProduct::create(['store_id' => $this->amazon->id, 'product_variant_id' => $this->variant->id, 'external_id' => 'A', 'allocated_quantity' => 250]);
+
+        $this->assertSame(250, $this->push()[$this->amazon->id]);
+    }
+
+    public function test_split_by_units_gives_each_channel_its_number_until_the_stock_runs_out(): void
+    {
+        $this->org->update(['stock_allocation_mode' => 'split', 'stock_split_basis' => 'units']);
+        $this->amazon->update(['allocation_units' => 40]);
+        $this->noon->update(['allocation_units' => 25]);
+        // Trendyol has no number, so it is offered nothing.
+
+        $sent = $this->push();
+        $this->assertSame([40, 25, 0], [$sent[$this->amazon->id], $sent[$this->noon->id], $sent[$this->trendyol->id]]);
+
+        // Only 50 on the shelf: the first channel is served in full, the next takes what is left.
+        $this->variant->update(['stock' => 50]);
+        $sent = $this->push();
+        $this->assertSame([40, 10, 0], [$sent[$this->amazon->id], $sent[$this->noon->id], $sent[$this->trendyol->id]]);
     }
 
     public function test_the_settings_endpoint_saves_mode_and_shares_and_rejects_more_than_100(): void
@@ -136,6 +160,12 @@ class StockAllocationTest extends TestCase
         ])->assertOk()->assertJsonPath('mode', 'split');
         $this->assertSame(60, $this->amazon->fresh()->allocation_percent);
         $this->assertNull($this->master->fresh()->allocation_percent); // the source never takes a share
+
+        $this->putJson('/api/stock-allocation', [
+            'mode' => 'split', 'basis' => 'units', 'allow_oversell' => true,
+            'units' => [$this->amazon->id => 15],
+        ])->assertOk()->assertJsonPath('basis', 'units')->assertJsonPath('allow_oversell', true);
+        $this->assertSame(15, $this->amazon->fresh()->allocation_units);
     }
 
     public function test_a_listing_quantity_can_only_be_set_inside_your_own_organisation(): void

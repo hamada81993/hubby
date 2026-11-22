@@ -9,11 +9,13 @@ import { useI18n } from "@/i18n";
 import { PlatformLogo } from "@/components/ui/PlatformLogo";
 
 type Mode = "shared" | "split" | "manual";
+type Basis = "percent" | "units";
 type Channel = {
   id: number;
   name: string;
   platform: string;
   allocation_percent: number | null;
+  allocation_units: number | null;
   effective_percent: number;
 };
 
@@ -27,6 +29,9 @@ export default function StockAllocation() {
   const { locale } = useI18n();
   const l = (en: string, ar: string) => (locale === "ar" ? ar : en);
   const [mode, setMode] = useState<Mode>("shared");
+  const [basis, setBasis] = useState<Basis>("percent");
+  const [oversell, setOversell] = useState(false);
+  const [unitDrafts, setUnitDrafts] = useState<Record<number, string>>({});
   const [channels, setChannels] = useState<Channel[]>([]);
   const [drafts, setDrafts] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
@@ -39,6 +44,9 @@ export default function StockAllocation() {
       .then((r) => {
         if (controller.signal.aborted) return;
         setMode(r.data.mode);
+        setBasis(r.data.basis ?? "percent");
+        setOversell(!!r.data.allow_oversell);
+        setUnitDrafts({});
         setChannels(r.data.channels ?? []);
         setDrafts({});
       })
@@ -47,18 +55,21 @@ export default function StockAllocation() {
   }, [org]);
 
   const value = (c: Channel) => drafts[c.id] ?? (c.allocation_percent === null ? "" : String(c.allocation_percent));
+  const units = (c: Channel) => unitDrafts[c.id] ?? (c.allocation_units === null ? "" : String(c.allocation_units));
   const total = channels.reduce((sum, c) => sum + (Number(value(c)) || 0), 0);
   const anySet = channels.some((c) => value(c) !== "");
-  const over = total > 100;
+  const over = basis === "percent" && total > 100;
 
   const save = async () => {
     setBusy(true);
     setMessage(null);
     try {
       const percents = Object.fromEntries(channels.map((c) => [c.id, value(c) === "" ? null : Number(value(c))]));
-      const r = await api.put("/stock-allocation", { mode, percents });
+      const perUnits = Object.fromEntries(channels.map((c) => [c.id, units(c) === "" ? null : Number(units(c))]));
+      const r = await api.put("/stock-allocation", { mode, basis, allow_oversell: oversell, percents, units: perUnits });
       setChannels(r.data.channels ?? []);
       setDrafts({});
+      setUnitDrafts({});
       setMessage({ ok: true, text: l("Saved. Each product follows it from its next stock update.", "تم الحفظ. يطبق على كل منتج عند تحديث مخزونه القادم.") });
     } catch (e: unknown) {
       const reason = (e as { response?: { data?: { message?: string }; status?: number } }).response;
@@ -83,13 +94,13 @@ export default function StockAllocation() {
     {
       id: "split",
       title: l("Divide it between channels", "قسّمه بين القنوات"),
-      body: l("Each channel gets a share. Together they never show more than you have.", "لكل قناة نصيب. مجموعها لا يتجاوز ما لديك أبداً."),
+      body: l("Each channel gets a share, as a percentage or a number of units. Together they never show more than you have.", "لكل قناة نصيب، بالنسبة أو بعدد القطع. مجموعها لا يتجاوز ما لديك أبداً."),
       example: l("100 in stock → 50 / 30 / 20", "100 في المخزن ← 50 / 30 / 20"),
     },
     {
       id: "manual",
       title: l("Set each one yourself", "حدّد كل قناة بنفسك"),
-      body: l("Choose the quantity per product and channel, above or below your stock.", "اختر الكمية لكل منتج وقناة، أكثر أو أقل من مخزونك."),
+      body: l("Choose the quantity for each product on each channel.", "اختر الكمية لكل منتج في كل قناة."),
       example: l("Set on each product's page", "تُحدد من صفحة كل منتج"),
     },
   ];
@@ -136,52 +147,101 @@ export default function StockAllocation() {
 
       {mode === "split" && (
         <div className="mt-5">
+          <div role="group" aria-label={l("Divide by", "التقسيم حسب")} className="inline-flex gap-1 rounded-xl bg-muted p-1">
+            {([["percent", l("By percentage", "بالنسبة")], ["units", l("By number of units", "بعدد القطع")]] as const).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={basis === id}
+                onClick={() => setBasis(id)}
+                className={cn("h-9 rounded-lg px-4 text-sm font-bold transition-colors", basis === id ? "bg-action text-action-foreground" : "text-muted-foreground hover:text-foreground")}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           {channels.length ? (
-            <ul className="divide-y divide-border border-y border-border">
+            <ul className="mt-4 divide-y divide-border border-y border-border">
               {channels.map((c) => (
                 <li key={c.id} className="flex items-center gap-3 py-3">
                   <PlatformLogo platform={c.platform} size={18} />
                   <span className="min-w-0 flex-1 truncate font-bold">{c.name}</span>
-                  {!anySet && <span className="text-xs text-muted-foreground tabular-nums">{c.effective_percent}%</span>}
+                  {basis === "percent" && !anySet && <span className="text-xs text-muted-foreground tabular-nums">{c.effective_percent}%</span>}
                   <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      inputMode="numeric"
-                      aria-label={l(`Share for ${c.name}`, `نصيب ${c.name}`)}
-                      value={value(c)}
-                      onChange={(e) => setDrafts((d) => ({ ...d, [c.id]: e.target.value }))}
-                      className="h-10 w-20 rounded-xl border border-border bg-background px-3 text-end font-bold text-foreground tabular-nums"
-                    />
-                    %
+                    {basis === "percent" ? (
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        inputMode="numeric"
+                        aria-label={l(`Share for ${c.name}`, `نصيب ${c.name}`)}
+                        value={value(c)}
+                        onChange={(e) => setDrafts((d) => ({ ...d, [c.id]: e.target.value }))}
+                        className="h-10 w-20 rounded-xl border border-border bg-background px-3 text-end font-bold text-foreground tabular-nums"
+                      />
+                    ) : (
+                      <input
+                        type="number"
+                        min={0}
+                        inputMode="numeric"
+                        aria-label={l(`Units for ${c.name}`, `قطع ${c.name}`)}
+                        value={units(c)}
+                        onChange={(e) => setUnitDrafts((d) => ({ ...d, [c.id]: e.target.value }))}
+                        className="h-10 w-24 rounded-xl border border-border bg-background px-3 text-end font-bold text-foreground tabular-nums"
+                      />
+                    )}
+                    {basis === "percent" ? "%" : l("units", "قطعة")}
                   </label>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">{l("Connect a sales channel to give it a share.", "اربط قناة بيع لتعطيها نصيباً.")}</p>
+            <p className="mt-4 text-sm text-muted-foreground">{l("Connect a sales channel to give it a share.", "اربط قناة بيع لتعطيها نصيباً.")}</p>
           )}
-          <p className={cn("mt-3 text-sm", over ? "font-bold text-negative" : "text-muted-foreground")}>
-            {!anySet
-              ? l("Leave them empty to split evenly.", "اتركها فارغة للتقسيم بالتساوي.")
-              : over
-                ? l(`The shares add up to ${total}%. Bring them down to 100% or less.`, `مجموع الأنصبة ${total}%. اجعله 100% أو أقل.`)
-                : l(`${total}% shared out, ${100 - total}% held back.`, `تم توزيع ${total}%، واحتجاز ${100 - total}%.`)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {l("Shares round down. A channel that sells out does not borrow from the others.", "الأنصبة تُقرّب للأسفل. القناة التي ينفد نصيبها لا تأخذ من غيرها.")}
-          </p>
+          {basis === "percent" ? (
+            <>
+              <p className={cn("mt-3 text-sm", over ? "font-bold text-negative" : "text-muted-foreground")}>
+                {!anySet
+                  ? l("Leave them empty to split evenly.", "اتركها فارغة للتقسيم بالتساوي.")
+                  : over
+                    ? l(`The shares add up to ${total}%. Bring them down to 100% or less.`, `مجموع الأنصبة ${total}%. اجعله 100% أو أقل.`)
+                    : l(`${total}% shared out, ${100 - total}% held back.`, `تم توزيع ${total}%، واحتجاز ${100 - total}%.`)}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {l("Shares round down. A channel that sells out does not borrow from the others.", "الأنصبة تُقرّب للأسفل. القناة التي ينفد نصيبها لا تأخذ من غيرها.")}
+              </p>
+            </>
+          ) : (
+            <p className="mt-3 text-sm text-muted-foreground">
+              {l(
+                "The same number applies to every product. If a product has less than the numbers add up to, channels are filled from the top of this list down, and the rest get what is left.",
+                "الرقم نفسه يطبق على كل منتج. إذا كان مخزون المنتج أقل من مجموع الأرقام، تُملأ القنوات من أعلى القائمة لأسفل ويأخذ الباقون ما تبقى.",
+              )}
+            </p>
+          )}
         </div>
       )}
 
       {mode === "manual" && (
-        <p className="mt-4 rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground">
-          {l(
-            "Open a product and set the quantity next to each channel. A sale on a channel uses up its number. A product you have not set shows your full stock. A quantity above your stock means selling units you do not have yet.",
-            "افتح المنتج وحدّد الكمية بجوار كل قناة. البيع في قناة يُنقص رقمها. المنتج الذي لم تحدده يعرض مخزونك كاملاً. كمية أعلى من مخزونك تعني بيع قطع ليست لديك بعد.",
-          )}
-        </p>
+        <div className="mt-4 space-y-3">
+          <p className="rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground">
+            {l(
+              "Open a product and set the quantity next to each channel. A sale on a channel uses up its number. A product you have not set shows your full stock.",
+              "افتح المنتج وحدّد الكمية بجوار كل قناة. البيع في قناة يُنقص رقمها. المنتج الذي لم تحدده يعرض مخزونك كاملاً.",
+            )}
+          </p>
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border px-4 py-3">
+            <input type="checkbox" checked={oversell} onChange={(e) => setOversell(e.target.checked)} className="mt-1 h-4 w-4 accent-[var(--action)]" />
+            <span>
+              <span className="block text-sm font-bold">{l("Allow a quantity above my stock", "اسمح بكمية أعلى من مخزوني")}</span>
+              <span className="block text-sm text-muted-foreground">
+                {oversell
+                  ? l("On. A channel can sell units you do not have yet, for pre-orders or stock on its way.", "مفعّل. يمكن لقناة بيع قطع ليست لديك بعد، للطلب المسبق أو لمخزون في الطريق.")
+                  : l("Off. Whatever you type, a channel is never shown more than you have.", "غير مفعّل. مهما كتبت، لا تُعرض في قناة كمية أكثر مما لديك.")}
+              </span>
+            </span>
+          </label>
+        </div>
       )}
 
       <div className="mt-5 flex flex-wrap items-center gap-3">

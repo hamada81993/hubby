@@ -13,6 +13,8 @@ class Organization extends Model
         'slug',
         'owner_id',
         'stock_allocation_mode',
+        'stock_split_basis',
+        'allow_oversell',
     ];
 
     public function users(): BelongsToMany

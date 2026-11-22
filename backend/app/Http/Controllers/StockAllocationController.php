@@ -27,8 +27,12 @@ class StockAllocationController extends Controller
         $org = $this->managedOrganization($request);
         $data = $request->validate([
             'mode' => ['required', Rule::in(StockAllocator::MODES)],
+            'basis' => ['sometimes', Rule::in(StockAllocator::BASES)],
+            'allow_oversell' => 'sometimes|boolean',
             'percents' => 'sometimes|array',
             'percents.*' => 'nullable|integer|min:0|max:100',
+            'units' => 'sometimes|array',
+            'units.*' => 'nullable|integer|min:0|max:1000000',
         ]);
 
         $channels = $this->channels($org);
@@ -40,10 +44,23 @@ class StockAllocationController extends Controller
             'Give at least one channel a share, or clear them all to split evenly.',
         );
 
-        $org->update(['stock_allocation_mode' => $data['mode']]);
+        $units = collect($data['units'] ?? [])->only($channels->pluck('id')->all());
+
+        $org->update(array_filter([
+            'stock_allocation_mode' => $data['mode'],
+            'stock_split_basis' => $data['basis'] ?? null,
+            'allow_oversell' => $data['allow_oversell'] ?? null,
+        ], fn ($value) => $value !== null));
         foreach ($channels as $channel) {
+            $changes = [];
             if ($percents->has($channel->id)) {
-                $channel->update(['allocation_percent' => $percents[$channel->id]]);
+                $changes['allocation_percent'] = $percents[$channel->id];
+            }
+            if ($units->has($channel->id)) {
+                $changes['allocation_units'] = $units[$channel->id];
+            }
+            if ($changes) {
+                $channel->update($changes);
             }
         }
 
@@ -93,11 +110,14 @@ class StockAllocationController extends Controller
 
         return [
             'mode' => $org->stock_allocation_mode ?? 'shared',
+            'basis' => $org->stock_split_basis ?? 'percent',
+            'allow_oversell' => (bool) $org->allow_oversell,
             'channels' => $channels->map(fn (Store $s) => [
                 'id' => $s->id,
                 'name' => $s->name,
                 'platform' => $s->platform,
                 'allocation_percent' => $s->allocation_percent,
+                'allocation_units' => $s->allocation_units,
                 'safety_stock' => (int) $s->safety_stock,
                 // What split mode gives this channel right now, including the even split.
                 'effective_percent' => round($allocator->shareOf($s, $connected), 1),

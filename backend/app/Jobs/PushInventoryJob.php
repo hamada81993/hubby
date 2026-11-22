@@ -48,7 +48,6 @@ class PushInventoryJob implements ShouldQueue
 
         // Every connected channel, including the one the change came from: shares are worked out across all of them.
         $channels = $organization->stores()->where('status', 'connected')->get();
-        $mode = $organization->stock_allocation_mode ?? 'shared';
         $allocator = app(StockAllocator::class);
 
         foreach ($stores as $store) {
@@ -61,7 +60,7 @@ class PushInventoryJob implements ShouldQueue
                 $service = $this->getService($store);
                 // The master retains its authoritative quantity; buffering it would compound
                 // deductions on every inbound sync. Only downstream channels get a cushion.
-                $quantity = $allocator->quantityFor($this->variant, $store, $mode, $channels);
+                $quantity = $allocator->quantityFor($this->variant, $store, $organization, $channels);
                 if ($service->updateInventory($store, $this->variant->sku, $quantity) === false) {
                     throw new \RuntimeException('Inventory update was not accepted by the channel.');
                 }
