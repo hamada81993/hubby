@@ -164,7 +164,9 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
           {platform.secretLabel && (
             <Input
               label={platform.secretLabel}
-              placeholder="••••••••••••••••"
+              // Odoo's second field is the login email, not a secret.
+              type={platform.id === 'odoo' ? 'email' : undefined}
+              placeholder={platform.id === 'odoo' ? 'you@company.com' : '••••••••••••••••'}
               value={secret}
               onChange={(e) => setSecret(e.target.value)}
               required
