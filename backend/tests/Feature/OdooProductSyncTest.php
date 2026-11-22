@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Store;
 use App\Models\User;
+use App\Services\Integrations\OdooService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -15,6 +16,19 @@ use Tests\TestCase;
 class OdooProductSyncTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // No DNS in tests: every hostname resolves to one public address.
+        OdooService::$resolver = fn (string $host): array => ['93.184.216.34'];
+    }
+
+    protected function tearDown(): void
+    {
+        OdooService::$resolver = null;
+        parent::tearDown();
+    }
 
     private function odooStore(string $domain): Store
     {
@@ -104,5 +118,25 @@ class OdooProductSyncTest extends TestCase
         $this->assertSame('error', $store->fresh()->status);
         $this->assertDatabaseHas('sync_logs', ['store_id' => $store->id, 'status' => 'failed']);
         $this->assertSame(0, Product::count());
+    }
+
+    public function test_an_internal_address_is_never_called(): void
+    {
+        Http::fake();
+
+        foreach (['127.0.0.1', '10.0.0.5', '169.254.169.254', 'erp.example.com:8069', 'user@erp.example.com', 'erp.example.com/admin'] as $domain) {
+            OdooService::$resolver = fn (string $host): array => [filter_var($host, FILTER_VALIDATE_IP) ? $host : '93.184.216.34'];
+            $store = $this->odooStore($domain);
+            (new SyncProductsJob($store))->handle();
+            $this->assertSame('error', $store->fresh()->status, $domain);
+        }
+
+        // A public name that resolves to a private address is refused as well.
+        OdooService::$resolver = fn (string $host): array => ['192.168.1.20'];
+        $store = $this->odooStore('erp.example.com');
+        (new SyncProductsJob($store))->handle();
+        $this->assertSame('error', $store->fresh()->status);
+
+        Http::assertNothingSent();
     }
 }

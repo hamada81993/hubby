@@ -27,6 +27,13 @@ class OdooService extends BaseIntegrationService
     /** Resolved once per store, then reused for every call in the same sync. */
     private array $session = [];
 
+    /**
+     * Turns a hostname into its IPv4 addresses. Swappable so tests do not depend on DNS.
+     *
+     * @var null|\Closure(string): array<int, string>
+     */
+    public static ?\Closure $resolver = null;
+
     public function getAuthUrl(): string
     {
         // Odoo connects with an API key, not an OAuth redirect.
@@ -179,9 +186,7 @@ class OdooService extends BaseIntegrationService
         $session = $this->session($store);
 
         if ($session['transport'] === 'json2') {
-            $response = Http::withToken($session['key'])
-                ->acceptJson()
-                ->timeout(30)
+            $response = $this->http($session)->withToken($session['key'])
                 ->post("{$session['base']}/json/2/{$model}/{$method}", $kwargs);
 
             if ($response->failed()) {
@@ -194,7 +199,7 @@ class OdooService extends BaseIntegrationService
         $domain = $kwargs['domain'] ?? [];
         unset($kwargs['domain']);
 
-        return $this->rpc($session['base'], 'object', 'execute_kw', [
+        return $this->rpc($session, 'object', 'execute_kw', [
             $session['db'], $session['uid'], $session['key'], $model, $method, [$domain], $kwargs,
         ]) ?? [];
     }
@@ -209,15 +214,13 @@ class OdooService extends BaseIntegrationService
         $integration = $store->integration;
         $key = (string) $integration?->access_token;
         $login = (string) $integration?->refresh_token;
-        [$host, $query] = array_pad(explode('?', (string) $store->domain, 2), 2, '');
-        parse_str($query, $options);
-        $base = 'https://'.rtrim($host, '/');
+        [$host, $options, $ip] = $this->safeHost((string) $store->domain);
+        $target = ['base' => "https://{$host}", 'host' => $host, 'ip' => $ip, 'key' => $key];
 
         // Odoo 19 and later: the key alone is enough.
-        $probe = Http::withToken($key)->acceptJson()->timeout(20)
-            ->post("{$base}/json/2/res.users/context_get", []);
+        $probe = $this->http($target)->withToken($key)->post("{$target['base']}/json/2/res.users/context_get", []);
         if ($probe->successful()) {
-            return $this->session[$store->id] = ['transport' => 'json2', 'base' => $base, 'key' => $key];
+            return $this->session[$store->id] = ['transport' => 'json2'] + $target;
         }
         if ($probe->status() === 401 || $probe->status() === 403) {
             throw new RuntimeException('Odoo rejected the API key. Create a new key under Preferences → Account Security and reconnect.');
@@ -227,22 +230,63 @@ class OdooService extends BaseIntegrationService
         if ($login === '') {
             throw new RuntimeException('This Odoo version needs the login email as well as the API key.');
         }
-        $db = $options['db'] ?? $this->guessDatabase($base, $host);
-        $uid = $this->rpc($base, 'common', 'login', [$db, $login, $key]);
+        $db = $options['db'] ?? $this->guessDatabase($target);
+        $uid = $this->rpc($target, 'common', 'login', [$db, $login, $key]);
         if (! $uid) {
-            throw new RuntimeException("Odoo did not accept this login and API key for database \"{$db}\".");
+            throw new RuntimeException('Odoo did not accept this login and API key for that database.');
         }
 
-        return $this->session[$store->id] = [
-            'transport' => 'jsonrpc', 'base' => $base, 'key' => $key, 'db' => $db, 'uid' => (int) $uid,
-        ];
+        return $this->session[$store->id] = ['transport' => 'jsonrpc', 'db' => (string) $db, 'uid' => (int) $uid] + $target;
+    }
+
+    /**
+     * The merchant types the Odoo address, so it is checked before this server calls it:
+     * a plain public hostname only, never an internal or reserved address. The request is
+     * then pinned to the address that was checked, so a second DNS answer cannot redirect it.
+     *
+     * @return array{0: string, 1: array<string, mixed>, 2: string}
+     */
+    protected function safeHost(string $domain): array
+    {
+        [$address, $query] = array_pad(explode('?', $domain, 2), 2, '');
+        parse_str($query, $options);
+        $parts = parse_url('https://'.trim($address));
+
+        $extras = array_diff(array_keys($parts ?: []), ['scheme', 'host']);
+        if (! $parts || empty($parts['host']) || $extras !== []) {
+            throw new RuntimeException('Enter the Odoo address as a hostname only, for example your-company.odoo.com.');
+        }
+
+        $host = strtolower($parts['host']);
+        $resolve = self::$resolver
+            ?? fn (string $name): array => filter_var($name, FILTER_VALIDATE_IP) ? [$name] : (gethostbynamel($name) ?: []);
+        $addresses = $resolve($host);
+        if ($addresses === []) {
+            throw new RuntimeException("Could not find the Odoo server {$host}.");
+        }
+        foreach ($addresses as $ip) {
+            if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                throw new RuntimeException('That Odoo address is not reachable from Hubby. Use the public address of your Odoo.');
+            }
+        }
+
+        return [$host, $options, $addresses[0]];
+    }
+
+    /** A client for one checked Odoo host: pinned to its address, and it does not follow redirects. */
+    protected function http(array $target)
+    {
+        return Http::acceptJson()->timeout(30)->withOptions([
+            'allow_redirects' => false,
+            'curl' => [CURLOPT_RESOLVE => ["{$target['host']}:443:{$target['ip']}"]],
+        ]);
     }
 
     /** The database to sign in to: the only one the server lists, or the odoo.com subdomain. */
-    protected function guessDatabase(string $base, string $host): string
+    protected function guessDatabase(array $target): string
     {
         try {
-            $list = $this->rpc($base, 'db', 'list', []);
+            $list = $this->rpc($target, 'db', 'list', []);
             if (is_array($list) && count($list) === 1) {
                 return (string) $list[0];
             }
@@ -250,7 +294,7 @@ class OdooService extends BaseIntegrationService
             // Listing databases is switched off on most hosted instances; fall through.
         }
 
-        if (preg_match('/^([a-z0-9-]+)\.odoo\.com$/i', $host, $m)) {
+        if (preg_match('/^([a-z0-9-]+)\.odoo\.com$/i', $target['host'], $m)) {
             return $m[1];
         }
 
@@ -258,9 +302,9 @@ class OdooService extends BaseIntegrationService
     }
 
     /** A classic JSON-RPC call to /jsonrpc. */
-    protected function rpc(string $base, string $service, string $method, array $args): mixed
+    protected function rpc(array $target, string $service, string $method, array $args): mixed
     {
-        $response = Http::acceptJson()->timeout(30)->post("{$base}/jsonrpc", [
+        $response = $this->http($target)->post("{$target['base']}/jsonrpc", [
             'jsonrpc' => '2.0',
             'method' => 'call',
             'params' => ['service' => $service, 'method' => $method, 'args' => $args],
@@ -268,7 +312,7 @@ class OdooService extends BaseIntegrationService
         ]);
 
         if ($response->failed()) {
-            throw new RuntimeException("Could not reach Odoo at {$base} (HTTP {$response->status()}).");
+            throw new RuntimeException("Could not reach Odoo at {$target['host']} (HTTP {$response->status()}).");
         }
         if ($response->json('error')) {
             throw new RuntimeException('Odoo error: '.$this->errorText($response->json('error'), $response->status()));
@@ -280,7 +324,8 @@ class OdooService extends BaseIntegrationService
     private function errorText(mixed $error, int $status): string
     {
         if (is_array($error)) {
-            return (string) ($error['data']['message'] ?? $error['message'] ?? "HTTP {$status}");
+            // Odoo's own short reason only, never a raw response body.
+            return mb_substr((string) ($error['data']['message'] ?? $error['message'] ?? "HTTP {$status}"), 0, 160);
         }
 
         return "HTTP {$status}";
