@@ -157,6 +157,7 @@ class SyncProductsJob implements ShouldQueue
             ];
         }
 
+        // Odoo's connector returns products already in this shape.
         return $data;
     }
 }

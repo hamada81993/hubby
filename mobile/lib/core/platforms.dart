@@ -76,6 +76,14 @@ const List<PlatformMeta> kPlatforms = [
     tokenLabel: 'API Key', secretLabel: 'API Secret',
     help: 'Trendyol Seller Center → Account Info → Integration Information.',
   ),
+  // Not a sales channel: Odoo is connected as the source of products, prices and stock.
+  PlatformMeta(
+    id: 'odoo', name: 'Odoo', icon: LucideIcons.boxes,
+    color: Color(0xFFA24689), auth: 'manual',
+    domainLabel: 'Odoo address', domainHint: 'your-company.odoo.com',
+    tokenLabel: 'API key', secretLabel: 'Login email',
+    help: 'Odoo → Preferences → Account Security → New API Key. Hubby only reads products, prices and stock.',
+  ),
 ];
 
 /// Platform ids that ship a real brand logo under assets/platforms/{id}.svg.

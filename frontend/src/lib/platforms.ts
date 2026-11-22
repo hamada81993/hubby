@@ -1,4 +1,4 @@
-import { ShoppingBag, Globe, Zap, Store, Package, Sun, Tag, type LucideIcon } from 'lucide-react';
+import { ShoppingBag, Globe, Zap, Store, Package, Sun, Tag, Boxes, type LucideIcon } from 'lucide-react';
 
 /**
  * Single source of truth for the e-commerce platforms Hubby connects to.
@@ -11,7 +11,8 @@ export type PlatformId =
   | 'zid'
   | 'amazon'
   | 'noon'
-  | 'trendyol';
+  | 'trendyol'
+  | 'odoo';
 
 export interface PlatformMeta {
   id: PlatformId;
@@ -115,6 +116,19 @@ export const PLATFORMS: PlatformMeta[] = [
     tokenLabel: 'API Key',
     secretLabel: 'API Secret',
     help: 'Trendyol Seller Center → Account Info → Integration Information (API Key & Secret).',
+  },
+  {
+    // Not a sales channel: Odoo is connected as the source of products, prices and stock.
+    id: 'odoo',
+    name: 'Odoo',
+    icon: Boxes,
+    color: 'text-[#A24689]',
+    auth: 'manual',
+    domainLabel: 'Odoo address',
+    domainPlaceholder: 'your-company.odoo.com',
+    tokenLabel: 'API key',
+    secretLabel: 'Login email',
+    help: 'In Odoo: your name (top right) → Preferences → Account Security → New API Key. Use the email you sign in to Odoo with. If you host Odoo yourself, add the database to the address: erp.example.com?db=your_database. Hubby only reads products, prices and stock; it never changes anything in Odoo.',
   },
 ];
 

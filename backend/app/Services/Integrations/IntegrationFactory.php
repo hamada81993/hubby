@@ -14,6 +14,7 @@ class IntegrationFactory
             'amazon' => new AmazonService(),
             'noon' => new NoonService(),
             'trendyol' => new TrendyolService(),
+            'odoo' => new OdooService(),
             default => throw new \Exception("Platform [{$platform}] not supported"),
         };
     }

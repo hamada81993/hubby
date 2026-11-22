@@ -54,7 +54,7 @@ class StoreController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'platform' => 'required|in:shopify,woocommerce,salla,zid,amazon,noon,trendyol',
+            'platform' => 'required|in:shopify,woocommerce,salla,zid,amazon,noon,trendyol,odoo',
             'domain' => 'required|string|max:255',
             'access_token' => 'required|string',
             // Some platforms need a second secret (e.g. WooCommerce consumer secret).
