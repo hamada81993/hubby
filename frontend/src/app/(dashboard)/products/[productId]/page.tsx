@@ -30,6 +30,29 @@ export default function ProductDetailsPage() {
   const { productId } = useParams();
   const router = useRouter();
   const [product, setProduct] = useState<any>(null);
+  // Manual stock allocation: the quantity offered per listing is set here.
+  const [manualStock, setManualStock] = useState(false);
+  const [offered, setOffered] = useState<Record<number, string>>({});
+  useEffect(() => {
+    api.get('/stock-allocation').then((r) => setManualStock(r.data?.mode === 'manual')).catch(() => setManualStock(false));
+  }, []);
+  const saveOffered = async (pp: any) => {
+    const raw = offered[pp.id];
+    if (raw === undefined) return;
+    const quantity = raw.trim() === '' ? null : Math.max(0, Math.floor(Number(raw)));
+    if (quantity !== null && Number.isNaN(quantity)) return;
+    try {
+      const r = await api.put(`/platform-products/${pp.id}/allocation`, { quantity });
+      setProduct((current: any) => ({
+        ...current,
+        platform_products: current.platform_products.map((row: any) =>
+          row.id === pp.id ? { ...row, allocated_quantity: r.data.allocated_quantity } : row),
+      }));
+      setOffered((d) => { const next = { ...d }; delete next[pp.id]; return next; });
+    } catch (err) {
+      console.error('Failed to save offered quantity', err);
+    }
+  };
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -211,6 +234,26 @@ export default function ProductDetailsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
+                    {manualStock && !pp.store?.is_master && (
+                      <label className="flex flex-col items-end gap-1 text-[10px] text-muted-foreground">
+                        <input
+                          type="number"
+                          min={0}
+                          inputMode="numeric"
+                          placeholder={String(product.stock ?? 0)}
+                          aria-label={`Quantity offered on ${pp.store?.name}`}
+                          value={offered[pp.id] ?? (pp.allocated_quantity ?? '')}
+                          onChange={(e) => setOffered((d) => ({ ...d, [pp.id]: e.target.value }))}
+                          onBlur={() => saveOffered(pp)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+                          className={cn(
+                            "h-9 w-20 rounded-lg border bg-background px-2 text-end text-xs font-bold text-foreground tabular-nums",
+                            Number(offered[pp.id] ?? pp.allocated_quantity ?? 0) > Number(product.stock ?? 0) ? "border-caution" : "border-border"
+                          )}
+                        />
+                        Offered
+                      </label>
+                    )}
                     <div className="text-end">
                       <p className="text-xs font-bold"><Money amount={pp.price || product.price} /></p>
                       <p className="text-[10px] text-muted-foreground">{t('products.detail.platformPrice')}</p>

@@ -20,6 +20,7 @@ class Store extends Model
         'default_ship_from_address_id',
         'shipping_settings',
         'safety_stock',
+        'allocation_percent',
     ];
 
     protected $casts = [

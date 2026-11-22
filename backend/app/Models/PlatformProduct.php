@@ -12,6 +12,7 @@ class PlatformProduct extends Model
         'store_id',
         'external_id',
         'sync_enabled',
+        'allocated_quantity',
     ];
 
     protected $casts = [

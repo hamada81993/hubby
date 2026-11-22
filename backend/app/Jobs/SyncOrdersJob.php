@@ -99,6 +99,9 @@ class SyncOrdersJob implements ShouldQueue
 
                 // Sync items
                 foreach ($mappedData['items'] as $itemData) {
+                    if ($order->wasRecentlyCreated) {
+                        $this->consumeManualAllocation($itemData);
+                    }
                     OrderItem::updateOrCreate(
                         [
                             'order_id' => $order->id,
@@ -277,5 +280,27 @@ class SyncOrdersJob implements ShouldQueue
         }
 
         return $data;
+    }
+
+    /**
+     * Manual stock allocation: the merchant set how many units this channel may sell, so a new
+     * order there uses up that number. Without this the next stock push would offer the full
+     * chosen quantity again and oversell.
+     */
+    protected function consumeManualAllocation(array $item): void
+    {
+        $sku = $item['sku'] ?? null;
+        $quantity = (int) ($item['quantity'] ?? 0);
+        if (! $sku || $quantity <= 0) {
+            return;
+        }
+
+        $listing = \App\Models\PlatformProduct::where('store_id', $this->store->id)
+            ->whereNotNull('allocated_quantity')
+            ->whereHas('productVariant', fn ($q) => $q->where('sku', $sku))
+            ->first();
+        if ($listing) {
+            $listing->update(['allocated_quantity' => max(0, $listing->allocated_quantity - $quantity)]);
+        }
     }
 }

@@ -7,6 +7,7 @@ use App\Models\ProductVariant;
 use App\Models\Store;
 use App\Models\SyncLog;
 use App\Services\Integrations\IntegrationFactory;
+use App\Services\Inventory\StockAllocator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -45,6 +46,11 @@ class PushInventoryJob implements ShouldQueue
             })
             ->get();
 
+        // Every connected channel, including the one the change came from: shares are worked out across all of them.
+        $channels = $organization->stores()->where('status', 'connected')->get();
+        $mode = $organization->stock_allocation_mode ?? 'shared';
+        $allocator = app(StockAllocator::class);
+
         foreach ($stores as $store) {
             // A disabled mapping must never be bypassed by a stock adjustment or receipt.
             if (PlatformProduct::where('store_id', $store->id)->where('product_variant_id', $this->variant->id)->where('sync_enabled', false)->exists()) {
@@ -55,7 +61,7 @@ class PushInventoryJob implements ShouldQueue
                 $service = $this->getService($store);
                 // The master retains its authoritative quantity; buffering it would compound
                 // deductions on every inbound sync. Only downstream channels get a cushion.
-                $quantity = max(0, (int) $this->variant->stock - ($store->is_master ? 0 : (int) $store->safety_stock));
+                $quantity = $allocator->quantityFor($this->variant, $store, $mode, $channels);
                 if ($service->updateInventory($store, $this->variant->sku, $quantity) === false) {
                     throw new \RuntimeException('Inventory update was not accepted by the channel.');
                 }

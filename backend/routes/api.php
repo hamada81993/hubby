@@ -85,6 +85,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/stores/sync-all', [StoreController::class, 'syncAll']);
         Route::post('/stores/{id}/set-master', [StoreController::class, 'setMaster']);
         Route::put('/stores/{id}/safety-stock', [StoreController::class, 'safetyStock']);
+        Route::get('/stock-allocation', [\App\Http\Controllers\StockAllocationController::class, 'show']);
+        Route::put('/stock-allocation', [\App\Http\Controllers\StockAllocationController::class, 'update']);
+        Route::put('/platform-products/{id}/allocation', [\App\Http\Controllers\StockAllocationController::class, 'setQuantity']);
         Route::post('/stores/{id}/sync', [StoreController::class, 'sync']);
         Route::delete('/stores/{id}', [StoreController::class, 'destroy']);
 

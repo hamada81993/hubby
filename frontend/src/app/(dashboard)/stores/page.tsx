@@ -16,6 +16,7 @@ import ConnectStoreModal from '@/components/stores/ConnectStoreModal';
 import { useStores } from '@/components/providers/StoresProvider';
 import { useI18n } from '@/i18n';
 import ChannelBuffers from '@/components/operations/ChannelBuffers';
+import StockAllocation from '@/components/operations/StockAllocation';
 
 /** Visual treatment for each real store status the backend reports. Labels are
  *  looked up at render time via `t('stores.status.<status>')`. */
@@ -266,6 +267,8 @@ export default function StoresPage() {
         <Crown size={14} className="mt-0.5 shrink-0 text-primary" />
         <span><b className="text-foreground">{t('stores.master.title')}.</b> {t('stores.master.description')}</span>
       </p>
+
+      <StockAllocation />
 
       <ChannelBuffers />
 
