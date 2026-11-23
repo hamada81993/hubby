@@ -66,6 +66,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('org.member')->group(function () {
         // Organization settings
         Route::put('/organization', [SettingsController::class, 'updateOrganization']);
+        Route::get('/invoice-source', [SettingsController::class, 'invoiceSource']);
+        Route::put('/invoice-source', [SettingsController::class, 'updateInvoiceSource']);
 
         // Integrations a merchant has asked for (not built yet)
         Route::get('/integration-requests', [IntegrationRequestController::class, 'index']);

@@ -15,6 +15,7 @@ class Organization extends Model
         'stock_allocation_mode',
         'stock_split_basis',
         'allow_oversell',
+        'invoice_source',
     ];
 
     public function users(): BelongsToMany

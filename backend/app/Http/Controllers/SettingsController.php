@@ -91,6 +91,26 @@ class SettingsController extends Controller
     /**
      * Update the active organization's name.
      */
+    /** Where this organisation issues its tax invoices: `hubby` or `accounting`. */
+    public function invoiceSource(Request $request)
+    {
+        $organization = Organization::findOrFail($request->header('X-Organization-Id'));
+
+        return response()->json(['invoice_source' => $organization->invoice_source ?? 'hubby']);
+    }
+
+    public function updateInvoiceSource(Request $request)
+    {
+        $organization = Organization::findOrFail($request->header('X-Organization-Id'));
+        $role = $organization->users()->where('users.id', $request->user()->id)->first()?->pivot->role;
+        abort_unless(in_array($role, ['owner', 'admin'], true), 403);
+
+        $data = $request->validate(['invoice_source' => ['required', Rule::in(['hubby', 'accounting'])]]);
+        $organization->update($data);
+
+        return response()->json(['invoice_source' => $organization->invoice_source]);
+    }
+
     public function updateOrganization(Request $request)
     {
         $organizationId = $request->header('X-Organization-Id');

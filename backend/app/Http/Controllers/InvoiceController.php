@@ -68,6 +68,10 @@ class InvoiceController extends Controller
             'issue' => ['nullable', 'boolean'],
         ]);
 
+        if ($blocked = $this->issuedElsewhere($orgId)) {
+            return $blocked;
+        }
+
         $registration = TaxRegistration::where('organization_id', $orgId)->where('is_active', true)->first();
         if (! $registration) {
             return response()->json([
@@ -100,6 +104,9 @@ class InvoiceController extends Controller
     public function issue(Request $request, int $id)
     {
         $this->authorizeManage($request);
+        if ($blocked = $this->issuedElsewhere((int) $request->header('X-Organization-Id'))) {
+            return $blocked;
+        }
         $invoice = $this->find($request, $id);
 
         try {
@@ -208,5 +215,21 @@ class InvoiceController extends Controller
         $org = Organization::findOrFail($request->header('X-Organization-Id'));
         $role = $org->users()->where('users.id', $request->user()->id)->first()?->pivot->role;
         abort_unless(in_array($role, ['owner', 'admin'], true), 403, 'Only owners and admins can manage invoices.');
+    }
+
+    /**
+     * An organisation that invoices from its accounting system must not get a second invoice
+     * for the same sale here. Existing invoices stay readable and can still be credited.
+     */
+    private function issuedElsewhere(int $orgId): ?\Illuminate\Http\JsonResponse
+    {
+        if ((\App\Models\Organization::find($orgId)?->invoice_source ?? 'hubby') !== 'accounting') {
+            return null;
+        }
+
+        return response()->json([
+            'message' => 'Invoices for this organisation are issued from your accounting system. Change this in Settings to invoice from Hubby.',
+            'code' => 'INVOICES_FROM_ACCOUNTING',
+        ], 422);
     }
 }

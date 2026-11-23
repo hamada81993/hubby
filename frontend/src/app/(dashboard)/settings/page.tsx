@@ -53,6 +53,25 @@ export default function SettingsPage() {
 
   const activeOrg = organizations.find((o) => o.id === activeOrgId) || organizations[0];
 
+  // Where tax invoices are issued: in Hubby, or in the merchant's accounting system.
+  const [invoiceSource, setInvoiceSource] = useState<'hubby' | 'accounting'>('hubby');
+  const [invoiceMsg, setInvoiceMsg] = useState<{ k: 'success' | 'error'; m: string } | null>(null);
+  useEffect(() => {
+    api.get('/invoice-source').then((r) => setInvoiceSource(r.data.invoice_source)).catch(() => {});
+  }, [activeOrgId]);
+  const saveInvoiceSource = async (value: 'hubby' | 'accounting') => {
+    const previous = invoiceSource;
+    setInvoiceSource(value);
+    setInvoiceMsg(null);
+    try {
+      await api.put('/invoice-source', { invoice_source: value });
+      setInvoiceMsg({ k: 'success', m: l('Saved.', 'تم الحفظ.') });
+    } catch (err: any) {
+      setInvoiceSource(previous);
+      setInvoiceMsg({ k: 'error', m: err.response?.status === 403 ? l('Only an owner or admin can change this.', 'هذا الإعداد للمالك أو المدير فقط.') : l('Could not save. Try again.', 'تعذر الحفظ. حاول مرة أخرى.') });
+    }
+  };
+
   // Profile
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -193,6 +212,27 @@ export default function SettingsPage() {
               </form>
             </Card>
           )}
+
+          <Card className="p-6 rounded-[28px] space-y-4">
+            <div>
+              <h3 className="text-lg font-bold">{l('Tax invoices', 'الفواتير الضريبية')}</h3>
+              <p className="text-sm text-muted-foreground">{l('One sale, one invoice. Choose the system that issues it.', 'بيع واحد، فاتورة واحدة. اختر النظام الذي يصدرها.')}</p>
+            </div>
+            {invoiceMsg && <Banner message={invoiceMsg.m} kind={invoiceMsg.k} />}
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <p className="max-w-[40ch] text-sm text-muted-foreground">
+                {invoiceSource === 'hubby'
+                  ? l('Hubby issues the invoice for each order, from the Invoices page.', 'هَبّي يصدر فاتورة كل طلب من صفحة الفواتير.')
+                  : l('Your accounting system issues invoices. Hubby will not create them, so nothing is invoiced twice.', 'نظامك المحاسبي يصدر الفواتير. هَبّي لن ينشئها، فلا تُصدر فاتورتان.')}
+              </p>
+              <Segmented
+                label={l('Tax invoices', 'الفواتير الضريبية')}
+                value={invoiceSource}
+                options={[{ value: 'hubby', label: 'Hubby' }, { value: 'accounting', label: l('Accounting system', 'النظام المحاسبي') }]}
+                onChange={saveInvoiceSource}
+              />
+            </div>
+          </Card>
 
           <Card className="p-6 rounded-[28px] space-y-5">
             <h3 className="text-lg font-bold">{l('Look and language', 'المظهر واللغة')}</h3>
