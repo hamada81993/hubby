@@ -218,6 +218,7 @@ function Page() {
 
       <footer className={styles.footer}>
         <Logo variant="dark" /><p>{c.footer.rights} {c.footer.sample}</p>
+        <Link href="/privacy">{ar ? 'الخصوصية' : 'Privacy'}</Link><Link href="/terms">{ar ? 'الشروط' : 'Terms'}</Link>
         <a href="#main">{c.footer.top}<ArrowUp size={15} /></a>
       </footer>
     </div>
