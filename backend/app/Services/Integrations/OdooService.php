@@ -24,6 +24,9 @@ class OdooService extends BaseIntegrationService
 {
     private const PAGE = 200;
 
+    /** The most records one sync reads from a model, so a misbehaving server cannot keep it busy for ever. */
+    private const MAX_RECORDS = 50000;
+
     /** Resolved once per store, then reused for every call in the same sync. */
     private array $session = [];
 
@@ -172,11 +175,17 @@ class OdooService extends BaseIntegrationService
                 continue;
             }
 
+            if (! array_is_list($page) || count($page) > self::PAGE) {
+                throw new RuntimeException('Odoo returned an unexpected list of records.');
+            }
             $records = [...$records, ...$page];
             if (count($page) < self::PAGE) {
                 return $records;
             }
             $offset += self::PAGE;
+            if ($offset >= self::MAX_RECORDS) {
+                throw new RuntimeException('This Odoo has more than '.self::MAX_RECORDS.' products, which is above what one sync reads.');
+            }
         }
     }
 
