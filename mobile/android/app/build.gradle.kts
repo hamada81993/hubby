@@ -32,11 +32,29 @@ android {
         versionName = flutter.versionName
     }
 
+    // Store releases are signed with the upload key described in android/key.properties, a
+    // file that is never committed. Without it the build falls back to the debug key, so
+    // `flutter run --release` still works on a machine that does not hold the key.
+    val keyProperties = java.util.Properties()
+    val keyPropertiesFile = rootProject.file("key.properties")
+    if (keyPropertiesFile.exists()) {
+        keyPropertiesFile.inputStream().use { keyProperties.load(it) }
+    }
+
+    signingConfigs {
+        if (keyPropertiesFile.exists()) {
+            create("release") {
+                keyAlias = keyProperties["keyAlias"] as String
+                keyPassword = keyProperties["keyPassword"] as String
+                storeFile = file(keyProperties["storeFile"] as String)
+                storePassword = keyProperties["storePassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(if (keyPropertiesFile.exists()) "release" else "debug")
         }
     }
 }

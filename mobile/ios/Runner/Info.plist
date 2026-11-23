@@ -62,7 +62,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allow access to your photos to set product images.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow camera access to take product photos.</string>
+	<string>Hubby uses the camera to scan barcodes in the warehouse and to take product photos.</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

@@ -7,6 +7,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import api from '@/lib/api';
 import { getPlatform, type PlatformId } from '@/lib/platforms';
+import { useI18n } from '@/i18n';
 import { PlatformLogo } from '@/components/ui/PlatformLogo';
 
 interface ConnectStoreModalProps {
@@ -25,6 +26,10 @@ interface ConnectStoreModalProps {
  */
 export default function ConnectStoreModal({ platformId, oauthEnabled = false, onClose, onConnected }: ConnectStoreModalProps) {
   const platform = platformId ? getPlatform(platformId) : null;
+  const { locale } = useI18n();
+  const l = (en: string, ar: string) => (locale === 'ar' ? ar : en);
+  // Arabic for the fields of platforms that have it; the rest keep the platform's own labels.
+  const odooAr = locale === 'ar' && platform?.id === 'odoo';
   // One-click OAuth is only offered when the platform supports it AND the
   // operator has configured its app keys; otherwise it's token-only.
   const showOAuth = platform?.auth === 'oauth' && oauthEnabled;
@@ -97,7 +102,7 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
   };
 
   return (
-    <Modal isOpen={!!platformId} onClose={onClose} title={`Connect ${platform.name}`} size="lg">
+    <Modal isOpen={!!platformId} onClose={onClose} title={l(`Connect ${platform.name}`, `ربط ${platform.name}`)} size="lg">
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-2xl bg-background border border-border shadow-inner flex items-center justify-center">
@@ -105,14 +110,14 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
           </div>
           <div>
             <p className="font-bold">{platform.name}</p>
-            <p className="text-xs text-muted-foreground">Connect your {platform.name} store to start syncing.</p>
+            <p className="text-xs text-muted-foreground">{platform.id === 'odoo' ? l('Bring your products, prices and stock from Odoo.', 'اجلب منتجاتك وأسعارك ومخزونك من أودو.') : l(`Connect your ${platform.name} store to start syncing.`, `اربط متجرك على ${platform.name} لبدء المزامنة.`)}</p>
           </div>
         </div>
 
         {/* Where to find the credentials. */}
         <div className="flex items-start gap-2 rounded-xl bg-primary/5 border border-primary/15 p-3 text-xs text-muted-foreground">
           <Info size={15} className="text-primary mt-0.5 shrink-0" />
-          <span>{platform.help}</span>
+          <span>{odooAr ? 'في أودو: اسمك (أعلى اليمين) ← Preferences ← Account Security ← New API Key. استخدم البريد الذي تدخل به أودو. إذا كنت تستضيف أودو بنفسك أضف قاعدة البيانات إلى العنوان: erp.example.com?db=your_database. هَبّي يقرأ المنتجات والأسعار والمخزون فقط ولا يغيّر شيئاً في أودو.' : platform.help}</span>
         </div>
 
         {error && (
@@ -123,15 +128,15 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Store name"
-            placeholder={`My ${platform.name} store`}
+            label={l(platform.id === 'odoo' ? 'Name' : 'Store name', 'الاسم')}
+            placeholder={platform.id === 'odoo' ? 'Odoo' : l(`My ${platform.name} store`, `متجري على ${platform.name}`)}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
 
           <Input
-            label={platform.domainLabel}
+            label={odooAr ? 'عنوان أودو' : platform.domainLabel}
             placeholder={platform.domainPlaceholder}
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
@@ -154,7 +159,7 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
           )}
 
           <Input
-            label={platform.tokenLabel}
+            label={odooAr ? 'مفتاح API' : platform.tokenLabel}
             placeholder="••••••••••••••••"
             value={token}
             onChange={(e) => setToken(e.target.value)}
@@ -163,7 +168,7 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
 
           {platform.secretLabel && (
             <Input
-              label={platform.secretLabel}
+              label={odooAr ? 'بريد الدخول' : platform.secretLabel}
               // Odoo's second field is the login email, not a secret.
               type={platform.id === 'odoo' ? 'email' : undefined}
               placeholder={platform.id === 'odoo' ? 'you@company.com' : '••••••••••••••••'}
@@ -175,15 +180,15 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
 
           <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
             <ShieldCheck size={13} className="text-secondary" />
-            Credentials are stored encrypted and used only to sync your store.
+            {l('Credentials are stored encrypted and used only to sync your store.', 'تُحفظ بيانات الربط مشفرة وتُستخدم للمزامنة فقط.')}
           </div>
 
           <div className="flex gap-3 pt-2">
             <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
-              Cancel
+              {l('Cancel', 'إلغاء')}
             </Button>
             <Button type="submit" variant="primary" className="flex-1" isLoading={isSubmitting}>
-              Connect store
+              {l(platform.id === 'odoo' ? 'Connect Odoo' : 'Connect store', platform.id === 'odoo' ? 'اربط أودو' : 'اربط المتجر')}
             </Button>
           </div>
         </form>

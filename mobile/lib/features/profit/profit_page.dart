@@ -6,6 +6,7 @@ import '../../core/format.dart';
 import '../../core/network/api_client.dart';
 import '../../core/platforms.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/theme/app_theme.dart';
 import '../../l10n/strings.dart';
 import '../../shared/widgets/app_widgets.dart';
 import '../../shared/widgets/async_builder.dart';
@@ -204,33 +205,58 @@ class _ProfitPageState extends State<ProfitPage> {
           ),
         );
 
+    // The answer first: what was kept, and the margin. The parts it came from sit under it.
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(children: [
-          tile(context.t('profit.netRevenue'),
-              MoneyText(summary['net_revenue'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-          const SizedBox(width: 12),
-          tile(context.t('profit.cogs'),
-              MoneyText(summary['cogs'],
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppPalette.mutedForeground))),
-        ]),
+        AppCard(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(context.t('profit.netProfit'), style: TextStyle(fontSize: 13, color: AppPalette.mutedForeground)),
+            const SizedBox(height: 2),
+            Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: MoneyText(summary['net_profit'],
+                      style: AppText.number(
+                          size: 34,
+                          weight: FontWeight.w900,
+                          color: netProfit >= 0 ? AppPalette.foreground : AppPalette.destructive)),
+                ),
+              ),
+              if (margin != null) ...[
+                const SizedBox(width: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: netProfit >= 0 ? AppPalette.action : AppPalette.destructiveSoft,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text('${margin.toStringAsFixed(1)}%',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: netProfit >= 0 ? AppPalette.onAction : AppPalette.destructive)),
+                ),
+              ],
+            ]),
+            const SizedBox(height: 2),
+            Text(orderCount(summary), style: TextStyle(fontSize: 12, color: AppPalette.mutedForeground)),
+          ]),
+        ),
         const SizedBox(height: 12),
         Row(children: [
+          tile(context.t('profit.netRevenue'),
+              MoneyText(summary['net_revenue'], compact: true, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+          const SizedBox(width: 8),
+          tile(context.t('profit.cogs'),
+              MoneyText(summary['cogs'], compact: true,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppPalette.mutedForeground))),
+          const SizedBox(width: 8),
           tile(context.t('profit.fees'),
-              MoneyText(summary['fees'],
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppPalette.mutedForeground))),
-          const SizedBox(width: 12),
-          tile(
-            context.t('profit.netProfit'),
-            MoneyText(summary['net_profit'],
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: netProfit >= 0 ? AppPalette.secondary : AppPalette.destructive)),
-            hint: margin == null
-                ? orderCount(summary)
-                : '${margin.toStringAsFixed(1)}% ${context.t('profit.margin')} · ${summary['orders']} ${context.t('profit.orders')}',
-          ),
+              MoneyText(summary['fees'], compact: true,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppPalette.mutedForeground))),
         ]),
       ],
     );

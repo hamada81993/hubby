@@ -20,6 +20,7 @@ class StoresPage extends StatelessWidget {
       body: BlocBuilder<StoresCubit, StoresState>(
         builder: (context, state) {
           if (state.loading) return const LoadingView();
+          final channels = state.stores.where((s) => s['platform'] != 'odoo').toList();
           return RefreshIndicator(
             onRefresh: () => context.read<StoresCubit>().refresh(),
             child: ListView(
@@ -28,6 +29,7 @@ class StoresPage extends StatelessWidget {
                 Wrap(
                   spacing: 8, runSpacing: 8,
                   children: kPlatforms
+                      .where((p) => p.id != 'odoo') // Odoo is under Integrations
                       .map((p) => ActionChip(
                             avatar: PlatformLogo(platformId: p.id, size: 18),
                             label: Text(p.name),
@@ -36,14 +38,14 @@ class StoresPage extends StatelessWidget {
                       .toList(),
                 ),
                 const SizedBox(height: 16),
-                if (state.stores.isEmpty)
+                if (channels.isEmpty)
                   ConnectPrompt(description: context.t('stores.firstStore'))
                 else ...[
-                  _summary(state.stores),
+                  _summary(channels),
                   const SizedBox(height: 12),
-                  _masterInfo(context, state.stores),
+                  _masterInfo(context, channels),
                   const SizedBox(height: 12),
-                  ...state.stores.map((s) => _storeCard(context, s)),
+                  ...channels.map((s) => _storeCard(context, s)),
                 ],
               ],
             ),

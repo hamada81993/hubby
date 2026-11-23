@@ -16,6 +16,7 @@ import '../profit/profit_page.dart';
 import '../settings/settings_page.dart';
 import '../warehouse/warehouse_page.dart';
 import '../stores/stores_page.dart';
+import '../integrations/integrations_page.dart';
 
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
@@ -24,6 +25,7 @@ class MorePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       (LucideIcons.store, context.t('nav.stores'), const StoresPage()),
+      (LucideIcons.plug, Localizations.localeOf(context).languageCode == 'ar' ? 'التكاملات' : 'Integrations', const IntegrationsPage()),
       (LucideIcons.folderTree, context.t('nav.categories'), const CategoriesPage()),
       (LucideIcons.users, context.t('nav.customers'), const CustomersPage()),
       (LucideIcons.barChart3, context.t('nav.analytics'), const AnalyticsPage()),

@@ -19,7 +19,8 @@ class StoresState extends Equatable {
     final set = <String>{};
     for (final s in stores) {
       final p = s['platform'];
-      if (p is String && p.isNotEmpty) set.add(p);
+      // Sales channels only: Odoo is a product source, not a place orders come from.
+      if (p is String && p.isNotEmpty && p != 'odoo') set.add(p);
     }
     return set.toList();
   }

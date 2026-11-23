@@ -23,10 +23,10 @@ import { cn } from '@/lib/utils';
 import { Money } from '@/components/ui/Money';
 import api from '@/lib/api';
 import Modal from '@/components/ui/Modal';
-import { useT } from '@/i18n';
+import { useI18n } from '@/i18n';
 
 export default function ProductDetailsPage() {
-  const t = useT();
+  const { t, locale } = useI18n();
   const { productId } = useParams();
   const router = useRouter();
   const [product, setProduct] = useState<any>(null);
@@ -251,7 +251,7 @@ export default function ProductDetailsPage() {
                             Number(offered[pp.id] ?? pp.allocated_quantity ?? 0) > Number(product.stock ?? 0) ? "border-caution" : "border-border"
                           )}
                         />
-                        Offered
+                        {locale === 'ar' ? 'المعروض' : 'Offered'}
                       </label>
                     )}
                     <div className="text-end">
