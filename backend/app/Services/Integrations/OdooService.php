@@ -98,6 +98,8 @@ class OdooService extends BaseIntegrationService
                 'sku' => $this->text($v['default_code'] ?? null) ?? $this->text($v['barcode'] ?? null) ?? 'ODOO-VAR-'.$v['id'],
                 'price' => (float) ($v['lst_price'] ?? $template['list_price'] ?? 0),
                 'stock' => (int) round((float) ($v['qty_available'] ?? 0)),
+                // Odoo's cost price, when this user is allowed to see it.
+                'cost' => isset($v['standard_price']) ? (float) $v['standard_price'] : null,
             ], $rows);
 
             $products[] = [
@@ -147,12 +149,14 @@ class OdooService extends BaseIntegrationService
     }
 
     /**
-     * Read every record of a model, a page at a time. Stock is asked for on product
-     * variants and dropped if this Odoo has no Inventory app (the field does not exist).
+     * Read every record of a model, a page at a time. Stock and cost are asked for on product
+     * variants and dropped, one at a time, if this Odoo refuses them: stock when there is no
+     * Inventory app, cost when the key's user may not see cost prices.
      */
     protected function readAll(Store $store, string $model, array $domain, array $fields): array
     {
-        $withStock = $model === 'product.product';
+        // Optional fields, tried together and given up one by one from the end.
+        $optional = $model === 'product.product' ? ['qty_available', 'standard_price'] : [];
         $records = [];
         $offset = 0;
 
@@ -160,17 +164,16 @@ class OdooService extends BaseIntegrationService
             try {
                 $page = $this->call($store, $model, 'search_read', [
                     'domain' => $domain,
-                    'fields' => $withStock ? [...$fields, 'qty_available'] : $fields,
+                    'fields' => [...$fields, ...$optional],
                     'limit' => self::PAGE,
                     'offset' => $offset,
                     'order' => 'id',
                 ]);
             } catch (RuntimeException $e) {
-                if (! $withStock) {
+                if ($optional === []) {
                     throw $e;
                 }
-                // Ask again without the stock field.
-                $withStock = false;
+                array_pop($optional);
 
                 continue;
             }

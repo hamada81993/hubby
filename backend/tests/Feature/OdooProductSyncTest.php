@@ -69,7 +69,7 @@ class OdooProductSyncTest extends TestCase
                     ['id' => 2, 'name' => 'Linen mist', 'default_code' => false, 'barcode' => false, 'list_price' => 31.0, 'description_sale' => false],
                 ]
                 : [
-                    ['id' => 11, 'product_tmpl_id' => [1, 'Oud Al Layl'], 'display_name' => 'Oud Al Layl (50ml)', 'default_code' => 'OUD-50', 'barcode' => false, 'lst_price' => 220.0, 'qty_available' => 12.0],
+                    ['id' => 11, 'product_tmpl_id' => [1, 'Oud Al Layl'], 'display_name' => 'Oud Al Layl (50ml)', 'default_code' => 'OUD-50', 'barcode' => false, 'lst_price' => 220.0, 'qty_available' => 12.0, 'standard_price' => 96.0],
                     ['id' => 21, 'product_tmpl_id' => [2, 'Linen mist'], 'display_name' => 'Linen mist', 'default_code' => false, 'barcode' => '6281000000017', 'lst_price' => 31.0, 'qty_available' => 3.0],
                 ]]);
         });
@@ -86,6 +86,14 @@ class OdooProductSyncTest extends TestCase
         $this->assertDatabaseHas('products', ['sku' => '6281000000017', 'name' => 'Linen mist', 'description' => null]);
         $this->assertSame(2, ProductVariant::count());
         $this->assertDatabaseHas('platform_products', ['store_id' => $store->id, 'external_id' => '11']);
+
+        // The cost price comes across once, and a hand-entered cost is left alone afterwards.
+        $this->assertDatabaseHas('product_costs', ['sku' => 'OUD-50', 'unit_cost' => 96, 'source' => 'api']);
+        $this->assertDatabaseMissing('product_costs', ['sku' => '6281000000017']);
+        \App\Models\ProductCost::where('sku', 'OUD-50')->update(['source' => 'manual', 'unit_cost' => 80]);
+        (new SyncProductsJob($store))->handle();
+        $this->assertSame(1, \App\Models\ProductCost::where('sku', 'OUD-50')->count());
+        $this->assertEquals(80, \App\Models\ProductCost::where('sku', 'OUD-50')->value('unit_cost'));
     }
 
     public function test_odoo_19_is_read_with_the_api_key_alone(): void

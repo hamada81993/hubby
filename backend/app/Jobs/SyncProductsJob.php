@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\PlatformProduct;
 use App\Models\Product;
+use App\Models\ProductCost;
 use App\Models\ProductVariant;
 use App\Models\Store;
 use App\Models\SyncLog;
@@ -72,6 +73,7 @@ class SyncProductsJob implements ShouldQueue
                         $variant->stock = $variantData['stock'];
                     }
                     $variant->save();
+                    $this->recordCost($variant, $variantData['cost'] ?? null);
 
                     PlatformProduct::updateOrCreate(
                         [
@@ -91,6 +93,51 @@ class SyncProductsJob implements ShouldQueue
             Log::error("SyncProductsJob failed for store {$this->store->id}: ".$e->getMessage());
             $log->update(['status' => 'failed', 'message' => $e->getMessage()]);
             $this->store->update(['status' => 'error']);
+        }
+    }
+
+    /**
+     * Keep the cost a source system reports (Odoo's cost price) as the SKU's cost, so profit is
+     * right without typing costs in twice. A cost somebody entered by hand is never replaced.
+     */
+    protected function recordCost(ProductVariant $variant, mixed $cost): void
+    {
+        if (! is_numeric($cost) || (float) $cost <= 0) {
+            return;
+        }
+        $organizationId = $this->store->organization_id;
+        $current = ProductCost::where('organization_id', $organizationId)
+            ->where('sku', $variant->sku)
+            ->whereNull('store_id')
+            ->whereNull('valid_to')
+            ->orderByDesc('valid_from')
+            ->orderByDesc('id')
+            ->first();
+
+        if ($current && $current->source !== 'api') {
+            return;
+        }
+        if ($current && abs((float) $current->unit_cost - (float) $cost) < 0.00005) {
+            return;
+        }
+
+        $attributes = [
+            'organization_id' => $organizationId,
+            'product_variant_id' => $variant->id,
+            'product_id' => $variant->product_id,
+            'sku' => $variant->sku,
+            'method' => ProductCost::METHOD_FIXED,
+            'unit_cost' => $cost,
+            'currency' => $this->store->organization?->base_currency ?? 'SAR',
+            'fx_rate_to_base' => 1,
+            'source' => 'api',
+            'note' => 'Cost price from '.ucfirst($this->store->platform),
+        ];
+        // Same day: correct today's figure. Later day: a new row, so past orders keep the cost they had.
+        if ($current && $current->valid_from->isToday()) {
+            $current->update($attributes);
+        } else {
+            ProductCost::create($attributes + ['valid_from' => now()->toDateString()]);
         }
     }
 
