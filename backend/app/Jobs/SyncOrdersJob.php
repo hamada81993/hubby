@@ -35,8 +35,16 @@ class SyncOrdersJob implements ShouldQueue
      * With no store the job fans out to one instance per store (the scheduler
      * path). With a store and no external id it syncs that store's orders.
      */
-    public function __construct(?Store $store = null, ?string $externalId = null, public ?int $syncLogId = null)
-    {
+    public function __construct(
+        ?Store $store = null,
+        ?string $externalId = null,
+        public ?int $syncLogId = null,
+        /**
+         * The every-minute scheduled pull. It keeps no log row and sends no notification unless
+         * something fails, and it leaves orders that have not changed alone.
+         */
+        public bool $scheduled = false,
+    ) {
         $this->store = $store;
         $this->externalId = $externalId;
     }
@@ -47,16 +55,22 @@ class SyncOrdersJob implements ShouldQueue
     public function handle(): void
     {
         if (! $this->store) {
-            Store::all()->each(fn ($store) => self::dispatch($store));
+            // Odoo is a product source, not a sales channel: it has no orders to pull.
+            Store::where('platform', '!=', 'odoo')
+                ->each(fn ($store) => self::dispatch($store, null, null, $this->scheduled));
 
             return;
         }
-        $log = $this->syncLogId ? SyncLog::findOrFail($this->syncLogId) : SyncLog::create([
-            'store_id' => $this->store->id,
-            'type' => 'orders',
-            'status' => 'in_progress',
-        ]);
-        $log->update(['status' => 'in_progress']);
+        $log = match (true) {
+            $this->syncLogId !== null => SyncLog::findOrFail($this->syncLogId),
+            $this->scheduled => null,
+            default => SyncLog::create([
+                'store_id' => $this->store->id,
+                'type' => 'orders',
+                'status' => 'in_progress',
+            ]),
+        };
+        $log?->update(['status' => 'in_progress']);
 
         try {
             $service = $this->getService();
@@ -75,9 +89,18 @@ class SyncOrdersJob implements ShouldQueue
                 $synced++;
 
                 // Capture the prior status before the upsert, so we can fire order.status_changed.
-                $previousStatus = Order::where('store_id', $this->store->id)
+                $previous = Order::where('store_id', $this->store->id)
                     ->where('external_id', $mappedData['external_id'])
-                    ->value('status');
+                    ->first(['status', 'total']);
+                $previousStatus = $previous?->status;
+
+                // The scheduled pull sees the same recent orders every minute; only new or
+                // changed ones are worth the profit and automation work below.
+                if ($this->scheduled && $previous
+                    && $previousStatus === $mappedData['status']
+                    && (float) $previous->total === (float) $mappedData['total']) {
+                    continue;
+                }
 
                 $order = Order::updateOrCreate(
                     [
@@ -144,7 +167,11 @@ class SyncOrdersJob implements ShouldQueue
                 }
             }
 
-            $log->update(['status' => 'success']);
+            $log?->update(['status' => 'success']);
+
+            if ($this->scheduled) {
+                return;
+            }
 
             if ($this->externalId !== null) {
                 // Webhook-driven single-order sync: no notification (these fire
@@ -164,7 +191,12 @@ class SyncOrdersJob implements ShouldQueue
             ]);
         } catch (\Exception $e) {
             Log::error("SyncOrdersJob failed for store {$this->store->id}: ".$e->getMessage());
-            $log->update(['status' => 'failed', 'message' => $e->getMessage()]);
+            $log?->update(['status' => 'failed', 'message' => $e->getMessage()]);
+
+            if ($this->scheduled) {
+                // One failed row per attempt would repeat every minute; the log line is enough.
+                return;
+            }
 
             Notification::create([
                 'organization_id' => $this->store->organization_id,
@@ -262,7 +294,7 @@ class SyncOrdersJob implements ShouldQueue
                 'external_id' => (string) ($data['orderNumber'] ?? $data['id']),
                 'status' => strtolower($data['status'] ?? $data['shipmentPackageStatus'] ?? 'pending'),
                 'total' => $data['totalPrice'] ?? $data['grossAmount'] ?? 0,
-                'currency' => $data['currencyCode'] ?? 'TRY',
+                'currency' => $data['currencyCode'] ?? 'SAR',
                 'customer_name' => trim(($data['customerFirstName'] ?? '').' '.($data['customerLastName'] ?? '')),
                 'customer_email' => $data['customerEmail'] ?? null,
                 // Trendyol sends orderDate as epoch milliseconds.

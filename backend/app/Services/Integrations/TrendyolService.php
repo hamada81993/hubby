@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Trendyol Marketplace (Türkiye) API integration.
+ * Trendyol Marketplace API integration (Saudi Arabia and the Gulf first, Türkiye too).
  *
  * Trendyol does NOT use OAuth — the merchant creates an API Key + API Secret in
  * the Seller Center and provides their Supplier (Seller) ID. We store:
@@ -16,21 +16,23 @@ use Illuminate\Support\Facades\Log;
  *   - refresh_token → API Secret
  *   - shop_domain / store.domain → Supplier ID
  *
- * Auth is HTTP Basic (apiKey:apiSecret); all endpoints are namespaced under the
- * supplier: https://api.trendyol.com/sapigw/suppliers/{supplierId}/...
+ * Auth is HTTP Basic (apiKey:apiSecret) on https://apigw.trendyol.com/integration/...
+ * Every country shares that host; the storeFrontCode header picks the market
+ * (SA, AE, KW…). Without it Trendyol answers for Türkiye.
  */
 class TrendyolService extends BaseIntegrationService
 {
     private function apiBase(): string
     {
-        return rtrim(config('services.trendyol.base_url', 'https://api.trendyol.com'), '/');
+        return rtrim(config('services.trendyol.base_url', 'https://apigw.trendyol.com'), '/');
     }
 
-    private function supplierEndpoint(Store $store, string $path): string
+    /** $area is the API family the path belongs to: order, product or inventory. */
+    private function sellerEndpoint(Store $store, string $area, string $path): string
     {
-        $supplierId = $store->integration->shop_domain ?? $store->domain;
+        $sellerId = $store->integration->shop_domain ?? $store->domain;
 
-        return $this->apiBase() . "/sapigw/suppliers/{$supplierId}" . $path;
+        return $this->apiBase() . "/integration/{$area}/sellers/{$sellerId}" . $path;
     }
 
     /** API keys are static — there is no OAuth redirect. */
@@ -62,13 +64,21 @@ class TrendyolService extends BaseIntegrationService
         $supplierId = $integration->shop_domain ?? '';
 
         return Http::withBasicAuth($apiKey, $apiSecret)
-            ->withHeaders(['User-Agent' => trim("{$supplierId} - SelfIntegration")]);
+            ->withHeaders([
+                'User-Agent' => trim("{$supplierId} - SelfIntegration"),
+                'storeFrontCode' => strtoupper(config('services.trendyol.storefront', 'SA')),
+            ]);
     }
 
     public function fetchOrders(Store $store, array $params = []): array
     {
         $response = $this->getHttpClient($store->integration)
-            ->get($this->supplierEndpoint($store, '/orders'), $params);
+            ->get($this->sellerEndpoint($store, 'order', '/orders'), $params + [
+                // Most recently changed first, so a scheduled pull sees new and updated orders.
+                'size' => 200,
+                'orderByField' => 'PackageLastModifiedDate',
+                'orderByDirection' => 'DESC',
+            ]);
 
         if ($response->failed()) {
             Log::error('Trendyol fetchOrders failed: ' . $response->body());
@@ -82,7 +92,7 @@ class TrendyolService extends BaseIntegrationService
     public function fetchProducts(Store $store): array
     {
         $response = $this->getHttpClient($store->integration)
-            ->get($this->supplierEndpoint($store, '/products'));
+            ->get($this->sellerEndpoint($store, 'product', '/products'), ['size' => 1000]);
 
         if ($response->failed()) {
             Log::error('Trendyol fetchProducts failed: ' . $response->body());
@@ -113,7 +123,7 @@ class TrendyolService extends BaseIntegrationService
     {
         // Trendyol updates stock (and price) in bulk via price-and-inventory.
         $response = $this->getHttpClient($store->integration)
-            ->post($this->supplierEndpoint($store, '/products/price-and-inventory'), [
+            ->post($this->sellerEndpoint($store, 'inventory', '/products/price-and-inventory'), [
                 'items' => [
                     ['barcode' => $sku, 'quantity' => $qty],
                 ],
@@ -131,7 +141,7 @@ class TrendyolService extends BaseIntegrationService
     {
         // Trendyol shipment-package status updates live under /shipment-packages.
         $response = $this->getHttpClient($store->integration)
-            ->put($this->supplierEndpoint($store, "/shipment-packages/{$externalId}"), [
+            ->put($this->sellerEndpoint($store, 'order', "/shipment-packages/{$externalId}"), [
                 'status' => strtoupper($status),
             ]);
 

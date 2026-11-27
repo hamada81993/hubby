@@ -2,13 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\RunAutomationJob;
 use App\Jobs\SyncOrdersJob;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Store;
+use App\Models\SyncLog;
 use App\Models\User;
 use App\Services\Integrations\IntegrationServiceInterface;
+use App\Services\Integrations\TrendyolService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 /**
@@ -184,6 +190,45 @@ class SyncOrdersJobTest extends TestCase
 
         $this->assertSame(0, Order::where('external_id', 'AAA')->count());
         $this->assertSame(1, Order::where('external_id', 'BBB')->count());
+    }
+
+    public function test_scheduled_pull_adds_new_orders_without_log_rows_or_notifications(): void
+    {
+        $store = $this->store();
+        Queue::fake();
+
+        FakeSyncOrdersJob::$orders = $this->orderPayload('NEW-1');
+        (new FakeSyncOrdersJob($store, null, null, true))->handle();
+
+        $this->assertSame(1, Order::where('external_id', 'NEW-1')->count());
+        $this->assertSame(0, SyncLog::where('store_id', $store->id)->count());
+        $this->assertSame(0, Notification::where('organization_id', $store->organization_id)->count());
+        Queue::assertPushed(RunAutomationJob::class, 1);
+
+        // The same order a minute later: nothing changed, so no work is queued again.
+        (new FakeSyncOrdersJob($store, null, null, true))->handle();
+        Queue::assertPushed(RunAutomationJob::class, 1);
+
+        // A status change on the platform is picked up.
+        $changed = $this->orderPayload('NEW-1');
+        $changed[0]['financial_status'] = 'refunded';
+        FakeSyncOrdersJob::$orders = $changed;
+        (new FakeSyncOrdersJob($store, null, null, true))->handle();
+        $this->assertSame('refunded', Order::where('external_id', 'NEW-1')->value('status'));
+    }
+
+    public function test_trendyol_calls_the_current_api_for_the_saudi_storefront(): void
+    {
+        $store = $this->store('Trendyol KSA');
+        $store->update(['platform' => 'trendyol']);
+        $store->integration->update(['access_token' => 'key', 'refresh_token' => 'secret', 'shop_domain' => '4321']);
+        Http::fake(['apigw.trendyol.com/*' => Http::response(['content' => []])]);
+
+        (new TrendyolService)->fetchOrders($store->fresh('integration'));
+
+        Http::assertSent(fn ($request) => str_starts_with($request->url(), 'https://apigw.trendyol.com/integration/order/sellers/4321/orders')
+            && $request->hasHeader('storeFrontCode', 'SA')
+            && $request->hasHeader('User-Agent', '4321 - SelfIntegration'));
     }
 }
 

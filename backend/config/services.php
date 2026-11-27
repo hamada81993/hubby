@@ -98,7 +98,9 @@ return [
         'client_id' => env('TRENDYOL_CLIENT_ID'),       // API Key
         'client_secret' => env('TRENDYOL_CLIENT_SECRET'), // API Secret
         'supplier_id' => env('TRENDYOL_SUPPLIER_ID'),
-        'base_url' => env('TRENDYOL_BASE_URL', 'https://api.trendyol.com'),
+        'base_url' => env('TRENDYOL_BASE_URL', 'https://apigw.trendyol.com'),
+        // Which Trendyol market the seller account belongs to: SA, AE, KW… (TR for Türkiye).
+        'storefront' => env('TRENDYOL_STOREFRONT', 'SA'),
         'webhook_secret' => env('TRENDYOL_WEBHOOK_SECRET'),
     ],
 
