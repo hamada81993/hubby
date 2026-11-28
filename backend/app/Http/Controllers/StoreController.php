@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SyncOrdersJob;
 use App\Jobs\SyncProductsJob;
+use App\Services\Integrations\NoonService;
 use App\Models\Organization;
 use App\Models\Store;
 use App\Models\SyncLog;
@@ -33,7 +34,6 @@ class StoreController extends Controller
             'shopify' => 'services.shopify.api_key',
             'salla' => 'services.salla.client_id',
             'amazon' => 'services.amazon.client_id',
-            'noon' => 'services.noon.client_id',
         ];
 
         $oauthEnabled = [];
@@ -61,6 +61,13 @@ class StoreController extends Controller
             'api_secret' => 'nullable|string',
         ]);
 
+        // noon connects with a service-account key file rather than a token.
+        if ($data['platform'] === 'noon' && ! NoonService::parseKey($data['access_token'])) {
+            return response()->json([
+                'message' => 'Upload the key file noon gave you when you added the Service Account (a .json file).',
+            ], 422);
+        }
+
         $organizationId = $request->header('X-Organization-Id');
 
         // Normalise the domain (strip scheme/trailing slash) so API base URLs build cleanly.
@@ -79,6 +86,18 @@ class StoreController extends Controller
             'refresh_token' => $data['api_secret'] ?? null,
             'shop_domain' => $domain,
         ]);
+
+        if ($store->platform === 'noon') {
+            // Sign in once now, so a wrong or disabled key is reported on the form.
+            try {
+                app(NoonService::class)->verify($store->integration);
+            } catch (\Throwable $e) {
+                $store->integration()->delete();
+                $store->delete();
+
+                return response()->json(['message' => $e->getMessage()], 422);
+            }
+        }
 
         // Pull the merchant's catalog and orders in the background.
         SyncProductsJob::dispatch($store);

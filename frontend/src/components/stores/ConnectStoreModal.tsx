@@ -117,7 +117,7 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
         {/* Where to find the credentials. */}
         <div className="flex items-start gap-2 rounded-xl bg-primary/5 border border-primary/15 p-3 text-xs text-muted-foreground">
           <Info size={15} className="text-primary mt-0.5 shrink-0" />
-          <span>{odooAr ? 'في أودو: اسمك (أعلى اليمين) ← Preferences ← Account Security ← New API Key. استخدم البريد الذي تدخل به أودو. إذا كنت تستضيف أودو بنفسك أضف قاعدة البيانات إلى العنوان: erp.example.com?db=your_database. هَبّي يقرأ المنتجات والأسعار والمخزون فقط ولا يغيّر شيئاً في أودو.' : platform.help}</span>
+          <span>{locale === 'ar' && platform.id === 'noon' ? 'في noon partners: Access ← API Users ← Add Service Account. سينزّل noon ملف مفتاح ‎.json‎؛ ارفعه هنا. كود المشروع هو رقم PRJ بجانب اسم شركتك.' : odooAr ? 'في أودو: اسمك (أعلى اليمين) ← Preferences ← Account Security ← New API Key. استخدم البريد الذي تدخل به أودو. إذا كنت تستضيف أودو بنفسك أضف قاعدة البيانات إلى العنوان: erp.example.com?db=your_database. هَبّي يقرأ المنتجات والأسعار والمخزون فقط ولا يغيّر شيئاً في أودو.' : platform.help}</span>
         </div>
 
         {error && (
@@ -127,7 +127,7 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
+            <Input
             label={l(platform.id === 'odoo' ? 'Name' : 'Store name', 'الاسم')}
             placeholder={platform.id === 'odoo' ? 'Odoo' : l(`My ${platform.name} store`, `متجري على ${platform.name}`)}
             value={name}
@@ -135,8 +135,8 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
             required
           />
 
-          <Input
-            label={odooAr ? 'عنوان أودو' : platform.domainLabel}
+            <Input
+            label={odooAr ? 'عنوان أودو' : locale === 'ar' && platform.id === 'noon' ? 'كود المشروع' : platform.domainLabel}
             placeholder={platform.domainPlaceholder}
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
@@ -158,13 +158,27 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
             </div>
           )}
 
-          <Input
-            label={odooAr ? 'مفتاح API' : platform.tokenLabel}
-            placeholder="••••••••••••••••"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            required
-          />
+          {platform.id === 'noon' ? (
+            // noon's credential is the service-account key file, read here and sent as text.
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium">{l('Key file (.json)', 'ملف المفتاح (.json)')}</span>
+              <input
+                type="file"
+                accept=".json,application/json"
+                required
+                onChange={async (e) => setToken((await e.target.files?.[0]?.text()) ?? '')}
+                className="block w-full rounded-xl border border-border bg-background p-2.5 text-sm file:me-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-bold file:text-foreground"
+              />
+            </label>
+          ) : (
+            <Input
+              label={odooAr ? 'مفتاح API' : platform.tokenLabel}
+              placeholder="••••••••••••••••"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              required
+            />
+          )}
 
           {platform.secretLabel && (
             <Input

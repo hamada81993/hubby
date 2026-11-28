@@ -82,12 +82,11 @@ return [
         'aws_session_token' => env('AMAZON_AWS_SESSION_TOKEN'),
     ],
 
-    // noon Seller (Partner) API — OAuth2 client creds (hosts are env-driven).
+    // noon Partner API. Each seller connects with their own service-account key file.
     'noon' => [
-        'client_id' => env('NOON_CLIENT_ID'),
-        'client_secret' => env('NOON_CLIENT_SECRET'),
-        'auth_url' => env('NOON_AUTH_URL', 'https://accounts.noon.partners'),
-        'base_url' => env('NOON_BASE_URL', 'https://api.noon.partners'),
+        'base_url' => env('NOON_BASE_URL', 'https://noon-api-gateway.noon.partners'),
+        // Country the seller's prices apply to: sa, ae or eg.
+        'country' => env('NOON_COUNTRY', 'sa'),
         'webhook_secret' => env('NOON_WEBHOOK_SECRET'),
     ],
 

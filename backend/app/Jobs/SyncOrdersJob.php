@@ -311,6 +311,35 @@ class SyncOrdersJob implements ShouldQueue
             ];
         }
 
+        if ($this->store->platform === 'noon') {
+            // noon reports one line per unit, with a marketplace state and a fulfilment state each.
+            $items = $data['items'] ?? [];
+            $live = array_filter($items, fn ($item) => ($item['mp_status'] ?? '') !== 'MP_ITEM_STATUS_CANCELLED');
+            $shipped = array_filter($live, fn ($item) => ($item['integration_status'] ?? '') === 'INTEGRATION_ITEM_STATUS_SHIPPED');
+
+            return [
+                'external_id' => (string) $data['fbpi_order_nr'],
+                'status' => match (true) {
+                    $items && ! $live => 'cancelled',
+                    $live && count($shipped) === count($live) => 'shipped',
+                    default => 'confirmed',
+                },
+                'total' => array_sum(array_map(fn ($item) => (float) ($item['delivered_invoice_price'] ?? 0), $live)),
+                'currency' => $data['currency_code'] ?? 'SAR',
+                // The buyer is only available from a separate customer-details call.
+                'customer_name' => '',
+                'customer_email' => null,
+                'placed_at' => $data['order_created_at'] ?? null,
+                'items' => array_map(fn ($item) => [
+                    'external_id' => (string) ($item['mp_item_nr'] ?? ''),
+                    'name' => $item['partner_sku'] ?? '',
+                    'sku' => $item['partner_sku'] ?? null,
+                    'quantity' => ($item['mp_status'] ?? '') === 'MP_ITEM_STATUS_CANCELLED' ? 0 : 1,
+                    'price' => $item['delivered_invoice_price'] ?? 0,
+                ], $items),
+            ];
+        }
+
         return $data;
     }
 
