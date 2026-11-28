@@ -11,6 +11,7 @@ class PlatformProduct extends Model
         'product_variant_id',
         'store_id',
         'external_id',
+        'external_sku',
         'sync_enabled',
         'allocated_quantity',
     ];

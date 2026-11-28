@@ -132,6 +132,123 @@ class OdooService extends BaseIntegrationService
         return $levels;
     }
 
+    /**
+     * Odoo's warehouses and how many units of each product sit in each.
+     *
+     * @return array{warehouses: array<int, array{id: int, name: string, code: string}>, levels: array<int, array{warehouse_id: int, product_id: string, quantity: int}>}
+     */
+    public function fetchWarehouseStock(Store $store): array
+    {
+        $warehouses = $this->readAll($store, 'stock.warehouse', [], ['name', 'code']);
+        if ($warehouses === []) {
+            return ['warehouses' => [], 'levels' => []];
+        }
+
+        // Internal locations only: stock at customers, suppliers or in transit is not on the shelf.
+        $locations = $this->readAll($store, 'stock.location', [['usage', '=', 'internal']], ['warehouse_id']);
+        $warehouseOf = [];
+        foreach ($locations as $location) {
+            if (is_array($location['warehouse_id'] ?? null)) {
+                $warehouseOf[$location['id']] = (int) $location['warehouse_id'][0];
+            }
+        }
+
+        $totals = [];
+        foreach ($this->readAll($store, 'stock.quant', [['location_id', 'in', array_keys($warehouseOf)]], ['product_id', 'location_id', 'quantity']) as $quant) {
+            $warehouse = $warehouseOf[$quant['location_id'][0] ?? 0] ?? null;
+            $product = is_array($quant['product_id'] ?? null) ? (string) $quant['product_id'][0] : null;
+            if ($warehouse && $product) {
+                $totals[$warehouse][$product] = ($totals[$warehouse][$product] ?? 0) + (float) $quant['quantity'];
+            }
+        }
+
+        $levels = [];
+        foreach ($totals as $warehouse => $products) {
+            foreach ($products as $product => $quantity) {
+                $levels[] = ['warehouse_id' => $warehouse, 'product_id' => (string) $product, 'quantity' => (int) round($quantity)];
+            }
+        }
+
+        return [
+            'warehouses' => array_map(fn ($w) => ['id' => (int) $w['id'], 'name' => (string) $w['name'], 'code' => (string) ($w['code'] ?: 'WH'.$w['id'])], $warehouses),
+            'levels' => $levels,
+        ];
+    }
+
+    /**
+     * Odoo's price lists with the price of each product they set directly.
+     *
+     * Rules that fix a price or take a percentage off the sales price are read, for a variant,
+     * a product or every product, at quantity one and valid today. Formula rules and rules per
+     * category are left out, and counted in `skipped`.
+     *
+     * @return array<int, array{id: string, name: string, currency: ?string, skipped: int, prices: array<string, float>}>
+     */
+    public function fetchPriceLists(Store $store): array
+    {
+        $lists = $this->readAll($store, 'product.pricelist', [], ['name', 'currency_id']);
+        if ($lists === []) {
+            return [];
+        }
+        $rules = $this->readAll($store, 'product.pricelist.item', [['pricelist_id', 'in', array_column($lists, 'id')]], [
+            'pricelist_id', 'applied_on', 'product_tmpl_id', 'product_id', 'compute_price',
+            'fixed_price', 'percent_price', 'min_quantity', 'date_start', 'date_end',
+        ]);
+        $variants = $this->readAll($store, 'product.product', [['sale_ok', '=', true]], ['product_tmpl_id', 'lst_price']);
+
+        $now = now()->utc()->format('Y-m-d H:i:s');
+        // Most specific rule wins: variant, then product, then every product.
+        $rank = ['0_product_variant' => 0, '1_product' => 1, '3_global' => 2];
+        $byList = [];
+        $skipped = [];
+        foreach ($rules as $rule) {
+            $list = $rule['pricelist_id'][0] ?? 0;
+            $usable = isset($rank[$rule['applied_on'] ?? ''])
+                && in_array($rule['compute_price'] ?? '', ['fixed', 'percentage'], true)
+                && (float) ($rule['min_quantity'] ?? 0) <= 1
+                && (empty($rule['date_start']) || $rule['date_start'] <= $now)
+                && (empty($rule['date_end']) || $rule['date_end'] >= $now);
+            if (! $usable) {
+                $skipped[$list] = ($skipped[$list] ?? 0) + 1;
+
+                continue;
+            }
+            $byList[$list][] = $rule;
+        }
+
+        $result = [];
+        foreach ($lists as $list) {
+            $own = $byList[$list['id']] ?? [];
+            usort($own, fn ($a, $b) => $rank[$a['applied_on']] <=> $rank[$b['applied_on']]);
+            $prices = [];
+            foreach ($variants as $variant) {
+                $template = $variant['product_tmpl_id'][0] ?? null;
+                foreach ($own as $rule) {
+                    $applies = match ($rule['applied_on']) {
+                        '0_product_variant' => ($rule['product_id'][0] ?? null) === $variant['id'],
+                        '1_product' => ($rule['product_tmpl_id'][0] ?? null) === $template,
+                        default => true,
+                    };
+                    if ($applies) {
+                        $prices[(string) $variant['id']] = $rule['compute_price'] === 'fixed'
+                            ? (float) $rule['fixed_price']
+                            : round((float) ($variant['lst_price'] ?? 0) * (1 - (float) $rule['percent_price'] / 100), 2);
+                        break;
+                    }
+                }
+            }
+            $result[] = [
+                'id' => (string) $list['id'],
+                'name' => (string) $list['name'],
+                'currency' => is_array($list['currency_id'] ?? null) ? (string) $list['currency_id'][1] : null,
+                'skipped' => $skipped[$list['id']] ?? 0,
+                'prices' => $prices,
+            ];
+        }
+
+        return $result;
+    }
+
     public function updateInventory(Store $store, string $sku, int $qty): bool
     {
         // Read-only by design: Hubby never changes stock inside the merchant's Odoo.

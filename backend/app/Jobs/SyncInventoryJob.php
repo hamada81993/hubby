@@ -86,6 +86,10 @@ class SyncInventoryJob implements ShouldQueue
                 }
             }
 
+            if ($service instanceof \App\Services\Integrations\OdooService) {
+                (new \App\Services\Catalogue\OdooExtrasSync($service))->warehouses($this->store);
+            }
+
             $log->update(['status' => 'success']);
         } catch (\Exception $e) {
             Log::error("SyncInventoryJob failed for store {$this->store->id}: ".$e->getMessage());

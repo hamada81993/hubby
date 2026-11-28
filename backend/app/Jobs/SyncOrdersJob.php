@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Store;
 use App\Models\SyncLog;
+use App\Services\Catalogue\ChannelCatalogue;
 use App\Services\Integrations\IntegrationFactory;
 use App\Services\Shipping\AddressExtractor;
 use Illuminate\Bus\Queueable;
@@ -122,6 +123,8 @@ class SyncOrdersJob implements ShouldQueue
 
                 // Sync items
                 foreach ($mappedData['items'] as $itemData) {
+                    // A channel may know the product by its own code; everything downstream uses ours.
+                    $itemData['sku'] = app(ChannelCatalogue::class)->localSku($this->store, $itemData['sku'] ?? null);
                     if ($order->wasRecentlyCreated) {
                         $this->consumeManualAllocation($itemData);
                     }

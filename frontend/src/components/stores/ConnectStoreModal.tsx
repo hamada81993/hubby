@@ -7,6 +7,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import api from '@/lib/api';
 import { getPlatform, type PlatformId } from '@/lib/platforms';
+import { MARKETS, NEEDS_MARKET } from '@/lib/markets';
 import { useI18n } from '@/i18n';
 import { PlatformLogo } from '@/components/ui/PlatformLogo';
 
@@ -38,6 +39,7 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
   const [domain, setDomain] = useState('');
   const [token, setToken] = useState('');
   const [secret, setSecret] = useState('');
+  const [market, setMarket] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [oauthBusy, setOauthBusy] = useState(false);
   const [error, setError] = useState('');
@@ -48,6 +50,7 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
     setDomain('');
     setToken('');
     setSecret('');
+    setMarket('');
     setError('');
   }, [platformId]);
 
@@ -89,6 +92,7 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
         domain: domain.trim(),
         access_token: token.trim(),
         api_secret: platform.secretLabel ? secret.trim() : undefined,
+        market: NEEDS_MARKET.has(platformId) ? market : undefined,
       });
       onConnected();
       onClose();
@@ -142,6 +146,22 @@ export default function ConnectStoreModal({ platformId, oauthEnabled = false, on
             onChange={(e) => setDomain(e.target.value)}
             required
           />
+
+          {NEEDS_MARKET.has(platform.id) && (
+            // One account on these platforms can sell in several countries.
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium">{l('Country this store sells in', 'الدولة التي يبيع فيها المتجر')}</span>
+              <select
+                required
+                value={market}
+                onChange={(e) => setMarket(e.target.value)}
+                className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm"
+              >
+                <option value="">{l('Choose a country', 'اختر الدولة')}</option>
+                {MARKETS.map((m) => <option key={m.code} value={m.code}>{l(m.en, m.ar)}</option>)}
+              </select>
+            </label>
+          )}
 
           {/* One-click connect — only when the operator has configured this platform. */}
           {showOAuth && (

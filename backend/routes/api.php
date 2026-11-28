@@ -90,6 +90,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/stock-allocation', [\App\Http\Controllers\StockAllocationController::class, 'show']);
         Route::put('/stock-allocation', [\App\Http\Controllers\StockAllocationController::class, 'update']);
         Route::put('/platform-products/{id}/allocation', [\App\Http\Controllers\StockAllocationController::class, 'setQuantity']);
+        Route::get('/stores/{id}/setup', [\App\Http\Controllers\ChannelSetupController::class, 'show']);
+        Route::put('/stores/{id}/setup', [\App\Http\Controllers\ChannelSetupController::class, 'update']);
+        Route::get('/sku-links', [\App\Http\Controllers\ChannelSetupController::class, 'skuLinks']);
+        Route::put('/sku-links', [\App\Http\Controllers\ChannelSetupController::class, 'setSkuLink']);
+        Route::post('/sku-links/import', [\App\Http\Controllers\ChannelSetupController::class, 'importSkuLinks']);
+        Route::get('/warehouse-stock', [\App\Http\Controllers\ChannelSetupController::class, 'warehouseStock']);
+        Route::put('/warehouse-stock', [\App\Http\Controllers\ChannelSetupController::class, 'setWarehouseStock']);
+        Route::get('/price-lists', [\App\Http\Controllers\PriceListController::class, 'index']);
+        Route::post('/price-lists', [\App\Http\Controllers\PriceListController::class, 'store']);
+        Route::delete('/price-lists/{id}', [\App\Http\Controllers\PriceListController::class, 'destroy']);
+        Route::get('/price-lists/{id}/items', [\App\Http\Controllers\PriceListController::class, 'items']);
+        Route::put('/price-lists/{id}/items', [\App\Http\Controllers\PriceListController::class, 'setItem']);
+        Route::post('/price-lists/{id}/import', [\App\Http\Controllers\PriceListController::class, 'import']);
         Route::post('/stores/{id}/sync', [StoreController::class, 'sync']);
         Route::delete('/stores/{id}', [StoreController::class, 'destroy']);
 

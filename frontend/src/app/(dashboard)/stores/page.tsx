@@ -6,13 +6,15 @@ import {
   RefreshCw,
   Trash2,
   Crown,
-  Plus
+  Plus,
+  SlidersHorizontal
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import { SALES_CHANNELS as PLATFORMS, INTEGRATION_IDS, getPlatform, type PlatformId } from '@/lib/platforms';
 import { PlatformLogo } from '@/components/ui/PlatformLogo';
 import ConnectStoreModal from '@/components/stores/ConnectStoreModal';
+import StoreSetupModal from '@/components/stores/StoreSetupModal';
 import { useStores } from '@/components/providers/StoresProvider';
 import { useI18n } from '@/i18n';
 import ChannelBuffers from '@/components/operations/ChannelBuffers';
@@ -51,6 +53,7 @@ export default function StoresPage() {
   const [oauthEnabled, setOauthEnabled] = useState<Record<string, boolean>>({});
   const [channels, setChannels] = useState<{ store_id: number; orders: number; net_revenue: string }[] | null>(null);
   const [syncingAll, setSyncingAll] = useState(false);
+  const [setupStore, setSetupStore] = useState<{ id: number; name: string; platform: string } | null>(null);
 
   useEffect(() => {
     // Re-sync on landing here in case stores changed elsewhere.
@@ -218,6 +221,14 @@ export default function StoresPage() {
                     )}
                     <button
                       className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                      title={l('Set up: country, warehouses, price list', 'إعداد: الدولة والمخازن وقائمة الأسعار')}
+                      aria-label={l('Set up', 'إعداد')}
+                      onClick={() => setSetupStore({ id: store.id, name: store.name, platform: store.platform })}
+                    >
+                      <SlidersHorizontal size={15} />
+                    </button>
+                    <button
+                      className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                       title={t('stores.card.syncNow')}
                       aria-label={t('stores.card.syncNow')}
                       onClick={() => syncStore(store.id)}
@@ -271,6 +282,8 @@ export default function StoresPage() {
       <StockAllocation />
 
       <ChannelBuffers />
+
+      <StoreSetupModal store={setupStore} onClose={() => setSetupStore(null)} />
 
       <ConnectStoreModal
         platformId={connectPlatform}

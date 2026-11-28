@@ -6,6 +6,7 @@ use App\Models\Organization;
 use App\Models\PlatformProduct;
 use App\Models\ProductVariant;
 use App\Models\Store;
+use App\Services\Catalogue\ChannelCatalogue;
 use Illuminate\Support\Collection;
 
 /**
@@ -34,10 +35,11 @@ class StockAllocator
      */
     public function quantityFor(ProductVariant $variant, Store $store, Organization $organization, Collection $channels): int
     {
-        $stock = max(0, (int) $variant->stock);
         if ($store->is_master) {
-            return $stock;
+            return max(0, (int) $variant->stock);
         }
+        // A store with warehouses assigned shares out their stock only.
+        $stock = app(ChannelCatalogue::class)->stockFor($variant, $store);
         $mode = $organization->stock_allocation_mode ?? 'shared';
 
         if ($mode === 'manual') {

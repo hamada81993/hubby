@@ -87,6 +87,13 @@ class SyncProductsJob implements ShouldQueue
                 }
             }
 
+            if ($service instanceof \App\Services\Integrations\OdooService) {
+                // Stock per warehouse and price lists, for merchants who use them in Odoo.
+                $extras = new \App\Services\Catalogue\OdooExtrasSync($service);
+                $extras->warehouses($this->store);
+                $extras->priceLists($this->store);
+            }
+
             $log->update(['status' => 'success']);
             $this->store->update(['status' => 'connected', 'last_synced_at' => now()]);
         } catch (\Exception $e) {

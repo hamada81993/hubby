@@ -26,7 +26,9 @@ import {
   Building2,
   ListChecks,
   Plug,
-  ClipboardList
+  ClipboardList,
+  Link2,
+  Tags
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/ui/Logo';
@@ -56,6 +58,8 @@ const menuGroups: { id: string; icon: typeof LayoutDashboard; en: string; ar: st
     ar: 'الكتالوج',
     items: [
       { icon: Package, key: 'products', href: '/products' },
+      { icon: Link2, key: 'productCodes', href: '/product-codes' },
+      { icon: Tags, key: 'priceLists', href: '/price-lists' },
       { icon: ListChecks, key: 'listingQuality', href: '/listing-quality' },
       { icon: Database, key: 'inventory', href: '/inventory' },
       { icon: Building2, key: 'warehouse', href: '/warehouse' },

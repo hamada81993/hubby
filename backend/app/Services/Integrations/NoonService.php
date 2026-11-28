@@ -4,6 +4,7 @@ namespace App\Services\Integrations;
 
 use App\Models\Integration;
 use App\Models\Store;
+use App\Services\Integrations\Contracts\SupportsPricePush;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -26,7 +27,7 @@ use Illuminate\Support\Str;
  * (fulfilled by the partner through the integration). It has no call that lists a seller's
  * whole catalogue, so products come from the master store and are matched to noon by SKU.
  */
-class NoonService extends BaseIntegrationService
+class NoonService extends BaseIntegrationService implements SupportsPricePush
 {
     /** How far back an order pull looks. */
     private const ORDER_WINDOW_DAYS = 14;
@@ -39,9 +40,10 @@ class NoonService extends BaseIntegrationService
         return rtrim(config('services.noon.base_url', 'https://noon-api-gateway.noon.partners'), '/');
     }
 
-    private function countryCode(): string
+    /** The country a store's prices apply to: the one chosen for the store, else the default. */
+    private function countryCode(Store $store): string
     {
-        return strtolower(config('services.noon.country', 'sa'));
+        return strtolower($store->market ?: config('services.noon.country', 'sa'));
     }
 
     /** The key file is the credential: nothing to redirect to. */
@@ -167,13 +169,29 @@ class NoonService extends BaseIntegrationService
     }
 
     /**
-     * Codes of the seller's active warehouses. Cached: noon allows few warehouse calls a minute.
+     * The seller's active warehouses, for the store setup screen.
      *
-     * @return array<int, string>
+     * @return array<int, array{code: string, name: string}>
      */
+    public function warehouses(Integration $integration): array
+    {
+        return array_map(fn ($w) => ['code' => $w['code'], 'name' => $w['name']], $this->activeWarehouses($integration));
+    }
+
+    /** @return array<int, string> */
     public function warehouseCodes(Integration $integration): array
     {
-        return Cache::remember("noon.warehouses.{$integration->id}", now()->addHour(), function () use ($integration) {
+        return array_column($this->activeWarehouses($integration), 'code');
+    }
+
+    /**
+     * Codes and names of the seller's active warehouses. Cached: noon allows few warehouse calls a minute.
+     *
+     * @return array<int, array{code: string, name: string}>
+     */
+    private function activeWarehouses(Integration $integration): array
+    {
+        return Cache::remember("noon.warehouse-list.{$integration->id}", now()->addHour(), function () use ($integration) {
             $codes = [];
             $next = null;
             do {
@@ -183,7 +201,7 @@ class NoonService extends BaseIntegrationService
                 }
                 foreach ($response->json('warehouses') ?? [] as $warehouse) {
                     if ($warehouse['is_active'] ?? false) {
-                        $codes[] = $warehouse['warehouse_code'];
+                        $codes[] = ['code' => $warehouse['warehouse_code'], 'name' => $warehouse['display_name'] ?? $warehouse['warehouse_code']];
                     }
                 }
                 $next = $response->json('next_token');
@@ -199,7 +217,10 @@ class NoonService extends BaseIntegrationService
         $integration = $store->integration;
         $orders = [];
 
-        foreach ($this->warehouseCodes($integration) as $warehouse) {
+        // A store tied to one noon warehouse reads that warehouse's orders only.
+        $warehouses = $store->channel_warehouse ? [$store->channel_warehouse] : $this->warehouseCodes($integration);
+
+        foreach ($warehouses as $warehouse) {
             $next = '';
             $pages = 0;
             do {
@@ -233,10 +254,10 @@ class NoonService extends BaseIntegrationService
         return [];
     }
 
-    /** Sets the absolute quantity of a partner SKU in the seller's first active warehouse. */
+    /** Sets the absolute quantity of a partner SKU in the warehouse chosen for the store (else the first active one). */
     public function updateInventory(Store $store, string $sku, int $qty): bool
     {
-        $warehouse = $this->warehouseCodes($store->integration)[0] ?? null;
+        $warehouse = $store->channel_warehouse ?: ($this->warehouseCodes($store->integration)[0] ?? null);
         if (! $warehouse) {
             Log::error("noon updateInventory: store {$store->id} has no active warehouse.");
 
@@ -254,7 +275,7 @@ class NoonService extends BaseIntegrationService
     public function updatePrice(Store $store, string $sku, float $price): bool
     {
         $response = $this->call($store->integration, 'POST', '/pricing/v1/pricing/upsert', [
-            'items' => [['partner_sku' => $sku, 'country_code' => $this->countryCode(), 'price' => $price]],
+            'items' => [['partner_sku' => $sku, 'country_code' => $this->countryCode($store), 'price' => $price]],
         ]);
 
         return $this->accepted($response, "updatePrice {$sku}");

@@ -4,6 +4,7 @@ namespace App\Services\Integrations;
 
 use App\Models\Store;
 use App\Models\Integration;
+use App\Services\Integrations\Contracts\SupportsPricePush;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Log;
  * Every country shares that host; the storeFrontCode header picks the market
  * (SA, AE, KW…). Without it Trendyol answers for Türkiye.
  */
-class TrendyolService extends BaseIntegrationService
+class TrendyolService extends BaseIntegrationService implements SupportsPricePush
 {
     private function apiBase(): string
     {
@@ -66,7 +67,8 @@ class TrendyolService extends BaseIntegrationService
         return Http::withBasicAuth($apiKey, $apiSecret)
             ->withHeaders([
                 'User-Agent' => trim("{$supplierId} - SelfIntegration"),
-                'storeFrontCode' => strtoupper(config('services.trendyol.storefront', 'SA')),
+                // The market chosen for the store; without the header Trendyol answers for Türkiye.
+                'storeFrontCode' => strtoupper($integration->store?->market ?: config('services.trendyol.storefront', 'SA')),
             ]);
     }
 
@@ -131,6 +133,21 @@ class TrendyolService extends BaseIntegrationService
 
         if ($response->failed()) {
             Log::error("Trendyol updateInventory failed for {$sku}: " . $response->body());
+            return false;
+        }
+
+        return true;
+    }
+
+    public function updatePrice(Store $store, string $sku, float $price): bool
+    {
+        $response = $this->getHttpClient($store->integration)
+            ->post($this->sellerEndpoint($store, 'inventory', '/products/price-and-inventory'), [
+                'items' => [['barcode' => $sku, 'salePrice' => $price, 'listPrice' => $price]],
+            ]);
+
+        if ($response->failed()) {
+            Log::error("Trendyol updatePrice failed for {$sku}: " . $response->body());
             return false;
         }
 

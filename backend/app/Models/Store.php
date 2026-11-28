@@ -22,6 +22,9 @@ class Store extends Model
         'safety_stock',
         'allocation_percent',
         'allocation_units',
+        'market',
+        'channel_warehouse',
+        'price_list_id',
     ];
 
     protected $casts = [
@@ -30,6 +33,17 @@ class Store extends Model
         'shipping_settings' => 'array',
         'safety_stock' => 'integer',
     ];
+
+    /** Warehouses whose stock this store sells. None chosen means the whole stock. */
+    public function warehouses(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Warehouse::class, 'store_warehouse');
+    }
+
+    public function priceList(): BelongsTo
+    {
+        return $this->belongsTo(PriceList::class);
+    }
 
     public function organization(): BelongsTo
     {

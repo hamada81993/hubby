@@ -59,6 +59,8 @@ class StoreController extends Controller
             'access_token' => 'required|string',
             // Some platforms need a second secret (e.g. WooCommerce consumer secret).
             'api_secret' => 'nullable|string',
+            // The country the store sells in, for channels that span countries (noon, Trendyol).
+            'market' => ['nullable', \Illuminate\Validation\Rule::in(ChannelSetupController::MARKETS)],
         ]);
 
         // noon connects with a service-account key file rather than a token.
@@ -79,6 +81,7 @@ class StoreController extends Controller
             'platform' => $data['platform'],
             'domain' => $domain,
             'status' => 'syncing',
+            'market' => $data['market'] ?? null,
         ]);
 
         $store->integration()->create([

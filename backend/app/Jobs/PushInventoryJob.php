@@ -7,6 +7,7 @@ use App\Models\ProductVariant;
 use App\Models\Store;
 use App\Models\SyncLog;
 use App\Services\Integrations\IntegrationFactory;
+use App\Services\Catalogue\ChannelCatalogue;
 use App\Services\Inventory\StockAllocator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -61,7 +62,7 @@ class PushInventoryJob implements ShouldQueue
                 // The master retains its authoritative quantity; buffering it would compound
                 // deductions on every inbound sync. Only downstream channels get a cushion.
                 $quantity = $allocator->quantityFor($this->variant, $store, $organization, $channels);
-                if ($service->updateInventory($store, $this->variant->sku, $quantity) === false) {
+                if ($service->updateInventory($store, app(ChannelCatalogue::class)->channelSku($this->variant, $store), $quantity) === false) {
                     throw new \RuntimeException('Inventory update was not accepted by the channel.');
                 }
                 $log->update(['status' => 'success']);
